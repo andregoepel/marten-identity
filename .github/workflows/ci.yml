@@ -33,10 +33,14 @@ jobs:
       - name: Test
         run: dotnet test --no-build -c Release
 
-  pack-and-push:
+  pack-and-publish:
     needs: build-and-test
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/v')
+
+    permissions:
+      id-token: write # request the OIDC token for NuGet trusted publishing
+      contents: read
 
     steps:
       - uses: actions/checkout@v4
@@ -55,5 +59,14 @@ jobs:
           dotnet pack src/AndreGoepel.Marten.Identity.Blazor/AndreGoepel.Marten.Identity.Blazor.csproj \
             -c Release -p:Version=$VERSION -o nupkgs
 
+      # Trusted publishing: exchange the GitHub OIDC token for a short-lived
+      # nuget.org API key. Requires a trusted publishing policy on nuget.org
+      # (owner: andregoepel, repository: marten-identity, workflow: ci.yml).
+      - name: NuGet login (OIDC → temporary API key)
+        uses: NuGet/login@v1
+        id: login
+        with:
+          user: ${{ secrets.NUGET_USER }}
+
       - name: Push to NuGet
-        run: dotnet nuget push "nupkgs/*.nupkg" --api-key ${{ secrets.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
+        run: dotnet nuget push "nupkgs/*.nupkg" --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json

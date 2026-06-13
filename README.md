@@ -31,7 +31,12 @@ dotnet csharpier format .
 
 ## Releasing
 
-The [CI workflow](.github/workflows/ci.yml) builds and tests every push and PR. Pushing a tag of the form `v1.2.3` packs all three libraries with that version and pushes them to NuGet (requires the `NUGET_API_KEY` secret).
+The [CI workflow](.github/workflows/ci.yml) builds and tests every push and PR. Pushing a tag of the form `v1.2.3` packs all three libraries with that version and publishes them to NuGet via [Trusted Publishing](https://learn.microsoft.com/nuget/nuget-org/trusted-publishing) (OIDC — no long-lived API key stored).
+
+This requires a one-time setup on nuget.org:
+
+- A **Trusted Publishing policy** (owner `andregoepel`, repository `marten-identity`, workflow file `ci.yml`).
+- A repository **secret `NUGET_USER`** holding the nuget.org account/profile name (not the email).
 
 ```bash
 git tag v1.0.0
