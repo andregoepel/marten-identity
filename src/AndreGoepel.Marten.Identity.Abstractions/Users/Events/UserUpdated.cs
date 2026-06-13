@@ -16,4 +16,10 @@ public record UserUpdated(UserId UserId)
     public bool LockoutEnabled { get; init; }
     public DateTimeOffset? LockoutEnd { get; init; }
     public int AccessFailedCount { get; init; }
+
+    /// <summary>
+    /// Opaque security stamp. When it changes, previously issued authentication
+    /// cookies stop revalidating, signing the user out everywhere.
+    /// </summary>
+    public string? SecurityStamp { get; init; }
 }

@@ -67,6 +67,53 @@ public class UserProjectionTests
     }
 
     [Fact]
+    public void Apply_UserCreated_DefaultsLockoutEnabledTrue()
+    {
+        // Brute-force protection must be on by default — including for legacy
+        // events that predate the field (they deserialize to the record default).
+        // Arrange
+        var userId = UserId.New();
+        var @event = new UserCreated(userId, null, null, null);
+        var user = new User();
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.True(user.LockoutEnabled);
+    }
+
+    [Fact]
+    public void Apply_UserCreated_HonoursExplicitLockoutDisabled()
+    {
+        // Arrange
+        var userId = UserId.New();
+        var @event = new UserCreated(userId, null, null, null) { LockoutEnabled = false };
+        var user = new User { LockoutEnabled = true };
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.False(user.LockoutEnabled);
+    }
+
+    [Fact]
+    public void Apply_UserCreated_SetsSecurityStamp()
+    {
+        // Arrange
+        var userId = UserId.New();
+        var @event = new UserCreated(userId, null, null, null) { SecurityStamp = "stamp-123" };
+        var user = new User();
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("stamp-123", user.SecurityStamp);
+    }
+
+    [Fact]
     public void Apply_UserCreated_RootUserFlag()
     {
         // Arrange
@@ -341,6 +388,36 @@ public class UserProjectionTests
         Assert.True(user.LockoutEnabled);
         Assert.Equal(lockoutEnd, user.LockoutEnd);
         Assert.Equal(3, user.AccessFailedCount);
+    }
+
+    [Fact]
+    public void Apply_UserUpdated_UpdatesSecurityStamp()
+    {
+        // Arrange
+        var userId = UserId.New();
+        var user = new User { SecurityStamp = "old-stamp" };
+        var @event = new UserUpdated(userId) { SecurityStamp = "new-stamp" };
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("new-stamp", user.SecurityStamp);
+    }
+
+    [Fact]
+    public void Apply_UserUpdated_NullSecurityStamp_DoesNotOverwrite()
+    {
+        // Arrange
+        var userId = UserId.New();
+        var user = new User { SecurityStamp = "existing-stamp" };
+        var @event = new UserUpdated(userId) { SecurityStamp = null };
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("existing-stamp", user.SecurityStamp);
     }
 
     [Fact]

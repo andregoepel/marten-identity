@@ -48,7 +48,7 @@ public class CookieLoginMiddleware(RequestDelegate next)
             var result = await signinManager.TwoFactorRecoveryCodeSignInAsync(code);
 
             if (result.Succeeded)
-                context.Response.Redirect(info.ReturnUrl ?? _defaultRedirect);
+                context.Response.Redirect(LocalUrl.OrDefault(info.ReturnUrl, _defaultRedirect));
             else if (result.IsLockedOut)
                 context.Response.Redirect("/Account/Lockout");
             else
@@ -76,7 +76,7 @@ public class CookieLoginMiddleware(RequestDelegate next)
             );
 
             if (result.Succeeded)
-                context.Response.Redirect(info.ReturnUrl ?? _defaultRedirect);
+                context.Response.Redirect(LocalUrl.OrDefault(info.ReturnUrl, _defaultRedirect));
             else if (result.IsLockedOut)
                 context.Response.Redirect("/Account/Lockout");
             else
@@ -98,11 +98,13 @@ public class CookieLoginMiddleware(RequestDelegate next)
                 lockoutOnFailure: true
             );
             if (result.Succeeded)
-                context.Response.Redirect(info.ReturnUrl ?? _defaultRedirect);
+                context.Response.Redirect(LocalUrl.OrDefault(info.ReturnUrl, _defaultRedirect));
             else if (result.RequiresTwoFactor)
             {
                 var rememberMe = info.RememberMe ? "true" : "false";
-                var returnUrl = Uri.EscapeDataString(info.ReturnUrl ?? _defaultRedirect);
+                var returnUrl = Uri.EscapeDataString(
+                    LocalUrl.OrDefault(info.ReturnUrl, _defaultRedirect)
+                );
                 context.Response.Redirect(
                     $"/Account/LoginWith2fa?rememberMe={rememberMe}&returnUrl={returnUrl}"
                 );

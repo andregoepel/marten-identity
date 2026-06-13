@@ -5,6 +5,8 @@ using AndreGoepel.Marten.Identity.Users;
 using AndreGoepel.Marten.Identity.Users.Events;
 using Marten;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Options;
 
 namespace AndreGoepel.Marten.Identity.IntegrationTests.Users;
 
@@ -74,6 +76,168 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
         var stream = await session.Events.FetchStreamAsync(user.UserId.Value, token: Ct);
         Assert.Single(stream);
         Assert.IsType<UserCreated>(stream[0].Data);
+    }
+
+    #endregion
+
+    #region Lockout enablement (brute-force protection)
+
+    [Fact]
+    public async Task CreateAsync_EnablesLockout_ByDefault()
+    {
+        // Regression for: new users were created with LockoutEnabled = false,
+        // which silently disabled brute-force lockout despite lockoutOnFailure.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+
+        // Act
+        await store.CreateAsync(user, Ct);
+
+        // Assert
+        Assert.True(user.LockoutEnabled);
+        await using var session = fixture.Store.QuerySession();
+        var persisted = await session.LoadAsync<User>(user.UserId.Value, Ct);
+        Assert.True(persisted!.LockoutEnabled);
+        Assert.True(await store.GetLockoutEnabledAsync(persisted, Ct));
+    }
+
+    [Fact]
+    public async Task CreateAsync_RootUser_DisablesLockout()
+    {
+        // The first-run root admin must be exempt from lockout — otherwise a
+        // brute-force attempt would lock the only administrator out entirely.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        user.RootUser = true;
+
+        // Act
+        await store.CreateAsync(user, Ct);
+
+        // Assert
+        Assert.False(user.LockoutEnabled);
+        await using var session = fixture.Store.QuerySession();
+        var persisted = await session.LoadAsync<User>(user.UserId.Value, Ct);
+        Assert.True(persisted!.RootUser);
+        Assert.False(persisted.LockoutEnabled);
+    }
+
+    [Fact]
+    public async Task CreateAsync_RespectsAllowedForNewUsersFalse()
+    {
+        // Arrange
+        var options = new IdentityOptions();
+        options.Lockout.AllowedForNewUsers = false;
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store, identityOptions: options);
+        var user = UserStoreTestHelpers.NewUser();
+
+        // Act
+        await store.CreateAsync(user, Ct);
+
+        // Assert
+        await using var session = fixture.Store.QuerySession();
+        var persisted = await session.LoadAsync<User>(user.UserId.Value, Ct);
+        Assert.False(persisted!.LockoutEnabled);
+    }
+
+    #endregion
+
+    #region Security stamp (session invalidation)
+
+    [Fact]
+    public void Store_ImplementsSecurityStampStore()
+    {
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        Assert.IsAssignableFrom<IUserSecurityStampStore<User>>(store);
+    }
+
+    [Fact]
+    public async Task CreateAsync_PersistsSecurityStamp()
+    {
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.SetSecurityStampAsync(user, "stamp-create", Ct);
+
+        // Act
+        await store.CreateAsync(user, Ct);
+
+        // Assert
+        var reloaded = await store.FindByIdAsync(user.Id, Ct);
+        Assert.Equal("stamp-create", await store.GetSecurityStampAsync(reloaded!, Ct));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_PersistsChangedSecurityStamp()
+    {
+        // A changed stamp is what invalidates previously issued auth cookies;
+        // it must survive a round-trip through the event store.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.SetSecurityStampAsync(user, "stamp-initial", Ct);
+        await store.CreateAsync(user, Ct);
+
+        var loaded = await store.FindByIdAsync(user.Id, Ct);
+        await store.SetSecurityStampAsync(loaded!, "stamp-rotated", Ct);
+
+        // Act
+        var result = await store.UpdateAsync(loaded!, Ct);
+
+        // Assert
+        Assert.True(result.Succeeded);
+        var reloaded = await store.FindByIdAsync(user.Id, Ct);
+        Assert.Equal("stamp-rotated", await store.GetSecurityStampAsync(reloaded!, Ct));
+    }
+
+    [Fact]
+    public async Task RestoreAsync_PreservesSecurityStamp()
+    {
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.SetSecurityStampAsync(user, "stamp-restore", Ct);
+        await store.CreateAsync(user, Ct);
+        var loaded = await store.FindByIdAsync(user.Id, Ct);
+        await store.DeleteAsync(loaded!, Ct);
+
+        // Act
+        await store.RestoreAsync(loaded!, Ct);
+
+        // Assert
+        var reloaded = await store.FindByIdAsync(user.Id, Ct);
+        Assert.Equal("stamp-restore", await store.GetSecurityStampAsync(reloaded!, Ct));
+    }
+
+    [Fact]
+    public async Task UserManager_SupportsSecurityStamp_AndRotationPersists()
+    {
+        // End-to-end proof that the missing IUserSecurityStampStore is now wired:
+        // UserManager reports support, and rotating the stamp (what password/2FA
+        // changes do under the hood) is persisted through the event store.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        using var userManager = BuildUserManager(store);
+        var user = UserStoreTestHelpers.NewUser();
+
+        // Act
+        var created = await userManager.CreateAsync(user);
+
+        // Assert support + a stamp was assigned on create
+        Assert.True(created.Succeeded);
+        Assert.True(userManager.SupportsUserSecurityStamp);
+        var originalStamp = await userManager.GetSecurityStampAsync(user);
+        Assert.False(string.IsNullOrEmpty(originalStamp));
+
+        // Act: rotate the stamp (mirrors what a password/2FA change triggers)
+        var rotate = await userManager.UpdateSecurityStampAsync(user);
+
+        // Assert the new stamp is different and durably persisted
+        Assert.True(rotate.Succeeded);
+        var reloaded = await store.FindByIdAsync(user.Id, Ct);
+        var persistedStamp = await userManager.GetSecurityStampAsync(reloaded!);
+        Assert.NotEqual(originalStamp, persistedStamp);
     }
 
     #endregion
@@ -293,6 +457,19 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
         session.Events.Append(roleId.Value, new RoleCreated(roleId, name, UserId.New()));
         await session.SaveChangesAsync(Ct);
     }
+
+    private static UserManager<User> BuildUserManager(UserStore<User> store) =>
+        new(
+            store,
+            Options.Create(new IdentityOptions()),
+            new PasswordHasher<User>(),
+            userValidators: [],
+            passwordValidators: [],
+            new UpperInvariantLookupNormalizer(),
+            new IdentityErrorDescriber(),
+            services: null!,
+            NullLogger<UserManager<User>>.Instance
+        );
 
     #endregion
 }

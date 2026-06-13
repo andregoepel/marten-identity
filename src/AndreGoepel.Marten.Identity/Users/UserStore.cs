@@ -6,6 +6,7 @@ using Marten;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace AndreGoepel.Marten.Identity.Users;
 
@@ -14,6 +15,7 @@ public class UserStore<TUser>(
     IQuerySession querySession,
     IDataProtectionProvider dataProtectionProvider,
     ICurrentUserService currentUserService,
+    IOptions<IdentityOptions> identityOptions,
     ILogger<UserStore<TUser>> logger
 )
     : IUserStore<TUser>,
@@ -23,6 +25,7 @@ public class UserStore<TUser>(
         IUserTwoFactorStore<TUser>,
         IUserAuthenticatorKeyStore<TUser>,
         IUserTwoFactorRecoveryCodeStore<TUser>,
+        IUserSecurityStampStore<TUser>,
         IQueryableUserStore<TUser>,
         IUserPasskeyStore<TUser>,
         IUserRoleStore<TUser>,
@@ -68,6 +71,14 @@ public class UserStore<TUser>(
         {
             var userId = UserId.Parse(user.Id);
 
+            // Enable lockout for newly created accounts so that brute-force
+            // protection (SignInManager's lockoutOnFailure) actually engages.
+            // Honour the host's policy via Lockout.AllowedForNewUsers.
+            // The root user (created during first-run setup) is exempt: locking
+            // it out would lock the only administrator out of the application.
+            user.LockoutEnabled =
+                !user.RootUser && identityOptions.Value.Lockout.AllowedForNewUsers;
+
             using var session = documentStore.LightweightSession();
 
             session.Events.Append(
@@ -77,6 +88,8 @@ public class UserStore<TUser>(
                     RootUser = user.RootUser,
                     Deletable = user.Deletable,
                     EmailConfirmed = user.EmailConfirmed,
+                    LockoutEnabled = user.LockoutEnabled,
+                    SecurityStamp = user.SecurityStamp,
                 }
             );
             await session.SaveChangesAsync(cancellationToken);
@@ -122,6 +135,7 @@ public class UserStore<TUser>(
                     LockoutEnabled = user.LockoutEnabled,
                     LockoutEnd = user.LockoutEnd,
                     AccessFailedCount = user.AccessFailedCount,
+                    SecurityStamp = user.SecurityStamp,
                 }
             );
             await session.SaveChangesAsync(cancellationToken);
@@ -211,6 +225,7 @@ public class UserStore<TUser>(
                     UserName = snapshot.UserName,
                     Email = snapshot.Email,
                     PasswordHash = snapshot.PasswordHash,
+                    SecurityStamp = snapshot.SecurityStamp,
                 }
             );
             await session.SaveChangesAsync(cancellationToken);
@@ -268,6 +283,21 @@ public class UserStore<TUser>(
     {
         bool hasPassword = !string.IsNullOrEmpty(user.PasswordHash);
         return Task.FromResult(hasPassword);
+    }
+
+    // IUserSecurityStampStore
+
+    public Task SetSecurityStampAsync(TUser user, string stamp, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+        user.SecurityStamp = stamp;
+        return Task.CompletedTask;
+    }
+
+    public Task<string?> GetSecurityStampAsync(TUser user, CancellationToken cancellationToken)
+    {
+        ArgumentNullException.ThrowIfNull(user);
+        return Task.FromResult(user.SecurityStamp);
     }
 
     // IUserEmailStore

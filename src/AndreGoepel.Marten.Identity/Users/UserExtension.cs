@@ -6,6 +6,7 @@ internal static class UserExtension
         @this.Email == other.Email
         && @this.UserName == other.UserName
         && @this.PasswordHash == other.PasswordHash
+        && @this.SecurityStamp == other.SecurityStamp
         && @this.EmailConfirmed == other.EmailConfirmed
         && @this.PhoneNumber == other.PhoneNumber
         && @this.AuthenticatorKey == other.AuthenticatorKey

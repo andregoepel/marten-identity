@@ -21,6 +21,9 @@ public class UserExtensionTests
             LockoutEnabled = true,
             LockoutEnd = _lockoutEnd,
             AccessFailedCount = 0,
+            // IdentityUser assigns a random SecurityStamp in its constructor;
+            // pin it so two "identical" fixtures genuinely match.
+            SecurityStamp = "stamp",
         };
 
     [Fact]
@@ -222,6 +225,24 @@ public class UserExtensionTests
         var a = BaseUser();
         var b = BaseUser();
         b.AccessFailedCount = 3;
+
+        // Act
+        var result = a.AreEqual(b);
+
+        // Assert
+        Assert.False(result);
+    }
+
+    [Fact]
+    public void AreEqual_DifferentSecurityStamp_ReturnsFalse()
+    {
+        // A changed security stamp must be treated as a real change so the
+        // update is persisted and existing sessions are invalidated.
+        // Arrange
+        var a = BaseUser();
+        var b = BaseUser();
+        a.SecurityStamp = "stamp-1";
+        b.SecurityStamp = "stamp-2";
 
         // Act
         var result = a.AreEqual(b);
