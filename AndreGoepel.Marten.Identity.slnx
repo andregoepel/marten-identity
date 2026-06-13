@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+    <File Path="Directory.Build.props" />
+    <File Path="Directory.Packages.props" />
+    <File Path="README.md" />
+  </Folder>
+  <Folder Name="/src/">
+    <Project Path="src/AndreGoepel.Marten.Identity.Abstractions/AndreGoepel.Marten.Identity.Abstractions.csproj" />
+    <Project Path="src/AndreGoepel.Marten.Identity/AndreGoepel.Marten.Identity.csproj" />
+    <Project Path="src/AndreGoepel.Marten.Identity.Blazor/AndreGoepel.Marten.Identity.Blazor.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/AndreGoepel.Marten.Identity.Tests/AndreGoepel.Marten.Identity.Tests.csproj" />
+    <Project Path="tests/AndreGoepel.Marten.Identity.IntegrationTests/AndreGoepel.Marten.Identity.IntegrationTests.csproj" />
+    <Project Path="tests/AndreGoepel.Marten.Identity.Blazor.Tests/AndreGoepel.Marten.Identity.Blazor.Tests.csproj" />
+  </Folder>
+</Solution>

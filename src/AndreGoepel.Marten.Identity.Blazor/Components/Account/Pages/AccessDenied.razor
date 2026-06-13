@@ -1,0 +1,10 @@
+@page "/Account/AccessDenied"
+
+@inject NavigationManager NavigationManager
+
+@code {
+    protected override void OnInitialized()
+    {
+        NavigationManager.NavigateTo("/", replace: true);
+    }
+}

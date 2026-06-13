@@ -1,0 +1,14 @@
+<Project>
+  <PropertyGroup>
+    <Authors>André Göpel</Authors>
+    <Copyright>© André Göpel</Copyright>
+    <RepositoryUrl>https://github.com/andregoepel/marten-identity</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageProjectUrl>https://github.com/andregoepel/marten-identity</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageRequireLicenseAcceptance>false</PackageRequireLicenseAcceptance>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+</Project>
