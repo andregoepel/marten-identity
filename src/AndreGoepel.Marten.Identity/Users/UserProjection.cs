@@ -22,6 +22,8 @@ internal partial class UserProjection : SingleStreamProjection<User, Guid>
         user.Deletable = @event.Deletable;
         user.RootUser = @event.RootUser;
         user.EmailConfirmed = @event.EmailConfirmed;
+        user.LockoutEnabled = @event.LockoutEnabled;
+        user.SecurityStamp = @event.SecurityStamp;
         user.CreatedBy = @event.CreatedBy;
         user.CreatedAt = @event.CreatedAt;
         user.ChangedBy = @event.CreatedBy;
@@ -70,6 +72,9 @@ internal partial class UserProjection : SingleStreamProjection<User, Guid>
 
         if (@event.PasswordHash is not null)
             user.PasswordHash = @event.PasswordHash;
+
+        if (@event.SecurityStamp is not null)
+            user.SecurityStamp = @event.SecurityStamp;
     }
 
     [SuppressMessage(
@@ -97,6 +102,9 @@ internal partial class UserProjection : SingleStreamProjection<User, Guid>
 
         if (@event.PasswordHash is not null)
             user.PasswordHash = @event.PasswordHash;
+
+        if (@event.SecurityStamp is not null)
+            user.SecurityStamp = @event.SecurityStamp;
 
         #region TwoFactor Authentication
 

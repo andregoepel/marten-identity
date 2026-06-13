@@ -1,6 +1,7 @@
 using System.Buffers.Text;
 using System.Security.Claims;
 using System.Text.Json;
+using AndreGoepel.Marten.Identity.Http;
 using AndreGoepel.Marten.Identity.Users;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -105,10 +106,7 @@ public static class IdentityComponentsEndpointRouteBuilderExtensions
 
                 var result = await signInManager.PasskeySignInAsync(credentialJson);
 
-                var safeReturnUrl =
-                    !string.IsNullOrEmpty(returnUrl) && returnUrl.StartsWith('/')
-                        ? returnUrl
-                        : "/dashboard";
+                var safeReturnUrl = LocalUrl.OrDefault(returnUrl, "/dashboard");
 
                 if (result.Succeeded)
                     return Results.Content(safeReturnUrl, contentType: "text/plain");

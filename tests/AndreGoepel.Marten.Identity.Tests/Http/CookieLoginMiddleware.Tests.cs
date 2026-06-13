@@ -108,6 +108,61 @@ public class CookieLoginMiddlewareTests
         Assert.Equal("/admin/content", RedirectLocation(context));
     }
 
+    [Theory]
+    [InlineData("https://evil.example/phish")]
+    [InlineData("//evil.example")]
+    [InlineData("/\\evil.example")]
+    public async Task Login_Success_OffSiteReturnUrl_RedirectsToDashboard(string returnUrl)
+    {
+        // Open-redirect guard (CWE-601): an attacker-supplied off-site ReturnUrl
+        // must be discarded in favour of the local default after sign-in.
+        // Arrange
+        var token = _tokens.Protect(new LoginInfo("alice@example.com", "pw", false, returnUrl));
+        var signInManager = BuildSignInManager();
+        signInManager
+            .PasswordSignInAsync(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<bool>(),
+                Arg.Any<bool>()
+            )
+            .Returns(Task.FromResult(SignInResult.Success));
+        var context = BuildContext("/login", token);
+
+        // Act
+        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+
+        // Assert
+        Assert.Equal("/dashboard", RedirectLocation(context));
+    }
+
+    [Fact]
+    public async Task Login_RequiresTwoFactor_OffSiteReturnUrl_ForwardsDefault()
+    {
+        // Arrange
+        var token = _tokens.Protect(
+            new LoginInfo("alice@example.com", "pw", false, "https://evil.example")
+        );
+        var signInManager = BuildSignInManager();
+        signInManager
+            .PasswordSignInAsync(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<bool>(),
+                Arg.Any<bool>()
+            )
+            .Returns(Task.FromResult(SignInResult.TwoFactorRequired));
+        var context = BuildContext("/login", token);
+
+        // Act
+        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+
+        // Assert
+        var location = RedirectLocation(context);
+        Assert.Contains("returnUrl=%2Fdashboard", location);
+        Assert.DoesNotContain("evil.example", location);
+    }
+
     [Fact]
     public async Task Login_RequiresTwoFactor_ForwardsReturnUrl()
     {
@@ -265,6 +320,26 @@ public class CookieLoginMiddlewareTests
         Assert.Equal("/dashboard", RedirectLocation(context));
     }
 
+    [Theory]
+    [InlineData("https://evil.example")]
+    [InlineData("//evil.example")]
+    public async Task Login2fa_Success_OffSiteReturnUrl_RedirectsToDashboard(string returnUrl)
+    {
+        // Arrange
+        var token = _tokens.Protect(new TwoFactorLoginInfo("123456", false, false, returnUrl));
+        var signInManager = BuildSignInManager();
+        signInManager
+            .TwoFactorAuthenticatorSignInAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>())
+            .Returns(Task.FromResult(SignInResult.Success));
+        var context = BuildContext("/login2fa", token);
+
+        // Act
+        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+
+        // Assert
+        Assert.Equal("/dashboard", RedirectLocation(context));
+    }
+
     [Fact]
     public async Task Login2fa_LockedOut_RedirectsToLockout()
     {
@@ -347,6 +422,26 @@ public class CookieLoginMiddlewareTests
     {
         // Arrange
         var token = _tokens.Protect(new RecoveryCodeLoginInfo("ABCDE-FGHIJ", null));
+        var signInManager = BuildSignInManager();
+        signInManager
+            .TwoFactorRecoveryCodeSignInAsync(Arg.Any<string>())
+            .Returns(Task.FromResult(SignInResult.Success));
+        var context = BuildContext("/loginrecovery", token);
+
+        // Act
+        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+
+        // Assert
+        Assert.Equal("/dashboard", RedirectLocation(context));
+    }
+
+    [Theory]
+    [InlineData("https://evil.example")]
+    [InlineData("//evil.example")]
+    public async Task LoginRecovery_Success_OffSiteReturnUrl_RedirectsToDashboard(string returnUrl)
+    {
+        // Arrange
+        var token = _tokens.Protect(new RecoveryCodeLoginInfo("ABCDE-FGHIJ", returnUrl));
         var signInManager = BuildSignInManager();
         signInManager
             .TwoFactorRecoveryCodeSignInAsync(Arg.Any<string>())
