@@ -147,7 +147,7 @@
                 return;
             }
 
-            Logger.LogInformation("User {UserId} ({Email}) deleted their account.", userId, CurrentUser.Email);
+            Logger.LogInformation("User {UserId} deleted their account.", userId);
 
             // Sign out via GET endpoint (SignOutAsync writes cookies — must run in real HTTP context)
             NavigationManager.NavigateTo("/Account/SignOutAndRedirect", forceLoad: true);
