@@ -114,6 +114,19 @@ public class UserStore<TUser>(
                 .Query<TUser>()
                 .FirstOrDefaultAsync(x => x.Id == user.Id, token: cancellationToken);
 
+            if (existingUser != null)
+            {
+                // Lockout state (AccessFailedCount / LockoutEnd) is owned exclusively
+                // by the atomic IUserLockoutStore methods, which serialize writes on
+                // the stream. The generic update path runs from a request-start
+                // snapshot with no concurrency control, so it must never carry a stale
+                // lockout value back into the stream — doing so would resurrect the
+                // failed-login accumulation race (#22). Treat the persisted values as
+                // authoritative here.
+                user.AccessFailedCount = existingUser.AccessFailedCount;
+                user.LockoutEnd = existingUser.LockoutEnd;
+            }
+
             if (existingUser != null && existingUser.AreEqual(user))
                 return IdentityResult.Success;
 
@@ -655,25 +668,80 @@ public class UserStore<TUser>(
         TUser user,
         DateTimeOffset? lockoutEnd,
         CancellationToken cancellationToken
-    )
-    {
-        user.LockoutEnd = lockoutEnd;
-        return Task.CompletedTask;
-    }
+    ) =>
+        PersistLockoutStateAsync(
+            user,
+            current => (current.AccessFailedCount, lockoutEnd),
+            cancellationToken
+        );
 
-    public Task<int> IncrementAccessFailedCountAsync(
+    public async Task<int> IncrementAccessFailedCountAsync(
         TUser user,
         CancellationToken cancellationToken
     )
     {
-        user.AccessFailedCount++;
-        return Task.FromResult(user.AccessFailedCount);
+        await PersistLockoutStateAsync(
+            user,
+            current => (current.AccessFailedCount + 1, current.LockoutEnd),
+            cancellationToken
+        );
+        return user.AccessFailedCount;
     }
 
-    public Task ResetAccessFailedCountAsync(TUser user, CancellationToken cancellationToken)
+    public Task ResetAccessFailedCountAsync(TUser user, CancellationToken cancellationToken) =>
+        PersistLockoutStateAsync(user, current => (0, current.LockoutEnd), cancellationToken);
+
+    /// <summary>
+    /// Atomically mutates the lockout state (failed-access counter and lockout
+    /// window) on the user's event stream under an exclusive stream lock.
+    /// <para>
+    /// ASP.NET Identity splits a failed-login into an in-memory increment followed
+    /// by a separate persist, so concurrent failures would otherwise each read the
+    /// same counter and write the same value (last-writer-wins), never reaching the
+    /// lockout threshold (#22). <c>AppendExclusive</c> takes a transaction-scoped
+    /// advisory lock on the stream; the re-read below therefore observes the latest
+    /// committed counter (the inline projection commits in the same transaction),
+    /// so increments serialize and accumulate.
+    /// </para>
+    /// </summary>
+    private async Task PersistLockoutStateAsync(
+        TUser user,
+        Func<User, (int AccessFailedCount, DateTimeOffset? LockoutEnd)> next,
+        CancellationToken cancellationToken
+    )
     {
-        user.AccessFailedCount = 0;
-        return Task.CompletedTask;
+        var userId = UserId.Parse(user.Id);
+
+        using var session = documentStore.LightweightSession();
+
+        // Acquire the exclusive stream lock before reading current state.
+        await session.Events.AppendExclusive(userId.Value);
+
+        var current = await session.LoadAsync<User>(userId.Value, cancellationToken) ?? user;
+        var (accessFailedCount, lockoutEnd) = next(current);
+
+        user.AccessFailedCount = accessFailedCount;
+        user.LockoutEnd = lockoutEnd;
+
+        // Nothing actually changed — release the lock without churning the stream.
+        if (accessFailedCount == current.AccessFailedCount && lockoutEnd == current.LockoutEnd)
+            return;
+
+        session.Events.Append(
+            userId.Value,
+            new UserUpdated(userId)
+            {
+                // Carry the current scalar state forward: the projection applies these
+                // unconditionally, so omitting them would reset unrelated flags.
+                EmailConfirmed = current.EmailConfirmed,
+                TwoFactorEnabled = current.TwoFactorEnabled,
+                Deletable = current.Deletable,
+                LockoutEnabled = current.LockoutEnabled,
+                LockoutEnd = lockoutEnd,
+                AccessFailedCount = accessFailedCount,
+            }
+        );
+        await session.SaveChangesAsync(cancellationToken);
     }
 
     public Task<int> GetAccessFailedCountAsync(TUser user, CancellationToken cancellationToken) =>

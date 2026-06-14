@@ -141,6 +141,114 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
         Assert.False(persisted!.LockoutEnabled);
     }
 
+    [Fact]
+    public async Task IncrementAccessFailedCount_Concurrent_AccumulatesWithoutLostUpdates()
+    {
+        // Regression for #22: lockout state is event-sourced with no optimistic
+        // concurrency, so N parallel failed logins each read AccessFailedCount = 0,
+        // computed 1, and wrote 1 (last-writer-wins) — the counter never accumulated
+        // and the lockout threshold was never reached, defeating brute-force
+        // protection. The increment must serialize on the stream and accumulate.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+
+        const int attempts = 25;
+
+        // Act — fire concurrent increments, each from its own freshly loaded snapshot
+        // (as independent login requests would).
+        await Task.WhenAll(
+            Enumerable
+                .Range(0, attempts)
+                .Select(async _ =>
+                {
+                    await using var session = fixture.Store.QuerySession();
+                    var snapshot = await session.LoadAsync<User>(user.UserId.Value, Ct);
+                    await store.IncrementAccessFailedCountAsync(snapshot!, Ct);
+                })
+        );
+
+        // Assert
+        await using var verify = fixture.Store.QuerySession();
+        var persisted = await verify.LoadAsync<User>(user.UserId.Value, Ct);
+        Assert.Equal(attempts, persisted!.AccessFailedCount);
+    }
+
+    [Fact]
+    public async Task ResetAccessFailedCount_PersistsZero()
+    {
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+        await store.IncrementAccessFailedCountAsync(user, Ct);
+        await store.IncrementAccessFailedCountAsync(user, Ct);
+
+        // Act
+        await store.ResetAccessFailedCountAsync(user, Ct);
+
+        // Assert
+        Assert.Equal(0, user.AccessFailedCount);
+        await using var session = fixture.Store.QuerySession();
+        var persisted = await session.LoadAsync<User>(user.UserId.Value, Ct);
+        Assert.Equal(0, persisted!.AccessFailedCount);
+    }
+
+    [Fact]
+    public async Task SetLockoutEndDate_PersistsAndPreservesCounter()
+    {
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+        await store.IncrementAccessFailedCountAsync(user, Ct);
+        var lockoutEnd = DateTimeOffset.UtcNow.AddMinutes(15);
+
+        // Act
+        await store.SetLockoutEndDateAsync(user, lockoutEnd, Ct);
+
+        // Assert — lockout window persisted, counter untouched.
+        await using var session = fixture.Store.QuerySession();
+        var persisted = await session.LoadAsync<User>(user.UserId.Value, Ct);
+        Assert.Equal(1, persisted!.AccessFailedCount);
+        Assert.NotNull(persisted.LockoutEnd);
+        Assert.Equal(
+            lockoutEnd.ToUnixTimeSeconds(),
+            persisted.LockoutEnd!.Value.ToUnixTimeSeconds()
+        );
+    }
+
+    [Fact]
+    public async Task UpdateAsync_DoesNotRegressConcurrentlyChangedLockoutState()
+    {
+        // Regression for #22: a stale snapshot flowing through the generic update
+        // path must not clobber lockout state that advanced in the meantime.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+
+        // A second actor records several failed logins after `user` was snapshotted.
+        await using (var session = fixture.Store.QuerySession())
+        {
+            var other = await session.LoadAsync<User>(user.UserId.Value, Ct);
+            await store.IncrementAccessFailedCountAsync(other!, Ct);
+            await store.IncrementAccessFailedCountAsync(other!, Ct);
+            await store.IncrementAccessFailedCountAsync(other!, Ct);
+        }
+
+        // Act — the stale snapshot changes an unrelated field and persists.
+        user.PhoneNumber = "+49 555 0000";
+        await store.UpdateAsync(user, Ct);
+
+        // Assert — the accumulated counter survives the unrelated update.
+        await using var verify = fixture.Store.QuerySession();
+        var persisted = await verify.LoadAsync<User>(user.UserId.Value, Ct);
+        Assert.Equal("+49 555 0000", persisted!.PhoneNumber);
+        Assert.Equal(3, persisted.AccessFailedCount);
+    }
+
     #endregion
 
     #region Security stamp (session invalidation)
