@@ -16,7 +16,17 @@ internal sealed class DeletedUserCleanupJob(
         try
         {
             var settings = await settingsService.GetAsync(context.CancellationToken);
-            var cutoff = DateTimeOffset.UtcNow.AddDays(-settings.RetentionDays);
+
+            // Defence in depth against a bad retention value reaching the job (e.g.
+            // persisted before validation existed, or written directly to the DB): a
+            // negative value would make the cutoff a *future* timestamp and purge every
+            // soft-deleted user. Clamp to the accepted range (#23).
+            var retentionDays = Math.Clamp(
+                settings.RetentionDays,
+                CleanupSettingsService.MinRetentionDays,
+                CleanupSettingsService.MaxRetentionDays
+            );
+            var cutoff = DateTimeOffset.UtcNow.AddDays(-retentionDays);
 
             using var querySession = documentStore.QuerySession();
             var usersToClean = await querySession
