@@ -43,8 +43,8 @@ public class ChangePasswordTests : BunitContext
     private static async Task SubmitAsync(IRenderedComponent<ChangePassword> cut)
     {
         cut.Find("input[name=OldPassword]").Change("old");
-        cut.Find("input[name=NewPassword]").Change("Br@ndNewPw1");
-        cut.Find("input[name=ConfirmPassword]").Change("Br@ndNewPw1");
+        cut.Find("input[name=NewPassword]").Change("Br@ndNewPw123");
+        cut.Find("input[name=ConfirmPassword]").Change("Br@ndNewPw123");
         await cut.Find("form").SubmitAsync();
     }
 
