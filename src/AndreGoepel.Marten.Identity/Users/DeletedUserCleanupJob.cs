@@ -1,3 +1,4 @@
+using AndreGoepel.Marten.Identity.UserRoles;
 using Marten;
 using Microsoft.Extensions.Logging;
 using Quartz;
@@ -38,16 +39,35 @@ internal sealed class DeletedUserCleanupJob(
                 return;
 
             logger.LogInformation(
-                "Purging event streams and documents for {Count} deleted user(s) beyond retention period.",
+                "Erasing personal data for {Count} deleted user(s) beyond retention period.",
                 usersToClean.Count
             );
 
             using var session = documentStore.LightweightSession();
 
+            // GDPR Art. 17 erasure. The previous implementation called
+            // Events.ArchiveStream, which only sets is_archived = true — the event
+            // rows (and the email, password hash, phone, authenticator key, etc. they
+            // carry in UserCreated/UserUpdated) physically remained in the database
+            // (#6, #16). True erasure requires removing those rows, so we hard-delete
+            // the event stream, its metadata, the projected document, and the user's
+            // role assignments in a single transaction.
+            var eventsSchema = documentStore.Options.Events.DatabaseSchemaName;
+
             foreach (var user in usersToClean)
             {
-                session.Events.ArchiveStream(user.StreamId);
+                var streamId = user.StreamId;
+
+                session.QueueSqlCommand(
+                    $"delete from {eventsSchema}.mt_events where stream_id = ?",
+                    streamId
+                );
+                session.QueueSqlCommand(
+                    $"delete from {eventsSchema}.mt_streams where id = ?",
+                    streamId
+                );
                 session.Delete(user);
+                session.DeleteWhere<UserRoleAssignment>(a => a.UserGuid == streamId);
             }
 
             await session.SaveChangesAsync(context.CancellationToken);

@@ -17,6 +17,10 @@ public sealed class MartenFixture : IAsyncLifetime
 
     public IDocumentStore Store { get; private set; } = null!;
 
+    /// <summary>Raw connection string for assertions that need to inspect the
+    /// underlying tables directly (e.g. proving event rows were hard-deleted).</summary>
+    public string ConnectionString => _container.GetConnectionString();
+
     public async ValueTask InitializeAsync()
     {
         _container = new PostgreSqlBuilder().Build();
