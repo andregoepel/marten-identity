@@ -16,7 +16,27 @@ public class SetupRedirectMiddleware(RequestDelegate next)
 
         var path = context.Request.Path.Value ?? "";
 
-        if (!_isConfigured && !IsSetupPath(path) && IsPageNavigation(context))
+        if (_isConfigured)
+        {
+            // Once setup is complete the /Setup endpoint must be unreachable so it
+            // cannot be re-run to mint a second root administrator (#21). This block
+            // is unconditional: it does not depend on the navigation heuristic below,
+            // which keys off client-controllable headers and is a UX aid, not a
+            // security boundary (#12). The host's Setup page should also re-check
+            // SetupCompletion.IsCompleteAsync and refuse — this is defence in depth.
+            if (IsSetupPath(path))
+            {
+                context.Response.Redirect("/");
+                return;
+            }
+
+            await next.Invoke(context);
+            return;
+        }
+
+        // Pre-setup: there is no data to protect yet, so funnel browser page
+        // navigations to /Setup as a convenience.
+        if (!IsSetupPath(path) && IsPageNavigation(context))
         {
             context.Response.Redirect("/Setup");
             return;
