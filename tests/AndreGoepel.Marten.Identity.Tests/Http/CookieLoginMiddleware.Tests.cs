@@ -552,6 +552,67 @@ public class CookieLoginMiddlewareTests
         Assert.Equal("/Account/Login", RedirectLocation(context));
     }
 
+    [Fact]
+    public async Task Login_TokenReplay_SecondUseRejected()
+    {
+        // Regression for #5: the handoff is strictly single-use, so a captured URL
+        // cannot be replayed to mint a second session (CWE-294).
+        // Arrange
+        var token = _tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
+        var signInManager = BuildSignInManager();
+        signInManager
+            .PasswordSignInAsync(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<bool>(),
+                Arg.Any<bool>()
+            )
+            .Returns(Task.FromResult(SignInResult.Success));
+
+        // Act — first use succeeds…
+        var first = BuildContext("/login", token);
+        await BuildMiddleware().Invoke(first, signInManager, _tokens);
+
+        // …second use of the same handle is rejected.
+        var second = BuildContext("/login", token);
+        await BuildMiddleware().Invoke(second, signInManager, _tokens);
+
+        // Assert
+        Assert.Equal("/dashboard", RedirectLocation(first));
+        Assert.Equal("/Account/Login", RedirectLocation(second));
+        await signInManager
+            .Received(1)
+            .PasswordSignInAsync(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<bool>(),
+                Arg.Any<bool>()
+            );
+    }
+
+    [Fact]
+    public async Task Login_SetsNoReferrerPolicyHeader()
+    {
+        // Arrange
+        var token = _tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
+        var signInManager = BuildSignInManager();
+        signInManager
+            .PasswordSignInAsync(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<bool>(),
+                Arg.Any<bool>()
+            )
+            .Returns(Task.FromResult(SignInResult.Success));
+        var context = BuildContext("/login", token);
+
+        // Act
+        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+
+        // Assert
+        Assert.Equal("no-referrer", context.Response.Headers["Referrer-Policy"].ToString());
+    }
+
     #endregion
 
     #region Other paths

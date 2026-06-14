@@ -33,8 +33,12 @@ public class CookieLoginMiddleware(RequestDelegate next)
     {
         if (context.Request.Path == "/loginrecovery")
         {
+            // Defence in depth: keep the (now opaque, single-use) handoff handle out
+            // of any onward Referer header (#5).
+            context.Response.Headers.Append("Referrer-Policy", "no-referrer");
+
             if (
-                !tokens.TryUnprotect<RecoveryCodeLoginInfo>(
+                !tokens.TryConsume<RecoveryCodeLoginInfo>(
                     context.Request.Query["token"],
                     out var info
                 )
@@ -57,11 +61,10 @@ public class CookieLoginMiddleware(RequestDelegate next)
         }
         else if (context.Request.Path == "/login2fa")
         {
+            context.Response.Headers.Append("Referrer-Policy", "no-referrer");
+
             if (
-                !tokens.TryUnprotect<TwoFactorLoginInfo>(
-                    context.Request.Query["token"],
-                    out var info
-                )
+                !tokens.TryConsume<TwoFactorLoginInfo>(context.Request.Query["token"], out var info)
             )
             {
                 context.Response.Redirect("/Account/Login");
@@ -85,7 +88,9 @@ public class CookieLoginMiddleware(RequestDelegate next)
         }
         else if (context.Request.Path == "/login")
         {
-            if (!tokens.TryUnprotect<LoginInfo>(context.Request.Query["token"], out var info))
+            context.Response.Headers.Append("Referrer-Policy", "no-referrer");
+
+            if (!tokens.TryConsume<LoginInfo>(context.Request.Query["token"], out var info))
             {
                 context.Response.Redirect("/Account/Login");
                 return;
