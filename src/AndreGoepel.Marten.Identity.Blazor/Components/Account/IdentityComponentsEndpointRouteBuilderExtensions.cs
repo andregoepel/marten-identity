@@ -34,7 +34,12 @@ public static class IdentityComponentsEndpointRouteBuilderExtensions
             ) =>
             {
                 await signInManager.SignOutAsync();
-                return TypedResults.LocalRedirect($"~{returnUrl}");
+                // Validate the returnUrl before building the redirect. Concatenating
+                // a crafted value (e.g. "//evil.com" -> "~//evil.com") makes
+                // LocalRedirect throw InvalidOperationException (HTTP 500) instead of
+                // redirecting (#11, CWE-601 mitigated). LocalUrl.OrDefault guarantees
+                // a safe rooted path.
+                return TypedResults.LocalRedirect(LocalUrl.OrDefault(returnUrl, "/"));
             }
         );
 

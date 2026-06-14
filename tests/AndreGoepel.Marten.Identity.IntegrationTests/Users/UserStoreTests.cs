@@ -367,6 +367,58 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
         Assert.Empty(passkeys);
     }
 
+    [Fact]
+    public async Task Passkey_CounterAdvance_IsPersisted()
+    {
+        // Regression for #10: a counter-only update returned early and was never
+        // persisted, freezing the WebAuthn signature counter and making
+        // counter-regression clone detection impossible. Counter advances must be
+        // recorded.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+        await store.AddOrUpdatePasskeyAsync(user, TestPasskey([1, 2, 3, 4], signCount: 5), Ct);
+
+        // Act — the authenticator reports an advanced counter on the next assertion.
+        var afterCreate = await store.FindByIdAsync(user.Id, Ct);
+        await store.AddOrUpdatePasskeyAsync(
+            afterCreate!,
+            TestPasskey([1, 2, 3, 4], signCount: 9),
+            Ct
+        );
+
+        // Assert
+        var refreshed = await store.FindByIdAsync(user.Id, Ct);
+        var passkey = await store.FindPasskeyAsync(refreshed!, [1, 2, 3, 4], Ct);
+        Assert.Equal((uint)9, passkey!.SignCount);
+    }
+
+    [Fact]
+    public async Task Passkey_NoChange_DoesNotAppendEvent()
+    {
+        // The early-skip must still hold when nothing changed at all (including the
+        // counter), to avoid churning the stream on every assertion.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+        await store.AddOrUpdatePasskeyAsync(user, TestPasskey([1, 2, 3, 4], signCount: 3), Ct);
+
+        // Act — identical passkey, identical counter.
+        var afterCreate = await store.FindByIdAsync(user.Id, Ct);
+        await store.AddOrUpdatePasskeyAsync(
+            afterCreate!,
+            TestPasskey([1, 2, 3, 4], signCount: 3),
+            Ct
+        );
+
+        // Assert — only UserCreated + PasskeyCreated, no redundant PasskeyUpdated.
+        await using var session = fixture.Store.QuerySession();
+        var stream = await session.Events.FetchStreamAsync(user.UserId.Value, token: Ct);
+        Assert.Equal(2, stream.Count);
+    }
+
     #endregion
 
     #region Roles
@@ -436,12 +488,24 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
 
     #region Helpers
 
-    private static UserPasskeyInfo TestPasskey(byte[] credentialId) =>
+    // Fixed timestamp so two passkeys built from the same credential differ only by
+    // the fields we vary (e.g. the signature counter).
+    private static readonly DateTimeOffset _passkeyCreatedAt = new(
+        2026,
+        1,
+        1,
+        0,
+        0,
+        0,
+        TimeSpan.Zero
+    );
+
+    private static UserPasskeyInfo TestPasskey(byte[] credentialId, uint signCount = 0) =>
         new(
             credentialId,
             publicKey: [9, 9, 9],
-            createdAt: DateTimeOffset.UtcNow,
-            signCount: 0,
+            createdAt: _passkeyCreatedAt,
+            signCount: signCount,
             transports: null,
             isUserVerified: false,
             isBackupEligible: false,
