@@ -106,9 +106,11 @@ public class DeletedUserCleanupJobTests(MartenFixture fixture) : IAsyncLifetime
     {
         // Regression for #23: a negative RetentionDays makes the cutoff a *future*
         // timestamp, so `DeletedAt < cutoff` matches every soft-deleted user and the
-        // job permanently purges them all. The job must clamp the retention window.
+        // job permanently purges them all. The job clamps the retention window to the
+        // minimum (1 day), so a user deleted moments ago — well inside that window —
+        // must survive. (Without the clamp, the future cutoff would purge it.)
         // Arrange
-        var recent = await SeedDeletedUserAsync(DateTimeOffset.UtcNow.AddDays(-5));
+        var recent = await SeedDeletedUserAsync(DateTimeOffset.UtcNow.AddHours(-1));
         var job = BuildJob(retentionDays: -999999);
 
         // Act
