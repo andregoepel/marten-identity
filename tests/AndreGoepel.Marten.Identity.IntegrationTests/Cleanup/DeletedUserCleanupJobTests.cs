@@ -4,6 +4,7 @@ using AndreGoepel.Marten.Identity.Users.Events;
 using Marten;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using Npgsql;
 using NSubstitute;
 using Quartz;
 
@@ -51,6 +52,53 @@ public class DeletedUserCleanupJobTests(MartenFixture fixture) : IAsyncLifetime
         await using var session = fixture.Store.QuerySession();
         var users = await session.Query<User>().ToListAsync(Ct);
         Assert.Single(users);
+    }
+
+    [Fact]
+    public async Task Execute_HardErasesEventRows_LeavingNoPersonalData()
+    {
+        // Regression for #6/#16: the job used to call Events.ArchiveStream, which only
+        // sets is_archived = true — the event rows (and the email / password hash /
+        // phone they carry) physically remained in the database. Erasure must actually
+        // remove those rows so no personal data survives.
+        // Arrange
+        var aged = await SeedDeletedUserAsync(DateTimeOffset.UtcNow.AddDays(-60));
+        var rowsBefore = await CountEventRowsAsync(aged.Value);
+        Assert.True(rowsBefore > 0, "precondition: the user's events should exist before erasure");
+        var job = BuildJob(retentionDays: 30);
+
+        // Act
+        await job.Execute(Context());
+
+        // Assert — projection document and every event row are physically gone.
+        await using var session = fixture.Store.QuerySession();
+        Assert.Null(await session.LoadAsync<User>(aged.Value, Ct));
+        Assert.Equal(0, await CountEventRowsAsync(aged.Value));
+        Assert.Equal(0, await CountStreamRowsAsync(aged.Value));
+    }
+
+    private async Task<long> CountEventRowsAsync(Guid streamId)
+    {
+        await using var conn = new NpgsqlConnection(fixture.ConnectionString);
+        await conn.OpenAsync(Ct);
+        await using var cmd = new NpgsqlCommand(
+            "select count(*) from public.mt_events where stream_id = @id",
+            conn
+        );
+        cmd.Parameters.AddWithValue("id", streamId);
+        return (long)(await cmd.ExecuteScalarAsync(Ct))!;
+    }
+
+    private async Task<long> CountStreamRowsAsync(Guid streamId)
+    {
+        await using var conn = new NpgsqlConnection(fixture.ConnectionString);
+        await conn.OpenAsync(Ct);
+        await using var cmd = new NpgsqlCommand(
+            "select count(*) from public.mt_streams where id = @id",
+            conn
+        );
+        cmd.Parameters.AddWithValue("id", streamId);
+        return (long)(await cmd.ExecuteScalarAsync(Ct))!;
     }
 
     [Fact]
