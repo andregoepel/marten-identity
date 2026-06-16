@@ -66,7 +66,8 @@
         if (user is null)
         {
             HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            error = $"Error loading user with ID '{UserId}'.";
+            // Do not reflect the supplied UserId back to the client (#13, CWE-204).
+            error = "Error confirming your email. The link may be invalid or expired.";
             return;
         }
 

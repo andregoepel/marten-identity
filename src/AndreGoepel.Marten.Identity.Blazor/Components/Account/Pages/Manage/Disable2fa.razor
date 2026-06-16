@@ -96,7 +96,7 @@
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to disable 2FA for user {UserEmail}", user?.Email);
+            Logger.LogError(ex, "Failed to disable 2FA for user {UserId}", user?.Id);
             NotificationService.Notify(
                 NotificationSeverity.Error,
                 summary: "Error",
