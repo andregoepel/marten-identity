@@ -99,8 +99,10 @@ public class ConfirmEmailChangeTests : BunitContext
     #region User not found
 
     [Fact]
-    public void UserNotFound_ShowsUserIdInError()
+    public void UserNotFound_ShowsGenericError_DoesNotReflectUserId()
     {
+        // Regression for #13: the supplied UserId must not be reflected back to the
+        // client (information disclosure, CWE-204).
         // Arrange
         var userManager = BuildUserManager();
         userManager.FindByIdAsync("missing").Returns(Task.FromResult<User?>(null));
@@ -115,7 +117,8 @@ public class ConfirmEmailChangeTests : BunitContext
         );
 
         // Assert
-        Assert.Contains("missing", cut.Markup);
+        Assert.DoesNotContain("missing", cut.Markup);
+        Assert.Contains("Invalid email change confirmation link", cut.Markup);
     }
 
     #endregion

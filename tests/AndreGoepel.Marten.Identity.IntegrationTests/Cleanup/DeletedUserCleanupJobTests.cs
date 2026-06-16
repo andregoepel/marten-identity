@@ -53,6 +53,53 @@ public class DeletedUserCleanupJobTests(MartenFixture fixture) : IAsyncLifetime
         Assert.Single(users);
     }
 
+    [Fact]
+    public async Task Execute_ErasesPersonalDataFromEventStream()
+    {
+        // Regression for #6/#16: the job used to call Events.ArchiveStream, which only
+        // sets is_archived = true — the email / password hash / phone the events carry
+        // physically remained in the database. Erasure must remove the personal data
+        // itself. We scrub the PII fields in place via Marten event-data masking; the
+        // (now PII-free) event rows may remain, but no personal data survives.
+        // Arrange
+        var aged = await SeedDeletedUserAsync(DateTimeOffset.UtcNow.AddDays(-60));
+        var job = BuildJob(retentionDays: 30);
+
+        // Act
+        await job.Execute(Context());
+
+        // Assert — projection gone, and the events no longer carry personal data.
+        await using var session = fixture.Store.QuerySession();
+        Assert.Null(await session.LoadAsync<User>(aged.Value, Ct));
+
+        var stream = await session.Events.FetchStreamAsync(aged.Value, token: Ct);
+        var created = stream.Select(e => e.Data).OfType<UserCreated>().Single();
+        Assert.Null(created.UserName);
+        Assert.Null(created.Email);
+        Assert.Null(created.PasswordHash);
+    }
+
+    [Fact]
+    public async Task Execute_NegativeRetention_DoesNotPurgeRecentlyDeletedUsers()
+    {
+        // Regression for #23: a negative RetentionDays makes the cutoff a *future*
+        // timestamp, so `DeletedAt < cutoff` matches every soft-deleted user and the
+        // job permanently purges them all. The job clamps the retention window to the
+        // minimum (1 day), so a user deleted moments ago — well inside that window —
+        // must survive. (Without the clamp, the future cutoff would purge it.)
+        // Arrange
+        var recent = await SeedDeletedUserAsync(DateTimeOffset.UtcNow.AddHours(-1));
+        var job = BuildJob(retentionDays: -999999);
+
+        // Act
+        await job.Execute(Context());
+
+        // Assert — the recently deleted user survives (clamp prevented the future cutoff).
+        await using var session = fixture.Store.QuerySession();
+        var recentDoc = await session.LoadAsync<User>(recent.Value, Ct);
+        Assert.NotNull(recentDoc);
+    }
+
     private DeletedUserCleanupJob BuildJob(int retentionDays)
     {
         var settings = new CleanupSettingsService(

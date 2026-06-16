@@ -34,7 +34,12 @@ public static class IdentityComponentsEndpointRouteBuilderExtensions
             ) =>
             {
                 await signInManager.SignOutAsync();
-                return TypedResults.LocalRedirect($"~{returnUrl}");
+                // Validate the returnUrl before building the redirect. Concatenating
+                // a crafted value (e.g. "//evil.com" -> "~//evil.com") makes
+                // LocalRedirect throw InvalidOperationException (HTTP 500) instead of
+                // redirecting (#11, CWE-601 mitigated). LocalUrl.OrDefault guarantees
+                // a safe rooted path.
+                return TypedResults.LocalRedirect(LocalUrl.OrDefault(returnUrl, "/"));
             }
         );
 
@@ -80,15 +85,17 @@ public static class IdentityComponentsEndpointRouteBuilderExtensions
         accountGroup.MapPost(
             "/PasskeyRequestOptions",
             async (
-                [FromServices] UserManager<User> userManager,
                 [FromServices] SignInManager<User> signInManager,
                 [FromQuery] string? username
             ) =>
             {
-                var user = string.IsNullOrEmpty(username)
-                    ? null
-                    : await userManager.FindByNameAsync(username);
-                var optionsJson = await signInManager.MakePasskeyRequestOptionsAsync(user);
+                // Do not resolve the supplied username to a user here. Returning
+                // user-specific request options (e.g. that account's allowCredentials)
+                // only when the username exists lets an attacker enumerate valid
+                // usernames (#13, CWE-204). Always issue generic options; discoverable
+                // (resident) passkeys — the modern default — authenticate without an
+                // allow-list, so the legitimate flow is unaffected.
+                var optionsJson = await signInManager.MakePasskeyRequestOptionsAsync(user: null);
                 return TypedResults.Content(optionsJson, contentType: "application/json");
             }
         );
@@ -244,9 +251,14 @@ public static class IdentityComponentsEndpointRouteBuilderExtensions
                     );
                 }
 
+                // Never export the authenticator key: it is a live, reusable TOTP
+                // seed. Bundling it into an unencrypted file users routinely email to
+                // themselves or sync to the cloud turns a privacy feature into a
+                // credential-leak vector (#17, GDPR Art. 32). Export a non-reusable
+                // status indicator instead.
                 personalData.Add(
-                    "Authenticator Key",
-                    (await userManager.GetAuthenticatorKeyAsync(user))!
+                    "Two-factor authentication",
+                    await userManager.GetTwoFactorEnabledAsync(user) ? "enabled" : "disabled"
                 );
                 var fileBytes = JsonSerializer.SerializeToUtf8Bytes(personalData);
 

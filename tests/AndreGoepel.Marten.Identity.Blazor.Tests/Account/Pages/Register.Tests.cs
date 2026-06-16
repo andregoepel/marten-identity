@@ -74,7 +74,7 @@ public class RegisterTests : BunitContext
     private static async Task SubmitAsync(
         IRenderedComponent<Register> cut,
         string email = "alice@example.com",
-        string password = "P@ssw0rd!"
+        string password = "P@ssw0rd!123"
     )
     {
         cut.Find("input[name=Email]").Change(email);

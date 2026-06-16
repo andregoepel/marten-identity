@@ -92,8 +92,10 @@ public class ConfirmEmailTests : BunitContext
     }
 
     [Fact]
-    public void UserNotFound_ShowsUserIdInErrorMessage()
+    public void UserNotFound_ShowsGenericError_DoesNotReflectUserId()
     {
+        // Regression for #13: the supplied UserId must not be reflected back to the
+        // client (information disclosure, CWE-204).
         // Arrange
         var userManager = BuildUserManager();
         userManager.FindByIdAsync("missing").Returns(Task.FromResult<User?>(null));
@@ -102,7 +104,8 @@ public class ConfirmEmailTests : BunitContext
         var cut = Render(userManager, new DefaultHttpContext(), userId: "missing", code: "token");
 
         // Assert
-        Assert.Contains("missing", cut.Markup);
+        Assert.DoesNotContain("missing", cut.Markup);
+        Assert.Contains("Error confirming your email", cut.Markup);
     }
 
     #endregion

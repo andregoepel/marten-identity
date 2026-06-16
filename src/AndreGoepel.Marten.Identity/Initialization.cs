@@ -4,7 +4,9 @@ using AndreGoepel.Marten.Identity.Services;
 using AndreGoepel.Marten.Identity.UserRoles;
 using AndreGoepel.Marten.Identity.Users;
 using Marten;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Quartz;
@@ -26,6 +28,26 @@ public static class Initialization
             })
             .AddIdentityCookies();
 
+        // Secure-by-default: the authentication cookies are only ever sent over
+        // HTTPS. AddIdentityCookies() leaves SecurePolicy at SameAsRequest, so over
+        // plain HTTP the cookie would lack the Secure flag and be exposed to
+        // interception (#8, CWE-614). Hosts are expected to serve over HTTPS/HSTS.
+        foreach (
+            var scheme in new[]
+            {
+                IdentityConstants.ApplicationScheme,
+                IdentityConstants.ExternalScheme,
+                IdentityConstants.TwoFactorRememberMeScheme,
+                IdentityConstants.TwoFactorUserIdScheme,
+            }
+        )
+        {
+            services.Configure<CookieAuthenticationOptions>(
+                scheme,
+                options => options.Cookie.SecurePolicy = CookieSecurePolicy.Always
+            );
+        }
+
         services.AddAuthorization();
 
         services
@@ -33,6 +55,13 @@ public static class Initialization
             {
                 options.SignIn.RequireConfirmedAccount = true;
                 options.Stores.SchemaVersion = IdentitySchemaVersions.Version3;
+
+                // Secure-by-default password policy: NIST 800-63B favours length over
+                // composition. Identity defaults to RequiredLength = 6, which is below
+                // any modern guidance; raise it to 12. Set before the host callback so
+                // integrators can still override it (#8, CWE-521).
+                options.Password.RequiredLength = 12;
+
                 configureOptions?.Invoke(options);
             })
             .AddRoles<Role>()

@@ -1,3 +1,4 @@
+using AndreGoepel.Marten.Identity.UserRoles;
 using Marten;
 using Microsoft.Extensions.Logging;
 using Quartz;
@@ -16,7 +17,17 @@ internal sealed class DeletedUserCleanupJob(
         try
         {
             var settings = await settingsService.GetAsync(context.CancellationToken);
-            var cutoff = DateTimeOffset.UtcNow.AddDays(-settings.RetentionDays);
+
+            // Defence in depth against a bad retention value reaching the job (e.g.
+            // persisted before validation existed, or written directly to the DB): a
+            // negative value would make the cutoff a *future* timestamp and purge every
+            // soft-deleted user. Clamp to the accepted range (#23).
+            var retentionDays = Math.Clamp(
+                settings.RetentionDays,
+                CleanupSettingsService.MinRetentionDays,
+                CleanupSettingsService.MaxRetentionDays
+            );
+            var cutoff = DateTimeOffset.UtcNow.AddDays(-retentionDays);
 
             using var querySession = documentStore.QuerySession();
             var usersToClean = await querySession
@@ -28,16 +39,32 @@ internal sealed class DeletedUserCleanupJob(
                 return;
 
             logger.LogInformation(
-                "Purging event streams and documents for {Count} deleted user(s) beyond retention period.",
+                "Erasing personal data for {Count} deleted user(s) beyond retention period.",
                 usersToClean.Count
+            );
+
+            // GDPR Art. 17 erasure (#6, #16). The PII the events carry (email, password
+            // hash, phone, authenticator key, recovery codes, security stamp) is scrubbed
+            // in place using Marten's native event-data masking — the masking rules are
+            // registered in InitializeUsersStore. This replaces the earlier approach of
+            // issuing raw DELETEs against Marten's internal event tables: no hand-written
+            // SQL and no interpolated schema/identifier reaches the database.
+            await documentStore.Advanced.ApplyEventDataMasking(
+                masking =>
+                {
+                    foreach (var user in usersToClean)
+                        masking.IncludeStream(user.StreamId);
+                },
+                context.CancellationToken
             );
 
             using var session = documentStore.LightweightSession();
 
             foreach (var user in usersToClean)
             {
-                session.Events.ArchiveStream(user.StreamId);
+                var streamId = user.StreamId;
                 session.Delete(user);
+                session.DeleteWhere<UserRoleAssignment>(a => a.UserGuid == streamId);
             }
 
             await session.SaveChangesAsync(context.CancellationToken);

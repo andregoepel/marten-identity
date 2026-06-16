@@ -18,7 +18,7 @@
 
         <div>
             <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Delete Account</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Permanently remove your personal data and account</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Deactivate your account and schedule your personal data for permanent erasure</RadzenText>
         </div>
 
         <RadzenCard>
@@ -27,9 +27,9 @@
             <!-- Starke Warnung -->
             <RadzenAlert AlertStyle="AlertStyle.Danger"
                          AllowClose="false"
-                         Icon="warning" 
-                         Title="This action is irreversible.">
-                    All your personal data, posts, comments, settings and account will be <strong>permanently deleted</strong>. This cannot be undone.
+                         Icon="warning"
+                         Title="Your data will be permanently erased.">
+                    Your account is deactivated immediately and you are signed out. Your personal data is then <strong>permanently erased</strong> once the retention period elapses, after which it cannot be recovered. Until then, an administrator can still reverse the deletion.
             </RadzenAlert>
 
             <RadzenTemplateForm TItem="InputModel"
@@ -53,7 +53,7 @@
                             </RadzenFormField>
 
                             <RadzenText TextStyle="TextStyle.Body2" class="rz-color-danger">
-                                After successful verification your account will be immediately and permanently deleted.
+                                After successful verification your account is deactivated immediately and your personal data is permanently erased once the retention period elapses.
                             </RadzenText>
 
                         </RadzenStack>
@@ -114,9 +114,9 @@
 
         // Zweifache Absicherung über Dialog
         var confirm = await DialogService.Confirm(
-            "Are you absolutely sure you want to permanently delete your account?\n\nThis cannot be undone.",
+            "Your account will be deactivated now and your personal data permanently erased after the retention period. Continue?",
             "Final Confirmation",
-            new ConfirmOptions { OkButtonText = "Yes, Delete Forever", CancelButtonText = "No, Cancel" });
+            new ConfirmOptions { OkButtonText = "Yes, Delete My Account", CancelButtonText = "No, Cancel" });
 
         if (confirm != true)
         {
@@ -147,7 +147,7 @@
                 return;
             }
 
-            Logger.LogInformation("User {UserId} ({Email}) deleted their account.", userId, CurrentUser.Email);
+            Logger.LogInformation("User {UserId} deleted their account.", userId);
 
             // Sign out via GET endpoint (SignOutAsync writes cookies — must run in real HTTP context)
             NavigationManager.NavigateTo("/Account/SignOutAndRedirect", forceLoad: true);
