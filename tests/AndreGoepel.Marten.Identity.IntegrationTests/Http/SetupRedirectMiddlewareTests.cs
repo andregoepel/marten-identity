@@ -95,6 +95,41 @@ public class SetupRedirectMiddlewareTests(MartenFixture fixture) : IAsyncLifetim
         Assert.True(called.Value);
     }
 
+    [Fact]
+    public async Task ConfiguredStore_SetupPath_RedirectsAway()
+    {
+        // Regression for #21: once setup is complete the /Setup endpoint must be
+        // unreachable so it cannot be re-run to mint a second root administrator.
+        // Arrange
+        await SeedConfiguredAsync();
+        var (middleware, context, called) = Build("/Setup", secFetchDest: "document");
+
+        // Act
+        await middleware.Invoke(context, fixture.Store.QuerySession());
+
+        // Assert
+        Assert.Equal("/", context.Response.Headers.Location.ToString());
+        Assert.False(called.Value);
+    }
+
+    [Fact]
+    public async Task AdministratorRoleWithoutHolder_RedirectsToSetup()
+    {
+        // Regression for #12/#21: an Administrator role plus some user is not enough —
+        // setup is only complete when a user actually holds the role. Otherwise the
+        // redirect could latch off while the admin pages remain unreachable.
+        // Arrange
+        await SeedRoleAndUserWithoutAssignmentAsync();
+        var (middleware, context, called) = Build("/dashboard", secFetchDest: "document");
+
+        // Act
+        await middleware.Invoke(context, fixture.Store.QuerySession());
+
+        // Assert
+        Assert.Equal("/Setup", context.Response.Headers.Location.ToString());
+        Assert.False(called.Value);
+    }
+
     private static (
         SetupRedirectMiddleware Middleware,
         DefaultHttpContext Context,
@@ -115,6 +150,22 @@ public class SetupRedirectMiddlewareTests(MartenFixture fixture) : IAsyncLifetim
     }
 
     private async Task SeedConfiguredAsync()
+    {
+        await using var session = fixture.Store.LightweightSession();
+        var roleId = RoleId.New();
+        var userId = UserId.New();
+        session.Events.Append(roleId.Value, new RoleCreated(roleId, "Administrator", userId));
+        session.Events.Append(
+            userId.Value,
+            new UserCreated(userId, "alice", "alice@example.com", "hash"),
+            // The user must actually hold the Administrator role for setup to count
+            // as complete.
+            new RoleAssigned(userId, roleId, userId)
+        );
+        await session.SaveChangesAsync(Ct);
+    }
+
+    private async Task SeedRoleAndUserWithoutAssignmentAsync()
     {
         await using var session = fixture.Store.LightweightSession();
         var roleId = RoleId.New();
