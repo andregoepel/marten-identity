@@ -16,6 +16,44 @@ public sealed class CleanupSettingsService(
     );
     private static readonly JobKey _jobKey = new("DeletedUserCleanup", "MartenIdentity");
 
+    /// <summary>Smallest accepted retention window. Zero/negative values are rejected because
+    /// they produce a future cutoff that would purge every soft-deleted user.</summary>
+    public const int MinRetentionDays = 1;
+
+    /// <summary>Largest accepted retention window (~10 years), guarding against absurd values
+    /// that would defeat erasure entirely.</summary>
+    public const int MaxRetentionDays = 3650;
+
+    /// <summary>
+    /// Validates cleanup settings before they are persisted. The administration UI
+    /// only enforces these bounds client-side, so the server must re-check them:
+    /// a crafted request with a negative <see cref="CleanupSettings.RetentionDays"/>
+    /// produces a future cutoff that permanently purges every soft-deleted user,
+    /// and an absurdly large value silently defeats erasure (#23).
+    /// </summary>
+    /// <exception cref="ArgumentOutOfRangeException">Retention is outside the accepted range.</exception>
+    /// <exception cref="ArgumentException">The cron expression is missing or invalid.</exception>
+    public static void Validate(CleanupSettings settings)
+    {
+        ArgumentNullException.ThrowIfNull(settings);
+
+        if (settings.RetentionDays is < MinRetentionDays or > MaxRetentionDays)
+            throw new ArgumentOutOfRangeException(
+                nameof(settings),
+                settings.RetentionDays,
+                $"Retention period must be between {MinRetentionDays} and {MaxRetentionDays} days."
+            );
+
+        if (
+            string.IsNullOrWhiteSpace(settings.CronSchedule)
+            || !CronExpression.IsValidExpression(settings.CronSchedule)
+        )
+            throw new ArgumentException(
+                $"'{settings.CronSchedule}' is not a valid Quartz cron expression.",
+                nameof(settings)
+            );
+    }
+
     public async Task<CleanupSettings> GetAsync(CancellationToken ct = default)
     {
         using var session = documentStore.QuerySession();
@@ -36,6 +74,8 @@ public sealed class CleanupSettingsService(
 
     public async Task SaveAsync(CleanupSettings settings, CancellationToken ct = default)
     {
+        Validate(settings);
+
         using var session = documentStore.LightweightSession();
         session.Store(settings);
         await session.SaveChangesAsync(ct);

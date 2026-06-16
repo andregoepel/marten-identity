@@ -53,6 +53,27 @@ public class DeletedUserCleanupJobTests(MartenFixture fixture) : IAsyncLifetime
         Assert.Single(users);
     }
 
+    [Fact]
+    public async Task Execute_NegativeRetention_DoesNotPurgeRecentlyDeletedUsers()
+    {
+        // Regression for #23: a negative RetentionDays makes the cutoff a *future*
+        // timestamp, so `DeletedAt < cutoff` matches every soft-deleted user and the
+        // job permanently purges them all. The job clamps the retention window to the
+        // minimum (1 day), so a user deleted moments ago — well inside that window —
+        // must survive. (Without the clamp, the future cutoff would purge it.)
+        // Arrange
+        var recent = await SeedDeletedUserAsync(DateTimeOffset.UtcNow.AddHours(-1));
+        var job = BuildJob(retentionDays: -999999);
+
+        // Act
+        await job.Execute(Context());
+
+        // Assert — the recently deleted user survives (clamp prevented the future cutoff).
+        await using var session = fixture.Store.QuerySession();
+        var recentDoc = await session.LoadAsync<User>(recent.Value, Ct);
+        Assert.NotNull(recentDoc);
+    }
+
     private DeletedUserCleanupJob BuildJob(int retentionDays)
     {
         var settings = new CleanupSettingsService(
