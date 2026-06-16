@@ -1,4 +1,6 @@
-﻿using AndreGoepel.Marten.Identity.Roles;
+﻿using System.Security.Cryptography;
+using System.Text;
+using AndreGoepel.Marten.Identity.Roles;
 using AndreGoepel.Marten.Identity.Services;
 using AndreGoepel.Marten.Identity.UserRoles;
 using AndreGoepel.Marten.Identity.Users.Events;
@@ -449,7 +451,7 @@ public class UserStore<TUser>(
             .Split(';', StringSplitOptions.RemoveEmptyEntries)
             .ToList();
 
-        var idx = codes.FindIndex(c => string.Equals(c, code, StringComparison.Ordinal));
+        var idx = codes.FindIndex(c => FixedTimeEquals(c, code));
         if (idx >= 0)
         {
             codes.RemoveAt(idx);
@@ -459,6 +461,16 @@ public class UserStore<TUser>(
 
         return Task.FromResult(false);
     }
+
+    /// <summary>
+    /// Compares two recovery codes in length-constant time to avoid leaking a
+    /// per-character timing signal (#9, CWE-208).
+    /// </summary>
+    private static bool FixedTimeEquals(string a, string b) =>
+        CryptographicOperations.FixedTimeEquals(
+            Encoding.UTF8.GetBytes(a),
+            Encoding.UTF8.GetBytes(b)
+        );
 
     public Task<int> CountCodesAsync(TUser user, CancellationToken cancellationToken)
     {
@@ -490,8 +502,18 @@ public class UserStore<TUser>(
 
         var isUpdate = userEntity.Passkeys.ContainsKey(credentialId);
 
-        if (isUpdate && userEntity.Passkeys[credentialId].PasskeyInfo.OnlyCountChanged(passkey))
-            return;
+        if (isUpdate)
+        {
+            var existing = userEntity.Passkeys[credentialId].PasskeyInfo;
+
+            // Persist counter advances. Previously a counter-only change returned
+            // early and was never written, so the WebAuthn signature counter froze
+            // and counter-regression clone detection was impossible (#10). Skip only
+            // when nothing changed at all — including the signature counter — so an
+            // advancing authenticator's counter is recorded via a PasskeyUpdated.
+            if (existing.OnlyCountChanged(passkey) && existing.SignCount == passkey.SignCount)
+                return;
+        }
 
         using var session = documentStore.LightweightSession();
 
