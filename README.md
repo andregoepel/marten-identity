@@ -43,6 +43,14 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
+## Privacy & data protection
+
+The package stores authentication credentials and contact identifiers. See
+[`PRIVACY.md`](PRIVACY.md) for the data inventory, storage location, retention and
+erasure model, the DataProtection key-persistence requirement, the email-processor
+(DPA) dependency, what ends up in logs, and a deployment checklist — everything you
+need to build an accurate privacy notice and Records of Processing.
+
 ## License
 
 [MIT](LICENSE) © André Göpel
