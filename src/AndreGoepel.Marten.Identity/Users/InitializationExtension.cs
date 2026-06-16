@@ -1,4 +1,5 @@
-﻿using JasperFx.Events.Projections;
+﻿using AndreGoepel.Marten.Identity.Users.Events;
+using JasperFx.Events.Projections;
 using Marten;
 
 namespace AndreGoepel.Marten.Identity.Users;
@@ -14,5 +15,51 @@ internal static class InitializationExtension
             .Duplicate(x => x.NormalizedUserName);
 
         options.Projections.Add<UserProjection>(ProjectionLifecycle.Inline);
+
+        RegisterPiiMaskingRules(options);
+    }
+
+    /// <summary>
+    /// GDPR Art. 17 erasure for the append-only event store (#6, #16). Rather than
+    /// leaving personal data in historical events forever — or issuing raw DELETEs
+    /// against Marten's internal event tables — these rules let Marten scrub the PII
+    /// fields in place via <c>Advanced.ApplyEventDataMasking</c> (invoked by the
+    /// deleted-user cleanup job past the retention period). Non-PII fields (IDs,
+    /// flags, timestamps, audit actors) are preserved so the stream stays coherent.
+    /// </summary>
+    private static void RegisterPiiMaskingRules(StoreOptions options)
+    {
+        options.Events.AddMaskingRuleForProtectedInformation<UserCreated>(e =>
+            e with
+            {
+                UserName = null,
+                Email = null,
+                PasswordHash = null,
+                SecurityStamp = null,
+            }
+        );
+
+        options.Events.AddMaskingRuleForProtectedInformation<UserUpdated>(e =>
+            e with
+            {
+                UserName = null,
+                Email = null,
+                PasswordHash = null,
+                PhoneNumber = null,
+                AuthenticatorKey = null,
+                RecoveryCodes = null,
+                SecurityStamp = null,
+            }
+        );
+
+        options.Events.AddMaskingRuleForProtectedInformation<UserRestored>(e =>
+            e with
+            {
+                UserName = null,
+                Email = null,
+                PasswordHash = null,
+                SecurityStamp = null,
+            }
+        );
     }
 }

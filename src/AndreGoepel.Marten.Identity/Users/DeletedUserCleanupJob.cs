@@ -43,29 +43,26 @@ internal sealed class DeletedUserCleanupJob(
                 usersToClean.Count
             );
 
-            using var session = documentStore.LightweightSession();
+            // GDPR Art. 17 erasure (#6, #16). The PII the events carry (email, password
+            // hash, phone, authenticator key, recovery codes, security stamp) is scrubbed
+            // in place using Marten's native event-data masking — the masking rules are
+            // registered in InitializeUsersStore. This replaces the earlier approach of
+            // issuing raw DELETEs against Marten's internal event tables: no hand-written
+            // SQL and no interpolated schema/identifier reaches the database.
+            await documentStore.Advanced.ApplyEventDataMasking(
+                masking =>
+                {
+                    foreach (var user in usersToClean)
+                        masking.IncludeStream(user.StreamId);
+                },
+                context.CancellationToken
+            );
 
-            // GDPR Art. 17 erasure. The previous implementation called
-            // Events.ArchiveStream, which only sets is_archived = true — the event
-            // rows (and the email, password hash, phone, authenticator key, etc. they
-            // carry in UserCreated/UserUpdated) physically remained in the database
-            // (#6, #16). True erasure requires removing those rows, so we hard-delete
-            // the event stream, its metadata, the projected document, and the user's
-            // role assignments in a single transaction.
-            var eventsSchema = documentStore.Options.Events.DatabaseSchemaName;
+            using var session = documentStore.LightweightSession();
 
             foreach (var user in usersToClean)
             {
                 var streamId = user.StreamId;
-
-                session.QueueSqlCommand(
-                    $"delete from {eventsSchema}.mt_events where stream_id = ?",
-                    streamId
-                );
-                session.QueueSqlCommand(
-                    $"delete from {eventsSchema}.mt_streams where id = ?",
-                    streamId
-                );
                 session.Delete(user);
                 session.DeleteWhere<UserRoleAssignment>(a => a.UserGuid == streamId);
             }
