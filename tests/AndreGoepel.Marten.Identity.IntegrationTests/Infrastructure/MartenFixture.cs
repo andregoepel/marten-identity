@@ -17,9 +17,15 @@ public sealed class MartenFixture : IAsyncLifetime
 
     public IDocumentStore Store { get; private set; } = null!;
 
+    // Pin the Postgres image by digest (not a mutable tag) so the test/CI
+    // environment can't be fed a different image behind the same tag (#37).
+    // Update via Dependabot/manual bump together with the digest.
+    private const string _postgresImage =
+        "postgres:16-alpine@sha256:e013e867e712fec275706a6c51c966f0bb0c93cfa8f51000f85a15f9865a28cb";
+
     public async ValueTask InitializeAsync()
     {
-        _container = new PostgreSqlBuilder().Build();
+        _container = new PostgreSqlBuilder().WithImage(_postgresImage).Build();
         await _container.StartAsync();
 
         Store = DocumentStore.For(opts =>
