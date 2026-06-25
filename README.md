@@ -43,6 +43,15 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
+## Security model
+
+The library ships secure defaults but delegates some security-critical concerns to
+the host (TLS, DataProtection key storage, antiforgery, authorization for your own
+routes, rate limiting, first-run setup protection). See
+[`THREAT-MODEL.md`](THREAT-MODEL.md) for the trust boundaries, the protections the
+library guarantees, an explicit **host-obligations checklist**, and the known
+residual risks. Read it before deploying.
+
 ## Privacy & data protection
 
 The package stores authentication credentials and contact identifiers. See
