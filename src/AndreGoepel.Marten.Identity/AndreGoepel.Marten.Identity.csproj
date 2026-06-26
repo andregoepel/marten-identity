@@ -23,6 +23,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="Marten" />
     <PackageReference Include="Marten.AspNetCore" />
     <PackageReference Include="Quartz.Extensions.Hosting" />
   </ItemGroup>
