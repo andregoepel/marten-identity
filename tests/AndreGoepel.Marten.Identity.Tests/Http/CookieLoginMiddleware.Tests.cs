@@ -565,21 +565,32 @@ public class CookieLoginMiddlewareTests
     }
 
     [Fact]
-    public async Task Handoff_InvalidAntiforgeryToken_IsRejectedWithoutThrowing()
+    public async Task Handoff_DeferredAntiforgeryFailure_DoesNotBlockSameOriginPost()
     {
-        // UseAntiforgery() validates the form post and defers a failure to the first
-        // form read; the middleware must reject it cleanly rather than letting the
-        // form access throw (which would surface as a 500).
+        // UseAntiforgery() defers a failed validation to the first form read, which
+        // would throw when the middleware reads the form. These endpoints rely on the
+        // same-origin check, not the antiforgery token, so the middleware clears that
+        // deferral: a legitimate same-origin handoff must still sign in (not 500, not
+        // bounce back to the login page). (#40 follow-up)
         // Arrange
         var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
+        var signInManager = BuildSignInManager();
+        signInManager
+            .PasswordSignInAsync(
+                Arg.Any<string>(),
+                Arg.Any<string>(),
+                Arg.Any<bool>(),
+                Arg.Any<bool>()
+            )
+            .Returns(Task.FromResult(SignInResult.Success));
         var context = BuildContext("/login", token);
         context.Features.Set<IAntiforgeryValidationFeature>(new FailedAntiforgeryValidation());
 
         // Act
-        await BuildMiddleware().Invoke(context, BuildSignInManager(), Tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
-        Assert.Equal("/Account/Login", RedirectLocation(context));
+        Assert.Equal("/dashboard", RedirectLocation(context));
     }
 
     private sealed class FailedAntiforgeryValidation : IAntiforgeryValidationFeature
