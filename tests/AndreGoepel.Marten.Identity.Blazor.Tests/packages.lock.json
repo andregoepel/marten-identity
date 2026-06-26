@@ -386,7 +386,7 @@
         "dependencies": {
           "AndreGoepel.Marten.Identity": "[1.0.0, )",
           "Marten": "[9.10.0, )",
-          "Radzen.Blazor": "[10.4.9, )"
+          "Radzen.Blazor": "[11.0.4, )"
         }
       },
       "Marten": {
@@ -421,9 +421,9 @@
       },
       "Radzen.Blazor": {
         "type": "CentralTransitive",
-        "requested": "[10.4.9, )",
-        "resolved": "10.4.9",
-        "contentHash": "FU01EgPRuI3AmD7QtzVqxiWe8RKJbFHSexvqanDArxiZMcJP8x1c5dEI/hI8sgNPDMIpOAyAK3bLIhi83unGGg=="
+        "requested": "[11.0.4, )",
+        "resolved": "11.0.4",
+        "contentHash": "SqpkYTWi4XnqAvGeh0aHbA7FasAeCia9XQv3XiYYR7CQy7DcumB9xlb08VkX+Sxn5cnexGhWFUbLyn4NT0+9lA=="
       }
     }
   }

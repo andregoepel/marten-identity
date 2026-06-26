@@ -39,12 +39,16 @@
     </RadzenStack>
 </RadzenTemplateForm>
 
+<SignInHandoff Action="/login" Handle="@_handle" />
+
 @code {
     [SupplyParameterFromForm]
     private InputModel Input { get; set; } = default!;
 
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
+
+    private string? _handle;
 
     protected override async Task OnInitializedAsync()
     {
@@ -75,11 +79,10 @@
             return;
         }
 
-        // Hand off to middleware for cookie sign-in (handles 2FA, remember-me, etc.)
-        var token = LoginTokens.Protect(
+        // SignInHandoff POSTs this handle to the cookie-sign-in middleware (body, not URL).
+        _handle = LoginTokens.Protect(
             new LoginInfo(model.Email, model.Password, model.RememberMe, ReturnUrl)
         );
-        NavigationManager.NavigateTo($"/login?token={Uri.EscapeDataString(token)}", forceLoad: true);
     }
 
     private sealed class InputModel

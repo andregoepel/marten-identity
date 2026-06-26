@@ -1,4 +1,5 @@
 @page "/Account/LoginWith2fa"
+@attribute [AllowAnonymous]
 @layout LoginLayout
 @rendermode InteractiveServer
 
@@ -39,7 +40,7 @@
             <RadzenButton ButtonType="ButtonType.Submit"
                           Text="Log in"
                           ButtonStyle="ButtonStyle.Primary"
-                          IsBusy=@isProcessing
+                          IsBusy=@_isProcessing
                           BusyText="Verifying..." />
 
             <RadzenLink Path="@($"/Account/LoginWithRecoveryCode?returnUrl={ReturnUrl}")"
@@ -49,9 +50,12 @@
     </RadzenStack>
 </RadzenTemplateForm>
 
+<SignInHandoff Action="/login2fa" Handle="@_handle" />
+
 @code {
     private InputModel Input { get; set; } = new();
-    private bool isProcessing;
+    private bool _isProcessing;
+    private string? _handle;
 
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
@@ -72,24 +76,16 @@
 
     private async Task OnSubmitAsync(InputModel model)
     {
-        isProcessing = true;
+        _isProcessing = true;
 
-        try
-        {
-            var token = LoginTokens.Protect(
-                new TwoFactorLoginInfo(
-                    Code: model.TwoFactorCode!,
-                    RememberMe: RememberMe,
-                    RememberMachine: model.RememberMachine,
-                    ReturnUrl: ReturnUrl
-                )
-            );
-            NavigationManager.NavigateTo($"/login2fa?token={Uri.EscapeDataString(token)}", forceLoad: true);
-        }
-        finally
-        {
-            isProcessing = false;
-        }
+        _handle = LoginTokens.Protect(
+            new TwoFactorLoginInfo(
+                Code: model.TwoFactorCode!,
+                RememberMe: RememberMe,
+                RememberMachine: model.RememberMachine,
+                ReturnUrl: ReturnUrl
+            )
+        );
     }
 
     private sealed class InputModel

@@ -1,6 +1,7 @@
 ﻿using System.Security.Cryptography;
 using System.Text;
 using AndreGoepel.Marten.Identity.Roles;
+using AndreGoepel.Marten.Identity.Roles.Events;
 using AndreGoepel.Marten.Identity.Services;
 using AndreGoepel.Marten.Identity.UserRoles;
 using AndreGoepel.Marten.Identity.Users.Events;
@@ -9,6 +10,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using RoleNames = AndreGoepel.Marten.Identity.Roles.Roles;
 
 namespace AndreGoepel.Marten.Identity.Users;
 
@@ -73,6 +75,27 @@ public class UserStore<TUser>(
         {
             var userId = UserId.Parse(user.Id);
 
+            if (user.RootUser)
+            {
+                // Safeguard: at most one root user may ever exist. The root account is
+                // privileged (non-deletable, always administrator); allowing a second
+                // one would let the frontend mint another all-powerful account and
+                // bypass the guarantees below (#41).
+                var rootAlreadyExists = await querySession
+                    .Query<TUser>()
+                    .AnyAsync(u => u.RootUser && !u.Deleted, cancellationToken);
+                if (rootAlreadyExists)
+                {
+                    return IdentityResult.Failed(
+                        new IdentityError
+                        {
+                            Code = "RootUserAlreadyExists",
+                            Description = "A root user already exists; only one is permitted.",
+                        }
+                    );
+                }
+            }
+
             // Enable lockout for newly created accounts so that brute-force
             // protection (SignInManager's lockoutOnFailure) actually engages.
             // Honour the host's policy via Lockout.AllowedForNewUsers.
@@ -94,6 +117,26 @@ public class UserStore<TUser>(
                     SecurityStamp = user.SecurityStamp,
                 }
             );
+
+            if (user.RootUser)
+            {
+                // The root user is always an administrator. Ensure the Administrator
+                // role exists and assign it in the same transaction, so a root account
+                // can never exist without administrative authority — regardless of what
+                // the frontend setup flow does (#41). The assignment is idempotent
+                // (UserRoleAssignment is keyed by user:role), so a host that also assigns
+                // the role causes no duplication.
+                var administratorRoleId = await EnsureAdministratorRoleAsync(
+                    session,
+                    userId,
+                    cancellationToken
+                );
+                session.Events.Append(
+                    userId.Value,
+                    new RoleAssigned(userId, administratorRoleId, userId)
+                );
+            }
+
             await session.SaveChangesAsync(cancellationToken);
             return IdentityResult.Success;
         }
@@ -104,6 +147,35 @@ public class UserStore<TUser>(
                 new IdentityError() { Description = "Something went wrong saving the user." }
             );
         }
+    }
+
+    /// <summary>
+    /// Returns the id of the (non-deleted) Administrator role, creating it as a
+    /// protected, non-deletable role in the supplied session if it does not yet
+    /// exist. Used to guarantee the root user is always an administrator.
+    /// </summary>
+    private async Task<RoleId> EnsureAdministratorRoleAsync(
+        IDocumentSession session,
+        UserId createdBy,
+        CancellationToken cancellationToken
+    )
+    {
+        var normalizedName = RoleNames.Administrator.ToUpperInvariant();
+        var existing = await querySession
+            .Query<Role>()
+            .FirstOrDefaultAsync(
+                r => r.NormalizedName == normalizedName && !r.Deleted,
+                cancellationToken
+            );
+        if (existing is not null)
+            return existing.RoleId;
+
+        var roleId = RoleId.New();
+        session.Events.Append(
+            roleId.Value,
+            new RoleCreated(roleId, RoleNames.Administrator, createdBy) { Deletable = false }
+        );
+        return roleId;
     }
 
     public async Task<IdentityResult> UpdateAsync(TUser user, CancellationToken cancellationToken)
@@ -127,6 +199,12 @@ public class UserStore<TUser>(
                 // authoritative here.
                 user.AccessFailedCount = existingUser.AccessFailedCount;
                 user.LockoutEnd = existingUser.LockoutEnd;
+
+                // Domain-layer invariant (#41): the root user must stay non-deletable so
+                // it can never be removed (which would orphan administration). Don't let
+                // a generic update flip Deletable, regardless of who initiates it.
+                if (existingUser.RootUser)
+                    user.Deletable = false;
             }
 
             if (existingUser != null && existingUser.AreEqual(user))
@@ -625,6 +703,20 @@ public class UserStore<TUser>(
 
         if (string.IsNullOrWhiteSpace(roleName))
             throw new ArgumentException("Role name cannot be null or empty.", nameof(roleName));
+
+        // Domain-layer invariant (defence in depth, independent of any UI [Authorize]):
+        // the root user is the un-removable administrator anchor created during setup.
+        // Stripping its Administrator role would orphan all admin access, so refuse it
+        // here regardless of who initiates the call (#41).
+        if (
+            user.RootUser
+            && string.Equals(roleName, RoleNames.Administrator, StringComparison.OrdinalIgnoreCase)
+        )
+        {
+            throw new InvalidOperationException(
+                "The root administrator cannot have the Administrator role removed."
+            );
+        }
 
         var role =
             await querySession

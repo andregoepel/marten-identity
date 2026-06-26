@@ -1,4 +1,5 @@
 @page "/Account/LoginWithRecoveryCode"
+@attribute [AllowAnonymous]
 @layout LoginLayout
 @rendermode InteractiveServer
 
@@ -32,7 +33,7 @@
             <RadzenButton ButtonType="ButtonType.Submit"
                           Text="Log in"
                           ButtonStyle="ButtonStyle.Primary"
-                          IsBusy=@isProcessing
+                          IsBusy=@_isProcessing
                           BusyText="Verifying..." />
 
             <RadzenLink Path="/Account/LoginWith2fa" Text="Use an authenticator code instead" />
@@ -41,9 +42,12 @@
     </RadzenStack>
 </RadzenTemplateForm>
 
+<SignInHandoff Action="/loginrecovery" Handle="@_handle" />
+
 @code {
     private InputModel Input { get; set; } = new();
-    private bool isProcessing;
+    private bool _isProcessing;
+    private string? _handle;
 
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
@@ -61,19 +65,11 @@
 
     private async Task OnSubmitAsync(InputModel model)
     {
-        isProcessing = true;
+        _isProcessing = true;
 
-        try
-        {
-            var token = LoginTokens.Protect(
-                new RecoveryCodeLoginInfo(Code: model.RecoveryCode, ReturnUrl: ReturnUrl)
-            );
-            NavigationManager.NavigateTo($"/loginrecovery?token={Uri.EscapeDataString(token)}", forceLoad: true);
-        }
-        finally
-        {
-            isProcessing = false;
-        }
+        _handle = LoginTokens.Protect(
+            new RecoveryCodeLoginInfo(Code: model.RecoveryCode, ReturnUrl: ReturnUrl)
+        );
     }
 
     private sealed class InputModel

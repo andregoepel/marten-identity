@@ -1,4 +1,5 @@
 @page "/Account/Register"
+@attribute [AllowAnonymous]
 @layout LoginLayout
 @rendermode InteractiveServer
 
@@ -67,12 +68,16 @@
     </RadzenStack>
 </RadzenTemplateForm>
 
+<SignInHandoff Action="/login" Handle="@_handle" />
+
 @code {
     [SupplyParameterFromForm]
     private InputModel Input { get; set; } = default!;
 
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
+
+    private string? _handle;
 
     protected override void OnInitialized()
     {
@@ -114,9 +119,11 @@
         }
         else
         {
-            // SignInAsync writes cookies — must go through middleware
-            var token = LoginTokens.Protect(new LoginInfo(model.Email, model.Password, RememberMe: false));
-            NavigationManager.NavigateTo($"/login?token={Uri.EscapeDataString(token)}&returnUrl={Uri.EscapeDataString(ReturnUrl ?? "/")}", forceLoad: true);
+            // SignInAsync writes cookies, which the Blazor circuit can't — SignInHandoff
+            // POSTs this handle to the sign-in middleware (returnUrl is inside it).
+            _handle = LoginTokens.Protect(
+                new LoginInfo(model.Email, model.Password, RememberMe: false, ReturnUrl ?? "/")
+            );
         }
     }
 

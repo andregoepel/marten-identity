@@ -114,6 +114,45 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
         Assert.Equal("Moderator", found.Name);
     }
 
+    [Fact]
+    public async Task CreateAsync_DuplicateActiveRoleName_IsRejected()
+    {
+        // DB-level partial unique index: two *active* roles cannot share a name.
+        // Arrange
+        var (store, _) = Build();
+        Assert.True((await store.CreateAsync(new Role { Name = "Dup" }, Ct)).Succeeded);
+
+        // Act — a second active role with the same name (different stream) must fail
+        var result = await store.CreateAsync(new Role { Name = "Dup" }, Ct);
+
+        // Assert
+        Assert.False(result.Succeeded);
+        await using var session = fixture.Store.QuerySession();
+        var activeCount = await session
+            .Query<Role>()
+            .Where(r => r.NormalizedName == "DUP" && !r.Deleted)
+            .CountAsync(Ct);
+        Assert.Equal(1, activeCount);
+    }
+
+    [Fact]
+    public async Task CreateAsync_ReuseNameAfterSoftDelete_IsAllowed()
+    {
+        // The unique index is partial (excludes soft-deleted roles), so a name can be
+        // reused once the prior role is deleted.
+        // Arrange
+        var (store, _) = Build();
+        var first = new Role { Name = "Reusable" };
+        await store.CreateAsync(first, Ct);
+        await store.DeleteAsync(first, Ct);
+
+        // Act
+        var result = await store.CreateAsync(new Role { Name = "Reusable" }, Ct);
+
+        // Assert
+        Assert.True(result.Succeeded);
+    }
+
     private (RoleStore<Role> Store, IDocumentSession Session) Build()
     {
         var currentUserService = Substitute.For<ICurrentUserService>();
