@@ -2,10 +2,13 @@
 @inject IJSRuntime JSRuntime
 
 @* When a handle is set, render a hidden form and POST it to the cookie sign-in
-   middleware. The handle travels in the request body — never the URL (#40). *@
+   middleware. The handle travels in the request body — never the URL (#40). The
+   AntiforgeryToken satisfies UseAntiforgery()'s validation of the form post; the
+   middleware's same-origin check stays as a second layer. *@
 @if (!string.IsNullOrEmpty(Handle))
 {
     <form @ref="_form" method="post" action="@Action" style="display:none" aria-hidden="true">
+        <AntiforgeryToken />
         <input type="hidden" name="token" value="@Handle" />
     </form>
 }

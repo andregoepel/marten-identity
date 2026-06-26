@@ -1,4 +1,5 @@
 using AndreGoepel.Marten.Identity.Users;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 
@@ -153,7 +154,16 @@ public class CookieLoginMiddleware(RequestDelegate next)
     private static bool IsSameOriginFormPost(HttpContext context)
     {
         var request = context.Request;
-        if (!HttpMethods.IsPost(request.Method) || !request.HasFormContentType)
+        if (!HttpMethods.IsPost(request.Method))
+            return false;
+
+        // UseAntiforgery() validates the post and defers a failure to first form
+        // access; reading the form below would otherwise throw on a missing/invalid
+        // token (e.g. a forged cross-site post). Reject cleanly instead of 500ing.
+        if (context.Features.Get<IAntiforgeryValidationFeature>() is { IsValid: false })
+            return false;
+
+        if (!request.HasFormContentType)
             return false;
 
         var site = request.Headers["Sec-Fetch-Site"].FirstOrDefault();

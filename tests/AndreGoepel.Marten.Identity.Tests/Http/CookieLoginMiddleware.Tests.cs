@@ -1,5 +1,6 @@
 using AndreGoepel.Marten.Identity.Http;
 using AndreGoepel.Marten.Identity.Users;
+using Microsoft.AspNetCore.Antiforgery;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Http;
@@ -561,6 +562,30 @@ public class CookieLoginMiddlewareTests
 
         // Assert
         Assert.Equal("/Account/Login", RedirectLocation(context));
+    }
+
+    [Fact]
+    public async Task Handoff_InvalidAntiforgeryToken_IsRejectedWithoutThrowing()
+    {
+        // UseAntiforgery() validates the form post and defers a failure to the first
+        // form read; the middleware must reject it cleanly rather than letting the
+        // form access throw (which would surface as a 500).
+        // Arrange
+        var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
+        var context = BuildContext("/login", token);
+        context.Features.Set<IAntiforgeryValidationFeature>(new FailedAntiforgeryValidation());
+
+        // Act
+        await BuildMiddleware().Invoke(context, BuildSignInManager(), Tokens);
+
+        // Assert
+        Assert.Equal("/Account/Login", RedirectLocation(context));
+    }
+
+    private sealed class FailedAntiforgeryValidation : IAntiforgeryValidationFeature
+    {
+        public bool IsValid => false;
+        public Exception? Error => new InvalidOperationException("invalid token");
     }
 
     [Fact]
