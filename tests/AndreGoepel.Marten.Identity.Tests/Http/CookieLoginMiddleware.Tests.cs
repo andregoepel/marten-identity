@@ -6,6 +6,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using Microsoft.Extensions.Primitives;
 using NSubstitute;
 
 namespace AndreGoepel.Marten.Identity.Tests.Http;
@@ -14,7 +15,7 @@ public class CookieLoginMiddlewareTests
 {
     #region Helpers
 
-    private static readonly LoginTokenProtector _tokens = new(
+    private static readonly LoginTokenProtector Tokens = new(
         DataProtectionProvider.Create("Tests")
     );
 
@@ -43,11 +44,23 @@ public class CookieLoginMiddlewareTests
         );
     }
 
-    private static DefaultHttpContext BuildContext(string path, string token)
+    // The handoff is a same-origin form POST carrying the handle in the body (#40).
+    private static DefaultHttpContext BuildContext(
+        string path,
+        string token,
+        string method = "POST",
+        string? secFetchSite = "same-origin"
+    )
     {
         var context = new DefaultHttpContext();
+        context.Request.Method = method;
         context.Request.Path = path;
-        context.Request.QueryString = QueryString.Create("token", token);
+        context.Request.ContentType = "application/x-www-form-urlencoded";
+        context.Request.Form = new FormCollection(
+            new Dictionary<string, StringValues> { ["token"] = token }
+        );
+        if (secFetchSite is not null)
+            context.Request.Headers["Sec-Fetch-Site"] = secFetchSite;
         return context;
     }
 
@@ -64,7 +77,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login_Success_NoReturnUrl_RedirectsToDashboard()
     {
         // Arrange
-        var token = _tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
+        var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
         var signInManager = BuildSignInManager();
         signInManager
             .PasswordSignInAsync(
@@ -77,7 +90,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/dashboard", RedirectLocation(context));
@@ -87,7 +100,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login_Success_WithReturnUrl_RedirectsToReturnUrl()
     {
         // Arrange
-        var token = _tokens.Protect(
+        var token = Tokens.Protect(
             new LoginInfo("alice@example.com", "pw", false, "/admin/content")
         );
         var signInManager = BuildSignInManager();
@@ -102,7 +115,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/admin/content", RedirectLocation(context));
@@ -117,7 +130,7 @@ public class CookieLoginMiddlewareTests
         // Open-redirect guard (CWE-601): an attacker-supplied off-site ReturnUrl
         // must be discarded in favour of the local default after sign-in.
         // Arrange
-        var token = _tokens.Protect(new LoginInfo("alice@example.com", "pw", false, returnUrl));
+        var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", false, returnUrl));
         var signInManager = BuildSignInManager();
         signInManager
             .PasswordSignInAsync(
@@ -130,7 +143,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/dashboard", RedirectLocation(context));
@@ -140,7 +153,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login_RequiresTwoFactor_OffSiteReturnUrl_ForwardsDefault()
     {
         // Arrange
-        var token = _tokens.Protect(
+        var token = Tokens.Protect(
             new LoginInfo("alice@example.com", "pw", false, "https://evil.example")
         );
         var signInManager = BuildSignInManager();
@@ -155,7 +168,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         var location = RedirectLocation(context);
@@ -167,7 +180,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login_RequiresTwoFactor_ForwardsReturnUrl()
     {
         // Arrange
-        var token = _tokens.Protect(
+        var token = Tokens.Protect(
             new LoginInfo("alice@example.com", "pw", false, "/admin/content")
         );
         var signInManager = BuildSignInManager();
@@ -182,7 +195,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Contains("returnUrl=%2Fadmin%2Fcontent", RedirectLocation(context));
@@ -192,7 +205,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login_RequiresTwoFactor_RedirectsToTwoFaPage()
     {
         // Arrange
-        var token = _tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
+        var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
         var signInManager = BuildSignInManager();
         signInManager
             .PasswordSignInAsync(
@@ -205,7 +218,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.StartsWith("/Account/LoginWith2fa", RedirectLocation(context));
@@ -215,7 +228,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login_RequiresTwoFactor_IncludesRememberMeFlag()
     {
         // Arrange
-        var token = _tokens.Protect(new LoginInfo("alice@example.com", "pw", RememberMe: true));
+        var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", RememberMe: true));
         var signInManager = BuildSignInManager();
         signInManager
             .PasswordSignInAsync(
@@ -228,7 +241,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Contains("rememberMe=true", RedirectLocation(context));
@@ -238,7 +251,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login_LockedOut_RedirectsToLockout()
     {
         // Arrange
-        var token = _tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
+        var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
         var signInManager = BuildSignInManager();
         signInManager
             .PasswordSignInAsync(
@@ -251,7 +264,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/Account/Lockout", RedirectLocation(context));
@@ -261,7 +274,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login_Failed_RedirectsToLoginPage()
     {
         // Arrange
-        var token = _tokens.Protect(new LoginInfo("alice@example.com", "wrong", false));
+        var token = Tokens.Protect(new LoginInfo("alice@example.com", "wrong", false));
         var signInManager = BuildSignInManager();
         signInManager
             .PasswordSignInAsync(
@@ -274,7 +287,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/Account/Login", RedirectLocation(context));
@@ -288,7 +301,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login2fa_Success_RedirectsToReturnUrl()
     {
         // Arrange
-        var token = _tokens.Protect(new TwoFactorLoginInfo("123456", false, false, "/dashboard"));
+        var token = Tokens.Protect(new TwoFactorLoginInfo("123456", false, false, "/dashboard"));
         var signInManager = BuildSignInManager();
         signInManager
             .TwoFactorAuthenticatorSignInAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>())
@@ -296,7 +309,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login2fa", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/dashboard", RedirectLocation(context));
@@ -306,7 +319,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login2fa_Success_NoReturnUrl_RedirectsToDashboard()
     {
         // Arrange
-        var token = _tokens.Protect(new TwoFactorLoginInfo("123456", false, false, null));
+        var token = Tokens.Protect(new TwoFactorLoginInfo("123456", false, false, null));
         var signInManager = BuildSignInManager();
         signInManager
             .TwoFactorAuthenticatorSignInAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>())
@@ -314,7 +327,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login2fa", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/dashboard", RedirectLocation(context));
@@ -326,7 +339,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login2fa_Success_OffSiteReturnUrl_RedirectsToDashboard(string returnUrl)
     {
         // Arrange
-        var token = _tokens.Protect(new TwoFactorLoginInfo("123456", false, false, returnUrl));
+        var token = Tokens.Protect(new TwoFactorLoginInfo("123456", false, false, returnUrl));
         var signInManager = BuildSignInManager();
         signInManager
             .TwoFactorAuthenticatorSignInAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>())
@@ -334,7 +347,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login2fa", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/dashboard", RedirectLocation(context));
@@ -344,7 +357,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login2fa_LockedOut_RedirectsToLockout()
     {
         // Arrange
-        var token = _tokens.Protect(new TwoFactorLoginInfo("123456", false, false, null));
+        var token = Tokens.Protect(new TwoFactorLoginInfo("123456", false, false, null));
         var signInManager = BuildSignInManager();
         signInManager
             .TwoFactorAuthenticatorSignInAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>())
@@ -352,7 +365,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login2fa", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/Account/Lockout", RedirectLocation(context));
@@ -362,7 +375,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login2fa_Failed_RedirectsWithErrorQuery()
     {
         // Arrange
-        var token = _tokens.Protect(new TwoFactorLoginInfo("wrong", false, false, null));
+        var token = Tokens.Protect(new TwoFactorLoginInfo("wrong", false, false, null));
         var signInManager = BuildSignInManager();
         signInManager
             .TwoFactorAuthenticatorSignInAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>())
@@ -370,7 +383,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login2fa", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/Account/LoginWith2fa?error=invalid", RedirectLocation(context));
@@ -380,14 +393,14 @@ public class CookieLoginMiddlewareTests
     public async Task Login2fa_CodeWithSpacesAndDashes_StripsThemBeforeVerification()
     {
         // Arrange
-        var token = _tokens.Protect(new TwoFactorLoginInfo("123 456-789", false, false, null));
+        var token = Tokens.Protect(new TwoFactorLoginInfo("123 456-789", false, false, null));
         var signInManager = BuildSignInManager();
         signInManager
             .TwoFactorAuthenticatorSignInAsync(Arg.Any<string>(), Arg.Any<bool>(), Arg.Any<bool>())
             .Returns(Task.FromResult(SignInResult.Success));
 
         // Act
-        await BuildMiddleware().Invoke(BuildContext("/login2fa", token), signInManager, _tokens);
+        await BuildMiddleware().Invoke(BuildContext("/login2fa", token), signInManager, Tokens);
 
         // Assert
         await signInManager
@@ -403,7 +416,7 @@ public class CookieLoginMiddlewareTests
     public async Task LoginRecovery_Success_RedirectsToReturnUrl()
     {
         // Arrange
-        var token = _tokens.Protect(new RecoveryCodeLoginInfo("ABCDE-FGHIJ", "/home"));
+        var token = Tokens.Protect(new RecoveryCodeLoginInfo("ABCDE-FGHIJ", "/home"));
         var signInManager = BuildSignInManager();
         signInManager
             .TwoFactorRecoveryCodeSignInAsync(Arg.Any<string>())
@@ -411,7 +424,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/loginrecovery", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/home", RedirectLocation(context));
@@ -421,7 +434,7 @@ public class CookieLoginMiddlewareTests
     public async Task LoginRecovery_Success_NoReturnUrl_RedirectsToDashboard()
     {
         // Arrange
-        var token = _tokens.Protect(new RecoveryCodeLoginInfo("ABCDE-FGHIJ", null));
+        var token = Tokens.Protect(new RecoveryCodeLoginInfo("ABCDE-FGHIJ", null));
         var signInManager = BuildSignInManager();
         signInManager
             .TwoFactorRecoveryCodeSignInAsync(Arg.Any<string>())
@@ -429,7 +442,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/loginrecovery", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/dashboard", RedirectLocation(context));
@@ -441,7 +454,7 @@ public class CookieLoginMiddlewareTests
     public async Task LoginRecovery_Success_OffSiteReturnUrl_RedirectsToDashboard(string returnUrl)
     {
         // Arrange
-        var token = _tokens.Protect(new RecoveryCodeLoginInfo("ABCDE-FGHIJ", returnUrl));
+        var token = Tokens.Protect(new RecoveryCodeLoginInfo("ABCDE-FGHIJ", returnUrl));
         var signInManager = BuildSignInManager();
         signInManager
             .TwoFactorRecoveryCodeSignInAsync(Arg.Any<string>())
@@ -449,7 +462,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/loginrecovery", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/dashboard", RedirectLocation(context));
@@ -459,7 +472,7 @@ public class CookieLoginMiddlewareTests
     public async Task LoginRecovery_LockedOut_RedirectsToLockout()
     {
         // Arrange
-        var token = _tokens.Protect(new RecoveryCodeLoginInfo("CODE", null));
+        var token = Tokens.Protect(new RecoveryCodeLoginInfo("CODE", null));
         var signInManager = BuildSignInManager();
         signInManager
             .TwoFactorRecoveryCodeSignInAsync(Arg.Any<string>())
@@ -467,7 +480,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/loginrecovery", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/Account/Lockout", RedirectLocation(context));
@@ -477,7 +490,7 @@ public class CookieLoginMiddlewareTests
     public async Task LoginRecovery_Failed_RedirectsWithErrorQuery()
     {
         // Arrange
-        var token = _tokens.Protect(new RecoveryCodeLoginInfo("wrong", null));
+        var token = Tokens.Protect(new RecoveryCodeLoginInfo("wrong", null));
         var signInManager = BuildSignInManager();
         signInManager
             .TwoFactorRecoveryCodeSignInAsync(Arg.Any<string>())
@@ -485,7 +498,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/loginrecovery", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/Account/LoginWithRecoveryCode?error=invalid", RedirectLocation(context));
@@ -495,7 +508,7 @@ public class CookieLoginMiddlewareTests
     public async Task LoginRecovery_CodeWithSpaces_StripsThemBeforeVerification()
     {
         // Arrange
-        var token = _tokens.Protect(new RecoveryCodeLoginInfo("ABC DEF GHI", null));
+        var token = Tokens.Protect(new RecoveryCodeLoginInfo("ABC DEF GHI", null));
         var signInManager = BuildSignInManager();
         signInManager
             .TwoFactorRecoveryCodeSignInAsync(Arg.Any<string>())
@@ -503,10 +516,69 @@ public class CookieLoginMiddlewareTests
 
         // Act
         await BuildMiddleware()
-            .Invoke(BuildContext("/loginrecovery", token), signInManager, _tokens);
+            .Invoke(BuildContext("/loginrecovery", token), signInManager, Tokens);
 
         // Assert
         await signInManager.Received(1).TwoFactorRecoveryCodeSignInAsync("ABCDEFGHI");
+    }
+
+    #endregion
+
+    #region Transport security (#40)
+
+    [Theory]
+    [InlineData("/login")]
+    [InlineData("/login2fa")]
+    [InlineData("/loginrecovery")]
+    public async Task Handoff_GetRequest_IsRejected(string path)
+    {
+        // The handoff must be a POST — a GET (e.g. a handle leaked into the URL) is
+        // refused, so sign-in cannot be driven via a navigable link.
+        // Arrange
+        var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
+        var context = BuildContext(path, token, method: "GET");
+
+        // Act
+        await BuildMiddleware().Invoke(context, BuildSignInManager(), Tokens);
+
+        // Assert
+        Assert.Equal("/Account/Login", RedirectLocation(context));
+    }
+
+    [Theory]
+    [InlineData("cross-site")]
+    [InlineData("none")]
+    public async Task Handoff_NonSameOriginPost_IsRejected(string secFetchSite)
+    {
+        // A cross-site form post (login CSRF / session fixation) is refused before the
+        // handle is even consumed.
+        // Arrange
+        var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
+        var context = BuildContext("/login", token, secFetchSite: secFetchSite);
+
+        // Act
+        await BuildMiddleware().Invoke(context, BuildSignInManager(), Tokens);
+
+        // Assert
+        Assert.Equal("/Account/Login", RedirectLocation(context));
+    }
+
+    [Fact]
+    public async Task Handoff_NoFetchMetadata_RequiresMatchingOrigin()
+    {
+        // Older clients without Sec-Fetch-Site fall back to an Origin check.
+        // Arrange
+        var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
+        var context = BuildContext("/login", token, secFetchSite: null);
+        context.Request.Headers.Origin = "https://evil.example";
+        context.Request.Scheme = "https";
+        context.Request.Host = new HostString("app.example");
+
+        // Act
+        await BuildMiddleware().Invoke(context, BuildSignInManager(), Tokens);
+
+        // Assert
+        Assert.Equal("/Account/Login", RedirectLocation(context));
     }
 
     #endregion
@@ -520,7 +592,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login", "not-a-valid-token");
 
         // Act
-        await BuildMiddleware().Invoke(context, BuildSignInManager(), _tokens);
+        await BuildMiddleware().Invoke(context, BuildSignInManager(), Tokens);
 
         // Assert
         Assert.Equal("/Account/Login", RedirectLocation(context));
@@ -533,7 +605,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login2fa", "not-a-valid-token");
 
         // Act
-        await BuildMiddleware().Invoke(context, BuildSignInManager(), _tokens);
+        await BuildMiddleware().Invoke(context, BuildSignInManager(), Tokens);
 
         // Assert
         Assert.Equal("/Account/Login", RedirectLocation(context));
@@ -546,7 +618,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/loginrecovery", "not-a-valid-token");
 
         // Act
-        await BuildMiddleware().Invoke(context, BuildSignInManager(), _tokens);
+        await BuildMiddleware().Invoke(context, BuildSignInManager(), Tokens);
 
         // Assert
         Assert.Equal("/Account/Login", RedirectLocation(context));
@@ -558,7 +630,7 @@ public class CookieLoginMiddlewareTests
         // Regression for #5: the handoff is strictly single-use, so a captured URL
         // cannot be replayed to mint a second session (CWE-294).
         // Arrange
-        var token = _tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
+        var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
         var signInManager = BuildSignInManager();
         signInManager
             .PasswordSignInAsync(
@@ -571,11 +643,11 @@ public class CookieLoginMiddlewareTests
 
         // Act — first use succeeds…
         var first = BuildContext("/login", token);
-        await BuildMiddleware().Invoke(first, signInManager, _tokens);
+        await BuildMiddleware().Invoke(first, signInManager, Tokens);
 
         // …second use of the same handle is rejected.
         var second = BuildContext("/login", token);
-        await BuildMiddleware().Invoke(second, signInManager, _tokens);
+        await BuildMiddleware().Invoke(second, signInManager, Tokens);
 
         // Assert
         Assert.Equal("/dashboard", RedirectLocation(first));
@@ -594,7 +666,7 @@ public class CookieLoginMiddlewareTests
     public async Task Login_SetsNoReferrerPolicyHeader()
     {
         // Arrange
-        var token = _tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
+        var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
         var signInManager = BuildSignInManager();
         signInManager
             .PasswordSignInAsync(
@@ -607,7 +679,7 @@ public class CookieLoginMiddlewareTests
         var context = BuildContext("/login", token);
 
         // Act
-        await BuildMiddleware().Invoke(context, signInManager, _tokens);
+        await BuildMiddleware().Invoke(context, signInManager, Tokens);
 
         // Assert
         Assert.Equal("no-referrer", context.Response.Headers["Referrer-Policy"].ToString());
@@ -631,7 +703,7 @@ public class CookieLoginMiddlewareTests
         context.Request.Path = "/some-other-path";
 
         // Act
-        await middleware.Invoke(context, BuildSignInManager(), _tokens);
+        await middleware.Invoke(context, BuildSignInManager(), Tokens);
 
         // Assert
         Assert.True(nextInvoked);
