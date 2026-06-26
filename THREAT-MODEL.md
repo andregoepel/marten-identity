@@ -58,6 +58,11 @@ These are enforced by the library itself — you do not need to wire them up.
 - **Account lockout.** Lockout is enabled on user creation (honouring
   `Lockout.AllowedForNewUsers`); the first-run **root** user is exempt so it cannot
   be locked out. Failed-login counting is serialized so it cannot be raced.
+- **Root user integrity.** At most one root user can exist (a second creation is
+  rejected). The root user is automatically granted the Administrator role on
+  creation, cannot have that role removed, and cannot be made deletable — so the
+  privileged anchor account can neither be duplicated nor stripped of authority by
+  the frontend.
 - **Open-redirect protection.** Every post-authentication redirect (password, 2FA,
   recovery, passkey) is validated to be a local URL; absolute, protocol-relative
   (`//host`) and backslash targets are rejected.
