@@ -154,7 +154,7 @@ public class LoginFormTests : BunitContext
     }
 
     [Fact]
-    public async Task Submit_ValidCreds_NavigatesToLoginWithToken()
+    public async Task Submit_ValidCreds_PostsHandoffToLogin_NotInUrl()
     {
         // Arrange
         var user = new User { Email = "alice@example.com" };
@@ -171,7 +171,15 @@ public class LoginFormTests : BunitContext
         // Act
         await SubmitAsync(cut);
 
-        // Assert
-        Assert.Contains("/login?token=", Nav.Uri);
+        // Assert — the handoff is a POST to /login carrying the handle in the body (#40)
+        var form = cut.Find("form[action='/login']");
+        Assert.Equal("post", form.GetAttribute("method"));
+
+        var tokenInput = form.QuerySelector("input[name=token]");
+        Assert.NotNull(tokenInput);
+        Assert.False(string.IsNullOrEmpty(tokenInput!.GetAttribute("value")));
+
+        // and the handle never appears in the URL
+        Assert.DoesNotContain("token=", Nav.Uri);
     }
 }
