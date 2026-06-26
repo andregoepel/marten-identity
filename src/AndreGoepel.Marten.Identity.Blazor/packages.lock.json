@@ -16,9 +16,9 @@
       },
       "Radzen.Blazor": {
         "type": "Direct",
-        "requested": "[10.4.4, )",
-        "resolved": "10.4.4",
-        "contentHash": "+IoXXhOJ+LhxaSx7eBsT7bwxJVSRTecyTPNeOfCh2hKC1TwngEjBRxONvd0mwVnByoI+Bsvn1P3+mI5we7o4bw=="
+        "requested": "[11.0.4, )",
+        "resolved": "11.0.4",
+        "contentHash": "SqpkYTWi4XnqAvGeh0aHbA7FasAeCia9XQv3XiYYR7CQy7DcumB9xlb08VkX+Sxn5cnexGhWFUbLyn4NT0+9lA=="
       },
       "DistributedLock.Core": {
         "type": "Transitive",
