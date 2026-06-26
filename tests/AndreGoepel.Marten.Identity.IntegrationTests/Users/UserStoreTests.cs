@@ -7,6 +7,7 @@ using Marten;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
+using RoleNames = AndreGoepel.Marten.Identity.Roles.Roles;
 
 namespace AndreGoepel.Marten.Identity.IntegrationTests.Users;
 
@@ -100,6 +101,29 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
         var persisted = await session.LoadAsync<User>(user.UserId.Value, Ct);
         Assert.True(persisted!.LockoutEnabled);
         Assert.True(await store.GetLockoutEnabledAsync(persisted, Ct));
+    }
+
+    [Fact]
+    public async Task UpdateAsync_RootUser_StaysNonDeletable()
+    {
+        // #41 domain-layer invariant: a generic update must not be able to flip the
+        // root user to Deletable (a precursor to deleting the admin anchor).
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        user.RootUser = true;
+        user.Deletable = false;
+        await store.CreateAsync(user, Ct);
+
+        // Act — attempt to make it deletable (with another change so it is not a no-op)
+        var loaded = await store.FindByIdAsync(user.Id, Ct);
+        loaded!.Deletable = true;
+        loaded.PhoneNumber = "+49 100 200300";
+        await store.UpdateAsync(loaded, Ct);
+
+        // Assert
+        var reloaded = await store.FindByIdAsync(user.Id, Ct);
+        Assert.False(reloaded!.Deletable);
     }
 
     [Fact]
@@ -569,6 +593,51 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
 
         // Assert
         Assert.Empty(roles);
+    }
+
+    [Fact]
+    public async Task RemoveFromRole_RootUserAdministrator_IsRefused()
+    {
+        // #41 domain-layer invariant: the root admin anchor cannot lose its
+        // Administrator role, even via a direct store call that bypasses the UI guard.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        user.RootUser = true;
+        await store.CreateAsync(user, Ct);
+        await SeedRoleAsync(RoleNames.Administrator);
+        var fresh = await store.FindByIdAsync(user.Id, Ct);
+        await store.AddToRoleAsync(fresh!, RoleNames.Administrator, Ct);
+        var withRole = await store.FindByIdAsync(user.Id, Ct);
+
+        // Act / Assert
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            store.RemoveFromRoleAsync(withRole!, RoleNames.Administrator, Ct)
+        );
+
+        var after = await store.FindByIdAsync(user.Id, Ct);
+        Assert.Contains(RoleNames.Administrator, await store.GetRolesAsync(after!, Ct));
+    }
+
+    [Fact]
+    public async Task RemoveFromRole_NonRootAdministrator_IsAllowed()
+    {
+        // Guard must be scoped to the root user only — ordinary admins are removable.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+        await SeedRoleAsync(RoleNames.Administrator);
+        var fresh = await store.FindByIdAsync(user.Id, Ct);
+        await store.AddToRoleAsync(fresh!, RoleNames.Administrator, Ct);
+
+        // Act
+        var withRole = await store.FindByIdAsync(user.Id, Ct);
+        await store.RemoveFromRoleAsync(withRole!, RoleNames.Administrator, Ct);
+
+        // Assert
+        var after = await store.FindByIdAsync(user.Id, Ct);
+        Assert.Empty(await store.GetRolesAsync(after!, Ct));
     }
 
     [Fact]

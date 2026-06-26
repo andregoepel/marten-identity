@@ -9,6 +9,7 @@ using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
+using RoleNames = AndreGoepel.Marten.Identity.Roles.Roles;
 
 namespace AndreGoepel.Marten.Identity.Users;
 
@@ -127,6 +128,12 @@ public class UserStore<TUser>(
                 // authoritative here.
                 user.AccessFailedCount = existingUser.AccessFailedCount;
                 user.LockoutEnd = existingUser.LockoutEnd;
+
+                // Domain-layer invariant (#41): the root user must stay non-deletable so
+                // it can never be removed (which would orphan administration). Don't let
+                // a generic update flip Deletable, regardless of who initiates it.
+                if (existingUser.RootUser)
+                    user.Deletable = false;
             }
 
             if (existingUser != null && existingUser.AreEqual(user))
@@ -625,6 +632,20 @@ public class UserStore<TUser>(
 
         if (string.IsNullOrWhiteSpace(roleName))
             throw new ArgumentException("Role name cannot be null or empty.", nameof(roleName));
+
+        // Domain-layer invariant (defence in depth, independent of any UI [Authorize]):
+        // the root user is the un-removable administrator anchor created during setup.
+        // Stripping its Administrator role would orphan all admin access, so refuse it
+        // here regardless of who initiates the call (#41).
+        if (
+            user.RootUser
+            && string.Equals(roleName, RoleNames.Administrator, StringComparison.OrdinalIgnoreCase)
+        )
+        {
+            throw new InvalidOperationException(
+                "The root administrator cannot have the Administrator role removed."
+            );
+        }
 
         var role =
             await querySession
