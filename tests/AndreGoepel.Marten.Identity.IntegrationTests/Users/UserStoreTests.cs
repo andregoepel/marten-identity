@@ -148,6 +148,69 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task CreateAsync_RootUser_IsAutomaticallyAdministrator()
+    {
+        // The root user is always an administrator — the store assigns the role on
+        // creation so the frontend cannot create a root account without admin authority.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        user.RootUser = true;
+
+        // Act
+        var result = await store.CreateAsync(user, Ct);
+
+        // Assert — root holds Administrator and exactly one such role exists
+        Assert.True(result.Succeeded);
+        var root = await store.FindByIdAsync(user.Id, Ct);
+        Assert.Contains(RoleNames.Administrator, await store.GetRolesAsync(root!, Ct));
+        Assert.Equal(1, await CountAdministratorRolesAsync());
+    }
+
+    [Fact]
+    public async Task CreateAsync_RootUser_ReusesExistingAdministratorRole()
+    {
+        // If the Administrator role already exists, the root assignment reuses it
+        // rather than creating a duplicate.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        await SeedRoleAsync(RoleNames.Administrator);
+        var user = UserStoreTestHelpers.NewUser();
+        user.RootUser = true;
+
+        // Act
+        await store.CreateAsync(user, Ct);
+
+        // Assert
+        var root = await store.FindByIdAsync(user.Id, Ct);
+        Assert.Contains(RoleNames.Administrator, await store.GetRolesAsync(root!, Ct));
+        Assert.Equal(1, await CountAdministratorRolesAsync());
+    }
+
+    [Fact]
+    public async Task CreateAsync_SecondRootUser_IsRejected()
+    {
+        // Safeguard: only one root user may ever exist.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var first = UserStoreTestHelpers.NewUser("root1@example.com");
+        first.RootUser = true;
+        Assert.True((await store.CreateAsync(first, Ct)).Succeeded);
+
+        var second = UserStoreTestHelpers.NewUser("root2@example.com");
+        second.RootUser = true;
+
+        // Act
+        var result = await store.CreateAsync(second, Ct);
+
+        // Assert — rejected and not persisted
+        Assert.False(result.Succeeded);
+        Assert.Contains(result.Errors, e => e.Code == "RootUserAlreadyExists");
+        await using var session = fixture.Store.QuerySession();
+        Assert.Null(await session.LoadAsync<User>(second.UserId.Value, Ct));
+    }
+
+    [Fact]
     public async Task CreateAsync_RespectsAllowedForNewUsersFalse()
     {
         // Arrange
@@ -600,19 +663,16 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     {
         // #41 domain-layer invariant: the root admin anchor cannot lose its
         // Administrator role, even via a direct store call that bypasses the UI guard.
-        // Arrange
+        // Arrange — the root user is automatically an administrator on creation.
         var store = UserStoreTestHelpers.BuildStore(fixture.Store);
         var user = UserStoreTestHelpers.NewUser();
         user.RootUser = true;
         await store.CreateAsync(user, Ct);
-        await SeedRoleAsync(RoleNames.Administrator);
-        var fresh = await store.FindByIdAsync(user.Id, Ct);
-        await store.AddToRoleAsync(fresh!, RoleNames.Administrator, Ct);
-        var withRole = await store.FindByIdAsync(user.Id, Ct);
+        var root = await store.FindByIdAsync(user.Id, Ct);
 
         // Act / Assert
         await Assert.ThrowsAsync<InvalidOperationException>(() =>
-            store.RemoveFromRoleAsync(withRole!, RoleNames.Administrator, Ct)
+            store.RemoveFromRoleAsync(root!, RoleNames.Administrator, Ct)
         );
 
         var after = await store.FindByIdAsync(user.Id, Ct);
@@ -697,6 +757,15 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
         var roleId = RoleId.New();
         session.Events.Append(roleId.Value, new RoleCreated(roleId, name, UserId.New()));
         await session.SaveChangesAsync(Ct);
+    }
+
+    private async Task<int> CountAdministratorRolesAsync()
+    {
+        await using var session = fixture.Store.QuerySession();
+        return await session
+            .Query<Role>()
+            .Where(r => r.NormalizedName == RoleNames.Administrator.ToUpperInvariant())
+            .CountAsync(Ct);
     }
 
     private static UserManager<User> BuildUserManager(UserStore<User> store) =>
