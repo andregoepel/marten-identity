@@ -157,11 +157,14 @@ public class CookieLoginMiddleware(RequestDelegate next)
         if (!HttpMethods.IsPost(request.Method))
             return false;
 
-        // UseAntiforgery() validates the post and defers a failure to first form
-        // access; reading the form below would otherwise throw on a missing/invalid
-        // token (e.g. a forged cross-site post). Reject cleanly instead of 500ing.
-        if (context.Features.Get<IAntiforgeryValidationFeature>() is { IsValid: false })
-            return false;
+        // These handoff endpoints are guarded by the same-origin check below plus a
+        // single-use handle, not by the host's UseAntiforgery() — an interactive
+        // Blazor circuit can't reliably supply a valid form antiforgery token to a
+        // middleware endpoint, and prerendering behaviour varies by host render mode.
+        // UseAntiforgery() defers a failed validation to the first form read, which
+        // would otherwise throw here (#40 follow-up). Clear that deferral so reading
+        // the form succeeds; cross-site posts are still rejected just below.
+        context.Features.Set<IAntiforgeryValidationFeature>(null);
 
         if (!request.HasFormContentType)
             return false;
