@@ -1,9 +1,6 @@
 ﻿@page "/Account/Manage/DeletePersonalData"
 @rendermode InteractiveServer
 
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
-
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<User> UserManager
 @inject ILogger<DeletePersonalData> Logger
@@ -68,9 +65,9 @@
                                       Text="Permanently Delete My Account"
                                       ButtonStyle="ButtonStyle.Danger"
                                       Size="ButtonSize.Large"
-                                      IsBusy=@isDeleting
+                                      IsBusy=@_isDeleting
                                       BusyText="Deleting account..."
-                                      Disabled=@isDeleting />
+                                      Disabled=@_isDeleting />
 
                         <RadzenButton Text="Cancel – Keep my account"
                                       ButtonStyle="ButtonStyle.Secondary"
@@ -89,15 +86,15 @@
 
 @code {
     private InputModel Model { get; set; } = new();
-    private User? CurrentUser;
-    private bool isDeleting;
+    private User? _currentUser;
+    private bool _isDeleting;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        CurrentUser = await UserManager.GetUserAsync(authState.User);
+        _currentUser = await UserManager.GetUserAsync(authState.User);
 
-        if (CurrentUser == null)
+        if (_currentUser == null)
         {
             NotificationService.Notify(NotificationSeverity.Error, "Error", "Unable to load user profile.");
             NavigationManager.NavigateTo("/Account/Manage/Profile");
@@ -106,7 +103,7 @@
 
     private async Task OnValidSubmit(InputModel model)
     {
-        if (CurrentUser == null)
+        if (_currentUser == null)
         {
             NotificationService.Notify(NotificationSeverity.Error, "Error", "User not loaded.");
             return;
@@ -124,20 +121,20 @@
             return;
         }
 
-        isDeleting = true;
+        _isDeleting = true;
         StateHasChanged();
 
         try
         {
             // Passwort prüfen
-            if (!await UserManager.CheckPasswordAsync(CurrentUser, model.Password))
+            if (!await UserManager.CheckPasswordAsync(_currentUser, model.Password))
             {
                 NotificationService.Notify(NotificationSeverity.Error, "Error", "The password you entered is incorrect.");
                 return;
             }
 
-            var userId = await UserManager.GetUserIdAsync(CurrentUser);
-            var result = await UserManager.DeleteAsync(CurrentUser);
+            var userId = await UserManager.GetUserIdAsync(_currentUser);
+            var result = await UserManager.DeleteAsync(_currentUser);
 
             if (!result.Succeeded)
             {
@@ -154,7 +151,7 @@
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Unexpected error while deleting user {UserId}", await UserManager.GetUserIdAsync(CurrentUser));
+            Logger.LogError(ex, "Unexpected error while deleting user {UserId}", await UserManager.GetUserIdAsync(_currentUser));
             NotificationService.Notify(
                 NotificationSeverity.Error,
                 "Critical Error",
@@ -163,7 +160,7 @@
         }
         finally
         {
-            isDeleting = false;
+            _isDeleting = false;
             StateHasChanged();
         }
     }

@@ -6,14 +6,14 @@ public partial class UserRoleDialog
 {
     protected override async Task OnInitializedAsync()
     {
-        user =
+        _user =
             await UserManager.FindByIdAsync(UserId)
             ?? throw new InvalidOperationException("User not found");
-        roles = await RoleManager
+        _roles = await RoleManager
             .Roles.Where(role => !role.Deleted)
             .ToListAsync(CancellationToken.None);
 
-        Values = [.. user.Roles.Select(roleId => roleId)];
+        _values = [.. _user.Roles.Select(roleId => roleId)];
 
         await base.OnInitializedAsync();
     }

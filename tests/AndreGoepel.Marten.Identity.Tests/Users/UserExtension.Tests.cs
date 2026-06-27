@@ -4,7 +4,7 @@ namespace AndreGoepel.Marten.Identity.Tests.Users;
 
 public class UserExtensionTests
 {
-    private static readonly DateTimeOffset _lockoutEnd = new(2026, 1, 1, 12, 0, 0, TimeSpan.Zero);
+    private static readonly DateTimeOffset LockoutEnd = new(2026, 1, 1, 12, 0, 0, TimeSpan.Zero);
 
     private static User BaseUser() =>
         new()
@@ -19,7 +19,7 @@ public class UserExtensionTests
             TwoFactorEnabled = false,
             Deletable = true,
             LockoutEnabled = true,
-            LockoutEnd = _lockoutEnd,
+            LockoutEnd = LockoutEnd,
             AccessFailedCount = 0,
             // IdentityUser assigns a random SecurityStamp in its constructor;
             // pin it so two "identical" fixtures genuinely match.
@@ -209,7 +209,7 @@ public class UserExtensionTests
         // Arrange
         var a = BaseUser();
         var b = BaseUser();
-        b.LockoutEnd = _lockoutEnd.AddHours(1);
+        b.LockoutEnd = LockoutEnd.AddHours(1);
 
         // Act
         var result = a.AreEqual(b);

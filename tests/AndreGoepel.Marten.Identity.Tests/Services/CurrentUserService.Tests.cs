@@ -29,7 +29,7 @@ public class CurrentUserServiceTests
         var service = Build(AuthState(new Claim(ClaimTypes.NameIdentifier, expected.ToString())));
 
         // Act
-        var result = await service.GetCurrentUserIdAsync();
+        var result = await service.GetCurrentUserIdAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(expected, result);
@@ -42,7 +42,7 @@ public class CurrentUserServiceTests
         var service = Build(UnauthenticatedState());
 
         // Act
-        var result = await service.GetCurrentUserIdAsync();
+        var result = await service.GetCurrentUserIdAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(default, result);
@@ -55,7 +55,7 @@ public class CurrentUserServiceTests
         var service = Build(AuthState(new Claim(ClaimTypes.Email, "alice@example.com")));
 
         // Act
-        var result = await service.GetCurrentUserIdAsync();
+        var result = await service.GetCurrentUserIdAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(default, result);
@@ -68,7 +68,7 @@ public class CurrentUserServiceTests
         var service = Build(AuthState(new Claim(ClaimTypes.NameIdentifier, "not-a-guid")));
 
         // Act
-        var result = await service.GetCurrentUserIdAsync();
+        var result = await service.GetCurrentUserIdAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(default, result);
@@ -81,7 +81,7 @@ public class CurrentUserServiceTests
         var service = Build(AuthState(new Claim(ClaimTypes.NameIdentifier, "")));
 
         // Act
-        var result = await service.GetCurrentUserIdAsync();
+        var result = await service.GetCurrentUserIdAsync(TestContext.Current.CancellationToken);
 
         // Assert
         Assert.Equal(default, result);

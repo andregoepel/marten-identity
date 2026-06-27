@@ -19,15 +19,15 @@ namespace AndreGoepel.Marten.Identity.Http;
 /// </summary>
 public sealed class LoginTokenProtector(IDataProtectionProvider provider)
 {
-    private const string _purpose = "AndreGoepel.Marten.Identity.LoginHandoff";
+    private const string Purpose = "AndreGoepel.Marten.Identity.LoginHandoff";
 
     // Two minutes is plenty for the round-trip from the form submit to the
     // cookie-write middleware call; long enough to absorb a slow network, short
     // enough that an abandoned handoff is mostly useless.
-    private static readonly TimeSpan _lifetime = TimeSpan.FromMinutes(2);
+    private static readonly TimeSpan Lifetime = TimeSpan.FromMinutes(2);
 
     private readonly ITimeLimitedDataProtector _protector = provider
-        .CreateProtector(_purpose)
+        .CreateProtector(Purpose)
         .ToTimeLimitedDataProtector();
 
     private readonly ConcurrentDictionary<string, PendingHandoff> _pending = new();
@@ -42,9 +42,9 @@ public sealed class LoginTokenProtector(IDataProtectionProvider provider)
 
         // Encrypt at rest too, so the payload is not sitting in process memory in
         // the clear while it waits to be consumed.
-        var ciphertext = _protector.Protect(JsonSerializer.Serialize(payload), _lifetime);
+        var ciphertext = _protector.Protect(JsonSerializer.Serialize(payload), Lifetime);
         var handle = Guid.NewGuid().ToString("N");
-        _pending[handle] = new PendingHandoff(ciphertext, DateTimeOffset.UtcNow.Add(_lifetime));
+        _pending[handle] = new PendingHandoff(ciphertext, DateTimeOffset.UtcNow.Add(Lifetime));
         return handle;
     }
 

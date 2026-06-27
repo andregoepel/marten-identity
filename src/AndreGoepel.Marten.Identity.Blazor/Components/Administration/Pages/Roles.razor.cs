@@ -1,4 +1,3 @@
-using AndreGoepel.Marten.Identity.Roles;
 using Marten;
 
 namespace AndreGoepel.Marten.Identity.Blazor.Components.Administration.Pages;
@@ -9,6 +8,6 @@ public partial class Roles
     {
         var query = ShowDeleted ? RoleManager.Roles : RoleManager.Roles.Where(r => !r.Deleted);
 
-        roles = await query.ToListAsync(CancellationToken.None);
+        _roles = await query.ToListAsync(CancellationToken.None);
     }
 }

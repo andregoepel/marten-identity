@@ -18,12 +18,10 @@ public class RoleStoreTests
     private sealed record Harness(
         RoleStore<Role> Store,
         IDocumentSession Session,
-        IEventStoreOperations Events,
-        List<AppendedEvent> Appended,
-        UserId ActorId
+        List<AppendedEvent> Appended
     )
     {
-        public IEnumerable<object> Events_ => Appended.Select(a => a.Event);
+        public IEnumerable<object> Events => Appended.Select(a => a.Event);
     }
 
     private static Harness Build()
@@ -49,13 +47,7 @@ public class RoleStoreTests
 
         var logger = Substitute.For<ILogger<RoleStore<Role>>>();
 
-        return new Harness(
-            new RoleStore<Role>(session, currentUser, logger),
-            session,
-            events,
-            appended,
-            actor
-        );
+        return new Harness(new RoleStore<Role>(session, currentUser, logger), session, appended);
     }
 
     #endregion
@@ -112,7 +104,7 @@ public class RoleStoreTests
 
         // Assert
         Assert.True(result.Succeeded);
-        var changed = Assert.IsType<RoleChanged>(Assert.Single(harness.Events_));
+        var changed = Assert.IsType<RoleChanged>(Assert.Single(harness.Events));
         Assert.False(changed.Deletable);
     }
 
@@ -127,7 +119,7 @@ public class RoleStoreTests
         await harness.Store.UpdateAsync(role, CancellationToken.None);
 
         // Assert
-        var changed = Assert.IsType<RoleChanged>(Assert.Single(harness.Events_));
+        var changed = Assert.IsType<RoleChanged>(Assert.Single(harness.Events));
         Assert.True(changed.Deletable);
     }
 
@@ -147,7 +139,7 @@ public class RoleStoreTests
 
         // Assert
         Assert.True(result.Succeeded);
-        Assert.IsType<RoleDeleted>(Assert.Single(harness.Events_));
+        Assert.IsType<RoleDeleted>(Assert.Single(harness.Events));
         harness.Session.Received(0).Delete(Arg.Any<Role>());
     }
 
@@ -190,7 +182,7 @@ public class RoleStoreTests
 
         // Assert
         Assert.True(result.Succeeded);
-        Assert.IsType<RoleRestored>(Assert.Single(harness.Events_));
+        Assert.IsType<RoleRestored>(Assert.Single(harness.Events));
         harness.Session.Received(0).Store(Arg.Any<Role>());
     }
 

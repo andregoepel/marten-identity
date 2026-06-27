@@ -1,5 +1,4 @@
 using System.Buffers.Text;
-using System.Security.Claims;
 using System.Text.Json;
 using AndreGoepel.Marten.Identity.Http;
 using AndreGoepel.Marten.Identity.Users;
@@ -27,11 +26,7 @@ public static class IdentityComponentsEndpointRouteBuilderExtensions
 
         accountGroup.MapPost(
             "/Logout",
-            async (
-                ClaimsPrincipal user,
-                [FromServices] SignInManager<User> signInManager,
-                [FromForm] string returnUrl
-            ) =>
+            async ([FromServices] SignInManager<User> signInManager, [FromForm] string returnUrl) =>
             {
                 await signInManager.SignOutAsync();
                 // Validate the returnUrl before building the redirect. Concatenating

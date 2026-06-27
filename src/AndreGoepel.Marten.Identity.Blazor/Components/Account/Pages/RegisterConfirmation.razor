@@ -1,11 +1,6 @@
 @page "/Account/RegisterConfirmation"
 @attribute [AllowAnonymous]
 
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
-@using Radzen
-@using Radzen.Blazor
-
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
 
@@ -17,10 +12,10 @@
 
             <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Check your email</RadzenText>
 
-            @if (error is not null)
+            @if (_error is not null)
             {
                 <RadzenAlert AlertStyle="AlertStyle.Danger" Shade="Shade.Lighter" Variant="Variant.Flat" AllowClose="false">
-                    @error
+                    @_error
                 </RadzenAlert>
             }
             else
@@ -39,7 +34,7 @@
 </div>
 
 @code {
-    private string? error;
+    private string? _error;
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -59,7 +54,7 @@
         if (user is null)
         {
             HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            error = "Error finding user for the specified email.";
+            _error = "Error finding user for the specified email.";
         }
     }
 }

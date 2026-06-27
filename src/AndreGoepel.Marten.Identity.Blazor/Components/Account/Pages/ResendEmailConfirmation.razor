@@ -2,9 +2,6 @@
 @attribute [AllowAnonymous]
 @layout LoginLayout
 @rendermode InteractiveServer
-
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 
 @inject UserManager<User> UserManager
@@ -38,7 +35,7 @@
             <RadzenButton ButtonType="ButtonType.Submit"
                           Text="Resend"
                           ButtonStyle="ButtonStyle.Primary"
-                          IsBusy=@isProcessing
+                          IsBusy=@_isProcessing
                           BusyText="Sending..." />
         </div>
 
@@ -47,11 +44,11 @@
 
 @code {
     private InputModel Input { get; set; } = new();
-    private bool isProcessing;
+    private bool _isProcessing;
 
     private async Task OnSubmitAsync(InputModel model)
     {
-        isProcessing = true;
+        _isProcessing = true;
 
         try
         {
@@ -75,7 +72,7 @@
         }
         finally
         {
-            isProcessing = false;
+            _isProcessing = false;
         }
     }
 

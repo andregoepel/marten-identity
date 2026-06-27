@@ -12,11 +12,11 @@ internal sealed class CleanupScheduleStartupService(
     ILogger<CleanupScheduleStartupService> logger
 ) : IHostedService
 {
-    private static readonly TriggerKey _triggerKey = new(
+    private static readonly TriggerKey TriggerKey = new(
         "DeletedUserCleanupTrigger",
         "MartenIdentity"
     );
-    private static readonly JobKey _jobKey = new("DeletedUserCleanup", "MartenIdentity");
+    private static readonly JobKey JobKey = new("DeletedUserCleanup", "MartenIdentity");
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
@@ -30,7 +30,7 @@ internal sealed class CleanupScheduleStartupService(
     {
         try
         {
-            using var session = documentStore.QuerySession();
+            await using var session = documentStore.QuerySession();
             var settings = await session.LoadAsync<CleanupSettings>(CleanupSettings.DocumentId);
             if (settings is null)
                 return;
@@ -38,12 +38,12 @@ internal sealed class CleanupScheduleStartupService(
             var scheduler = await schedulerFactory.GetScheduler();
             var newTrigger = TriggerBuilder
                 .Create()
-                .WithIdentity(_triggerKey)
-                .ForJob(_jobKey)
+                .WithIdentity(TriggerKey)
+                .ForJob(JobKey)
                 .WithCronSchedule(settings.CronSchedule)
                 .Build();
 
-            var nextFire = await scheduler.RescheduleJob(_triggerKey, newTrigger);
+            var nextFire = await scheduler.RescheduleJob(TriggerKey, newTrigger);
             if (nextFire.HasValue)
                 logger.LogInformation(
                     "Applied stored cleanup schedule '{CronSchedule}'. Next run: {NextFire:u}.",
