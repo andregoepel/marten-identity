@@ -21,7 +21,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     public async Task CreateAsync_PersistsRole_AndProjectsDocument()
     {
         // Arrange
-        var store= Build();
+        var store = Build();
         var role = new Role { Name = "Administrator" };
         var expectedId = role.RoleId;
 
@@ -41,7 +41,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     public async Task UpdateAsync_PreservesDeletableFalseEndToEnd()
     {
         // Arrange
-        var store= Build();
+        var store = Build();
         var role = new Role { Name = "System", Deletable = false };
         await store.CreateAsync(role, Ct);
         var fresh = await store.FindByIdAsync(role.Id, Ct);
@@ -62,7 +62,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     public async Task DeleteAsync_SoftDeletes_DocumentSurvives()
     {
         // Arrange
-        var store= Build();
+        var store = Build();
         var role = new Role { Name = "Temp" };
         await store.CreateAsync(role, Ct);
 
@@ -82,7 +82,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     public async Task RestoreAsync_ClearsDeleted()
     {
         // Arrange
-        var store= Build();
+        var store = Build();
         var role = new Role { Name = "Temp" };
         await store.CreateAsync(role, Ct);
         await store.DeleteAsync(role, Ct);
@@ -103,7 +103,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     public async Task FindByName_ReturnsRoleByNormalizedName()
     {
         // Arrange
-        var store= Build();
+        var store = Build();
         await store.CreateAsync(new Role { Name = "Moderator" }, Ct);
 
         // Act
@@ -119,7 +119,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     {
         // DB-level partial unique index: two *active* roles cannot share a name.
         // Arrange
-        var store= Build();
+        var store = Build();
         Assert.True((await store.CreateAsync(new Role { Name = "Dup" }, Ct)).Succeeded);
 
         // Act — a second active role with the same name (different stream) must fail
@@ -161,6 +161,10 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
             .Returns(UserId.New());
 
         var session = fixture.Store.LightweightSession();
-        return new RoleStore<Role>(session, currentUserService, NullLogger<RoleStore<Role>>.Instance);
+        return new RoleStore<Role>(
+            session,
+            currentUserService,
+            NullLogger<RoleStore<Role>>.Instance
+        );
     }
 }

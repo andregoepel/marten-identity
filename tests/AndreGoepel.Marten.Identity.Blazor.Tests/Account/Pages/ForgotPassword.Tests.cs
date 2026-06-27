@@ -14,10 +14,9 @@ public class ForgotPasswordTests : BunitContext
 {
     #region Helpers
 
-    private (
-        IRenderedComponent<ForgotPassword> Cut,
-        IEmailSender<User> Email
-    ) Render(Action<UserManager<User>>? configure = null)
+    private (IRenderedComponent<ForgotPassword> Cut, IEmailSender<User> Email) Render(
+        Action<UserManager<User>>? configure = null
+    )
     {
         JSInterop.Mode = JSRuntimeMode.Loose;
         var store = Substitute.For<IUserStore<User>>();

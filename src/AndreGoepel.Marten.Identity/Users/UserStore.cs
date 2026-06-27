@@ -22,7 +22,7 @@ public class UserStore<TUser>(
     IOptions<IdentityOptions> identityOptions,
     ILogger<UserStore<TUser>> logger
 )
-    :   IUserPasswordStore<TUser>,
+    : IUserPasswordStore<TUser>,
         IUserEmailStore<TUser>,
         IUserPhoneNumberStore<TUser>,
         IUserTwoFactorStore<TUser>,

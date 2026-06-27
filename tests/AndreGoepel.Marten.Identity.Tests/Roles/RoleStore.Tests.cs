@@ -47,11 +47,7 @@ public class RoleStoreTests
 
         var logger = Substitute.For<ILogger<RoleStore<Role>>>();
 
-        return new Harness(
-            new RoleStore<Role>(session, currentUser, logger),
-            session,
-            appended
-        );
+        return new Harness(new RoleStore<Role>(session, currentUser, logger), session, appended);
     }
 
     #endregion

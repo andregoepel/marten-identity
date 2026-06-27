@@ -88,7 +88,7 @@ public class ProfileTests : BunitContext
     public async Task Submit_SetPhoneFails_NotifiesError()
     {
         // Arrange
-        var (cut, _,_) = Render(
+        var (cut, _, _) = Render(
             currentPhone: "+49 123 4567890",
             configure: (um, user) =>
                 um.SetPhoneNumberAsync(user, Arg.Any<string>())

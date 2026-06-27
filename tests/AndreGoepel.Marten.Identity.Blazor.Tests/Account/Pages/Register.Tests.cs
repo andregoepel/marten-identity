@@ -19,10 +19,10 @@ public class RegisterTests : BunitContext
 {
     #region Helpers
 
-    private (
-        IRenderedComponent<Register> Cut,
-        IEmailSender<User> Email
-    ) Render(Action<UserManager<User>>? configure = null, bool requireConfirmedAccount = true)
+    private (IRenderedComponent<Register> Cut, IEmailSender<User> Email) Render(
+        Action<UserManager<User>>? configure = null,
+        bool requireConfirmedAccount = true
+    )
     {
         JSInterop.Mode = JSRuntimeMode.Loose;
         var store = Substitute.For<IUserStore<User>, IUserEmailStore<User>>();

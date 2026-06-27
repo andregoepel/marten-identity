@@ -26,10 +26,7 @@ public static class IdentityComponentsEndpointRouteBuilderExtensions
 
         accountGroup.MapPost(
             "/Logout",
-            async (
-                [FromServices] SignInManager<User> signInManager,
-                [FromForm] string returnUrl
-            ) =>
+            async ([FromServices] SignInManager<User> signInManager, [FromForm] string returnUrl) =>
             {
                 await signInManager.SignOutAsync();
                 // Validate the returnUrl before building the redirect. Concatenating

@@ -43,10 +43,9 @@ public class LoginFormTests : BunitContext
             Substitute.For<IUserConfirmation<User>>()
         );
 
-    private (
-        IRenderedComponent<LoginForm> Cut,
-        UserManager<User> Um
-    ) Render(Action<UserManager<User>, SignInManager<User>>? configure = null)
+    private (IRenderedComponent<LoginForm> Cut, UserManager<User> Um) Render(
+        Action<UserManager<User>, SignInManager<User>>? configure = null
+    )
     {
         JSInterop.Mode = JSRuntimeMode.Loose;
         var um = BuildUserManager();
