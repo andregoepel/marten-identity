@@ -1,11 +1,6 @@
 ﻿@page "/Account/Manage/Disable2fa"
 @rendermode InteractiveServer
 
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
-@using Radzen
-@using Radzen.Blazor
-
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
 @inject ILogger<Disable2fa> Logger
@@ -35,7 +30,7 @@
                 <RadzenButton Text="Disable 2FA"
                               ButtonStyle="ButtonStyle.Danger"
                               Size="ButtonSize.Large"
-                              IsBusy="@isProcessing"
+                              IsBusy="@_isProcessing"
                               BusyText="Disabling..."
                               Style="width: 100%; max-width: 360px;"
                               Click=@OnSubmitAsync />
@@ -52,42 +47,41 @@
 </div>
 
 @code {
-    private User? user;
-    private bool isProcessing;
+    private User? _user;
+    private bool _isProcessing;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        user = await UserManager.GetUserAsync(authState.User);
+        _user = await UserManager.GetUserAsync(authState.User);
 
-        if (user is null)
+        if (_user is null)
         {
             NotificationService.Notify(NotificationSeverity.Error, "Error", "Could not load user profile.");
-            return;
         }
     }
 
     private async Task OnSubmitAsync()
     {
-        isProcessing = true;
+        _isProcessing = true;
         StateHasChanged();
 
         try
         {
-            if(user == null)
+            if(_user == null)
             {
                 NotificationService.Notify(NotificationSeverity.Error, "Error", "Invalid user.");
                 return;
             }
 
-            var result = await UserManager.SetTwoFactorEnabledAsync(user, enabled: false);
+            var result = await UserManager.SetTwoFactorEnabledAsync(_user, enabled: false);
 
             if (!result.Succeeded)
             {
                 throw new InvalidOperationException("Failed to disable 2FA: " + string.Join(", ", result.Errors.Select(e => e.Description)));
             }
 
-            var userId = await UserManager.GetUserIdAsync(user);
+            var userId = await UserManager.GetUserIdAsync(_user);
             Logger.LogInformation("User {UserId} disabled 2FA", userId);
 
             NotificationService.Notify(NotificationSeverity.Info, "2FA has been disabled",
@@ -96,7 +90,7 @@
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to disable 2FA for user {UserId}", user?.Id);
+            Logger.LogError(ex, "Failed to disable 2FA for user {UserId}", _user?.Id);
             NotificationService.Notify(
                 NotificationSeverity.Error,
                 summary: "Error",
@@ -105,7 +99,7 @@
         }
         finally
         {
-            isProcessing = false;
+            _isProcessing = false;
             StateHasChanged();
         }
     }

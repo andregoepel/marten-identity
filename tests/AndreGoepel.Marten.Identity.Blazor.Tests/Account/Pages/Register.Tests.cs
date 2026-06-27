@@ -21,8 +21,6 @@ public class RegisterTests : BunitContext
 
     private (
         IRenderedComponent<Register> Cut,
-        UserManager<User> Um,
-        IUserStore<User> Store,
         IEmailSender<User> Email
     ) Render(Action<UserManager<User>>? configure = null, bool requireConfirmedAccount = true)
     {
@@ -64,7 +62,7 @@ public class RegisterTests : BunitContext
         Services.AddSingleton(new NotificationService());
         Services.AddSingleton(new LoginTokenProtector(DataProtectionProvider.Create("Tests")));
 
-        return (Render<Register>(), um, store, emailSender);
+        return (Render<Register>(), emailSender);
     }
 
     private NotificationService Notifications => Services.GetRequiredService<NotificationService>();
@@ -77,9 +75,9 @@ public class RegisterTests : BunitContext
         string password = "P@ssw0rd!123"
     )
     {
-        cut.Find("input[name=Email]").Change(email);
-        cut.Find("input[name=NewPassword]").Change(password);
-        cut.Find("input[name=ConfirmPassword]").Change(password);
+        await cut.Find("input[name=Email]").ChangeAsync(email);
+        await cut.Find("input[name=NewPassword]").ChangeAsync(password);
+        await cut.Find("input[name=ConfirmPassword]").ChangeAsync(password);
         await cut.Find("form").SubmitAsync();
     }
 
@@ -89,7 +87,7 @@ public class RegisterTests : BunitContext
     public void RendersEmailPasswordConfirmFields()
     {
         // Arrange / Act
-        var (cut, _, _, _) = Render();
+        var (cut, _) = Render();
 
         // Assert
         Assert.NotNull(cut.Find("input[name=Email]"));
@@ -101,7 +99,7 @@ public class RegisterTests : BunitContext
     public async Task Submit_SuccessfulCreate_WithRequireConfirmed_SendsEmailAndNavigatesToConfirmation()
     {
         // Arrange
-        var (cut, um, _, email) = Render(um =>
+        var (cut, email) = Render(um =>
         {
             um.CreateAsync(Arg.Any<User>(), Arg.Any<string>()).Returns(IdentityResult.Success);
             um.GetUserIdAsync(Arg.Any<User>()).Returns("uid");
@@ -122,7 +120,7 @@ public class RegisterTests : BunitContext
     public async Task Submit_CreateFails_ShowsErrorNotification()
     {
         // Arrange
-        var (cut, um, _, _) = Render(um =>
+        var (cut, _) = Render(um =>
             um.CreateAsync(Arg.Any<User>(), Arg.Any<string>())
                 .Returns(IdentityResult.Failed(new IdentityError { Description = "duplicate" }))
         );

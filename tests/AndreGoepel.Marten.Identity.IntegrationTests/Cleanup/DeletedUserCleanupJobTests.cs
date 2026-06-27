@@ -134,7 +134,7 @@ public class DeletedUserCleanupJobTests(MartenFixture fixture) : IAsyncLifetime
         return userId;
     }
 
-    private async Task<UserId> SeedLiveUserAsync()
+    private async Task SeedLiveUserAsync()
     {
         var userId = UserId.New();
         await using var session = fixture.Store.LightweightSession();
@@ -143,6 +143,5 @@ public class DeletedUserCleanupJobTests(MartenFixture fixture) : IAsyncLifetime
             new UserCreated(userId, "bob", "bob@example.com", "hash")
         );
         await session.SaveChangesAsync(Ct);
-        return userId;
     }
 }

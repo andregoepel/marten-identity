@@ -1,12 +1,7 @@
 @page "/Account/ConfirmEmail"
 @attribute [AllowAnonymous]
 
-@using System.Text
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
-@using Radzen
-@using Radzen.Blazor
 
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
@@ -19,7 +14,7 @@
 
             <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Email confirmation</RadzenText>
 
-            @if (succeeded)
+            @if (_succeeded)
             {
                 <RadzenAlert AlertStyle="AlertStyle.Success" Shade="Shade.Lighter" Variant="Variant.Flat" AllowClose="false">
                     Thank you for confirming your email. You can now log in.
@@ -31,7 +26,7 @@
             else
             {
                 <RadzenAlert AlertStyle="AlertStyle.Danger" Shade="Shade.Lighter" Variant="Variant.Flat" AllowClose="false">
-                    @error
+                    @_error
                 </RadzenAlert>
                 <RadzenButton Text="Go to home"
                               ButtonStyle="ButtonStyle.Primary"
@@ -43,8 +38,8 @@
 </div>
 
 @code {
-    private bool succeeded;
-    private string error = "An error occurred confirming your email.";
+    private bool _succeeded;
+    private string _error = "An error occurred confirming your email.";
 
     [CascadingParameter]
     private HttpContext HttpContext { get; set; } = default!;
@@ -68,14 +63,14 @@
         {
             HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
             // Do not reflect the supplied UserId back to the client (#13, CWE-204).
-            error = "Error confirming your email. The link may be invalid or expired.";
+            _error = "Error confirming your email. The link may be invalid or expired.";
             return;
         }
 
         var code = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code));
         var result = await UserManager.ConfirmEmailAsync(user, code);
-        succeeded = result.Succeeded;
+        _succeeded = result.Succeeded;
         if (!result.Succeeded)
-            error = "Error confirming your email. The link may have expired.";
+            _error = "Error confirming your email. The link may have expired.";
     }
 }

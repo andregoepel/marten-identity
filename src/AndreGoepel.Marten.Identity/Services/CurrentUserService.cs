@@ -9,7 +9,7 @@ public class CurrentUserService(AuthenticationStateProvider authStateProvider) :
     public async Task<UserId> GetCurrentUserIdAsync(CancellationToken cancellationToken = default)
     {
         var authState = await authStateProvider.GetAuthenticationStateAsync();
-        var idClaim = authState.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        var idClaim = authState.User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         return Guid.TryParse(idClaim, out var guid) ? UserId.Parse(guid) : default;
     }
 }

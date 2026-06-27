@@ -100,6 +100,7 @@ public class UserPasskeyTests
         var passkey = MakePasskey([1, 2, 3]);
 
         // Act
+        // ReSharper disable once SuspiciousTypeConversion.Global
         var result = passkey.Equals("notapasskey");
 
         // Assert

@@ -16,7 +16,6 @@ public class ForgotPasswordTests : BunitContext
 
     private (
         IRenderedComponent<ForgotPassword> Cut,
-        UserManager<User> Um,
         IEmailSender<User> Email
     ) Render(Action<UserManager<User>>? configure = null)
     {
@@ -39,7 +38,7 @@ public class ForgotPasswordTests : BunitContext
         Services.AddSingleton(um);
         Services.AddSingleton(emailSender);
         Services.AddSingleton(new NotificationService());
-        return (Render<ForgotPassword>(), um, emailSender);
+        return (Render<ForgotPassword>(), emailSender);
     }
 
     private NavigationManager Nav => Services.GetRequiredService<NavigationManager>();
@@ -49,7 +48,7 @@ public class ForgotPasswordTests : BunitContext
         string email = "alice@example.com"
     )
     {
-        cut.Find("input[name=Email]").Change(email);
+        await cut.Find("input[name=Email]").ChangeAsync(email);
         await cut.Find("form").SubmitAsync();
     }
 
@@ -59,7 +58,7 @@ public class ForgotPasswordTests : BunitContext
     public void RendersEmailInput()
     {
         // Arrange / Act
-        var (cut, _, _) = Render();
+        var (cut, _) = Render();
 
         // Assert
         Assert.NotNull(cut.Find("input[name=Email]"));
@@ -69,7 +68,7 @@ public class ForgotPasswordTests : BunitContext
     public async Task Submit_UnknownEmail_NavigatesToConfirmation_WithoutSendingEmail()
     {
         // Arrange
-        var (cut, um, email) = Render(um =>
+        var (cut, email) = Render(um =>
             um.FindByEmailAsync(Arg.Any<string>()).Returns((User?)null)
         );
 
@@ -88,7 +87,7 @@ public class ForgotPasswordTests : BunitContext
     {
         // Arrange
         var user = new User { Email = "alice@example.com" };
-        var (cut, um, email) = Render(um =>
+        var (cut, email) = Render(um =>
         {
             um.FindByEmailAsync(Arg.Any<string>()).Returns(user);
             um.IsEmailConfirmedAsync(user).Returns(false);
@@ -109,7 +108,7 @@ public class ForgotPasswordTests : BunitContext
     {
         // Arrange
         var user = new User { Email = "alice@example.com" };
-        var (cut, um, email) = Render(um =>
+        var (cut, email) = Render(um =>
         {
             um.FindByEmailAsync(Arg.Any<string>()).Returns(user);
             um.IsEmailConfirmedAsync(user).Returns(true);

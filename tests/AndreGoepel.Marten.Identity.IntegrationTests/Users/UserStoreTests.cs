@@ -705,7 +705,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     {
         // Arrange
         var store = UserStoreTestHelpers.BuildStore(fixture.Store);
-        var alice = UserStoreTestHelpers.NewUser("alice@example.com");
+        var alice = UserStoreTestHelpers.NewUser();
         var bob = UserStoreTestHelpers.NewUser("bob@example.com");
         await store.CreateAsync(alice, Ct);
         await store.CreateAsync(bob, Ct);
@@ -727,7 +727,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
 
     // Fixed timestamp so two passkeys built from the same credential differ only by
     // the fields we vary (e.g. the signature counter).
-    private static readonly DateTimeOffset _passkeyCreatedAt = new(
+    private static readonly DateTimeOffset PasskeyCreatedAt = new(
         2026,
         1,
         1,
@@ -741,7 +741,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
         new(
             credentialId,
             publicKey: [9, 9, 9],
-            createdAt: _passkeyCreatedAt,
+            createdAt: PasskeyCreatedAt,
             signCount: signCount,
             transports: null,
             isUserVerified: false,

@@ -21,7 +21,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     public async Task CreateAsync_PersistsRole_AndProjectsDocument()
     {
         // Arrange
-        var (store, _) = Build();
+        var store= Build();
         var role = new Role { Name = "Administrator" };
         var expectedId = role.RoleId;
 
@@ -41,7 +41,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     public async Task UpdateAsync_PreservesDeletableFalseEndToEnd()
     {
         // Arrange
-        var (store, session) = Build();
+        var store= Build();
         var role = new Role { Name = "System", Deletable = false };
         await store.CreateAsync(role, Ct);
         var fresh = await store.FindByIdAsync(role.Id, Ct);
@@ -62,7 +62,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     public async Task DeleteAsync_SoftDeletes_DocumentSurvives()
     {
         // Arrange
-        var (store, _) = Build();
+        var store= Build();
         var role = new Role { Name = "Temp" };
         await store.CreateAsync(role, Ct);
 
@@ -82,7 +82,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     public async Task RestoreAsync_ClearsDeleted()
     {
         // Arrange
-        var (store, _) = Build();
+        var store= Build();
         var role = new Role { Name = "Temp" };
         await store.CreateAsync(role, Ct);
         await store.DeleteAsync(role, Ct);
@@ -103,7 +103,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     public async Task FindByName_ReturnsRoleByNormalizedName()
     {
         // Arrange
-        var (store, _) = Build();
+        var store= Build();
         await store.CreateAsync(new Role { Name = "Moderator" }, Ct);
 
         // Act
@@ -119,7 +119,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     {
         // DB-level partial unique index: two *active* roles cannot share a name.
         // Arrange
-        var (store, _) = Build();
+        var store= Build();
         Assert.True((await store.CreateAsync(new Role { Name = "Dup" }, Ct)).Succeeded);
 
         // Act — a second active role with the same name (different stream) must fail
@@ -141,7 +141,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
         // The unique index is partial (excludes soft-deleted roles), so a name can be
         // reused once the prior role is deleted.
         // Arrange
-        var (store, _) = Build();
+        var store = Build();
         var first = new Role { Name = "Reusable" };
         await store.CreateAsync(first, Ct);
         await store.DeleteAsync(first, Ct);
@@ -153,7 +153,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
         Assert.True(result.Succeeded);
     }
 
-    private (RoleStore<Role> Store, IDocumentSession Session) Build()
+    private RoleStore<Role> Build()
     {
         var currentUserService = Substitute.For<ICurrentUserService>();
         currentUserService
@@ -161,9 +161,6 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
             .Returns(UserId.New());
 
         var session = fixture.Store.LightweightSession();
-        return (
-            new RoleStore<Role>(session, currentUserService, NullLogger<RoleStore<Role>>.Instance),
-            session
-        );
+        return new RoleStore<Role>(session, currentUserService, NullLogger<RoleStore<Role>>.Instance);
     }
 }

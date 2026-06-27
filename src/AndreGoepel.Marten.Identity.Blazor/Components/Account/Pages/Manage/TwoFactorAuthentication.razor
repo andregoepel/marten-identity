@@ -1,15 +1,8 @@
 ﻿@page "/Account/Manage/TwoFactorAuthentication"
 
-@using AndreGoepel.Marten.Identity.Users
-@using AndreGoepel.Marten.Identity.Blazor.Components.Shared
-@using Microsoft.AspNetCore.Identity
-@using Radzen
-@using Radzen.Blazor
-
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
-@inject NotificationService NotificationService
 
 <PageTitle>Two-Factor Authentication – nerdventures.blog</PageTitle>
 
@@ -24,13 +17,13 @@
         <RadzenCard>
             <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
 
-            @if (is2faEnabled)
+            @if (_is2FaEnabled)
             {
                 <RadzenAlert AlertStyle="AlertStyle.Success" Icon="shield" AllowClose="false">
                     Two-factor authentication is <strong>currently enabled</strong>.
                 </RadzenAlert>
 
-                @if (recoveryCodesLeft == 0)
+                @if (_recoveryCodesLeft == 0)
                 {
                     <RadzenAlert AlertStyle="AlertStyle.Danger" Icon="error_outline">
                         <strong>You have no recovery codes left!</strong><br />
@@ -43,10 +36,10 @@
                         </div>
                     </RadzenAlert>
                 }
-                else if (recoveryCodesLeft <= 3)
+                else if (_recoveryCodesLeft <= 3)
                 {
                     <RadzenAlert AlertStyle="AlertStyle.Warning" Icon="warning">
-                        <strong>@recoveryCodesLeft recovery code@(recoveryCodesLeft == 1 ? "" : "s") remaining</strong><br />
+                        <strong>@_recoveryCodesLeft recovery code@(_recoveryCodesLeft == 1 ? "" : "s") remaining</strong><br />
                         Consider generating a new set soon.
                         <div class="mt-4">
                             <RadzenButton Text="Generate New Recovery Codes"
@@ -84,7 +77,7 @@
                         Microsoft Authenticator, Authy, Bitwarden, 1Password, etc.
                     </RadzenText>
 
-                    @if (!hasAuthenticator)
+                    @if (!_hasAuthenticator)
                     {
                         <LinkButton Text="Add Authenticator App"
                                     ButtonStyle="ButtonStyle.Primary"
@@ -112,9 +105,9 @@
 </div>
 
 @code {
-    private bool hasAuthenticator;
-    private int recoveryCodesLeft;
-    private bool is2faEnabled;
+    private bool _hasAuthenticator;
+    private int _recoveryCodesLeft;
+    private bool _is2FaEnabled;
 
     protected override async Task OnInitializedAsync()
     {
@@ -127,8 +120,8 @@
             return;
         }
 
-        hasAuthenticator = await UserManager.GetAuthenticatorKeyAsync(user) is not null;
-        is2faEnabled = await UserManager.GetTwoFactorEnabledAsync(user);
-        recoveryCodesLeft = await UserManager.CountRecoveryCodesAsync(user);
+        _hasAuthenticator = await UserManager.GetAuthenticatorKeyAsync(user) is not null;
+        _is2FaEnabled = await UserManager.GetTwoFactorEnabledAsync(user);
+        _recoveryCodesLeft = await UserManager.CountRecoveryCodesAsync(user);
     }
 }

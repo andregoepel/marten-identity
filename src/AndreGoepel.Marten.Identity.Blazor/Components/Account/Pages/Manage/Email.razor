@@ -1,8 +1,5 @@
 ﻿@page "/Account/Manage/Email"
 @rendermode InteractiveServer
-
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -33,13 +30,13 @@
                         <RadzenStack Gap="1.25rem">
 
                             <RadzenFormField Text="Current email" Style="width: 100%;">
-                                <RadzenTextBox @bind-Value=@CurrentEmail
+                                <RadzenTextBox @bind-Value=@_currentEmail
                                                Name="CurrentEmail"
                                                ReadOnly="true"
                                                Style="width:100%; background-color: var(--rz-input-disabled-background);" />
                             </RadzenFormField>
 
-                            @if (!isEmailConfirmed)
+                            @if (!_isEmailConfirmed)
                             {
                                 <div>
                                     <RadzenText TextStyle="TextStyle.Body2" class="rz-color-warning">
@@ -48,7 +45,7 @@
                                     <RadzenButton Text="Send verification email"
                                                   ButtonStyle="ButtonStyle.Warning"
                                                   Size="ButtonSize.Medium"
-                                                  IsBusy=@isSendingVerification
+                                                  IsBusy=@_isSendingVerification
                                                   BusyText="Sending..."
                                                   Click=@SendVerificationEmail
                                                   Style="margin-top: 0.75rem;" />
@@ -78,7 +75,7 @@
                                 <Helper>
                                     <RadzenRequiredValidator Component="NewEmail" Text="New email is required" />
                                     <RadzenEmailValidator Component="NewEmail" Text="Please enter a valid email address" />
-                                    <RadzenCompareValidator Component="NewEmail" Value=@CurrentEmail Text="New email must be different from current email" Operator="CompareOperator.NotEqual" />
+                                    <RadzenCompareValidator Component="NewEmail" Value=@_currentEmail Text="New email must be different from current email" Operator="CompareOperator.NotEqual" />
                                 </Helper>
                             </RadzenFormField>
 
@@ -94,7 +91,7 @@
                                       Text="Change Email"
                                       ButtonStyle="ButtonStyle.Primary"
                                       Size="ButtonSize.Large"
-                                      IsBusy=@isChangingEmail
+                                      IsBusy=@_isChangingEmail
                                       BusyText="Processing..." />
 
                         <RadzenButton Text="Cancel"
@@ -114,49 +111,49 @@
 
 @code {
     private ChangeEmailModel Model { get; set; } = new();
-    private User? CurrentUser;
-    private string? CurrentEmail;
-    private bool isEmailConfirmed;
-    private bool isSendingVerification;
-    private bool isChangingEmail;
+    private User? _currentUser;
+    private string? _currentEmail;
+    private bool _isEmailConfirmed;
+    private bool _isSendingVerification;
+    private bool _isChangingEmail;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        CurrentUser = await UserManager.GetUserAsync(authState.User);
+        _currentUser = await UserManager.GetUserAsync(authState.User);
 
-        if (CurrentUser == null)
+        if (_currentUser == null)
         {
             NotificationService.Notify(NotificationSeverity.Error, "Error", "Could not load user profile.");
             return;
         }
 
-        CurrentEmail = await UserManager.GetEmailAsync(CurrentUser);
-        isEmailConfirmed = await UserManager.IsEmailConfirmedAsync(CurrentUser);
-        Model.NewEmail = CurrentEmail;
+        _currentEmail = await UserManager.GetEmailAsync(_currentUser);
+        _isEmailConfirmed = await UserManager.IsEmailConfirmedAsync(_currentUser);
+        Model.NewEmail = _currentEmail;
     }
 
     private async Task OnValidSubmit(ChangeEmailModel model)
     {
-        if (CurrentUser == null || string.IsNullOrWhiteSpace(CurrentEmail))
+        if (_currentUser == null || string.IsNullOrWhiteSpace(_currentEmail))
         {
             NotificationService.Notify(NotificationSeverity.Error, "Error", "User not loaded.");
             return;
         }
 
-        if (model.NewEmail?.Trim() == CurrentEmail?.Trim())
+        if (model.NewEmail?.Trim() == _currentEmail?.Trim())
         {
             NotificationService.Notify(NotificationSeverity.Info, "Info", "No email change detected.");
             return;
         }
 
-        isChangingEmail = true;
+        _isChangingEmail = true;
         StateHasChanged();
 
         try
         {
-            var userId = await UserManager.GetUserIdAsync(CurrentUser);
-            var code = await UserManager.GenerateChangeEmailTokenAsync(CurrentUser, model.NewEmail!);
+            var userId = await UserManager.GetUserIdAsync(_currentUser);
+            var code = await UserManager.GenerateChangeEmailTokenAsync(_currentUser, model.NewEmail!);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
             var callbackUrl = NavigationManager.GetUriWithQueryParameters(
@@ -169,7 +166,7 @@
                 });
 
             await EmailSender.SendConfirmationLinkAsync(
-                CurrentUser,
+                _currentUser,
                 model.NewEmail!,
                 HtmlEncoder.Default.Encode(callbackUrl));
 
@@ -192,23 +189,23 @@
         }
         finally
         {
-            isChangingEmail = false;
+            _isChangingEmail = false;
             StateHasChanged();
         }
     }
 
     private async Task SendVerificationEmail()
     {
-        if (CurrentUser == null || string.IsNullOrWhiteSpace(CurrentEmail))
+        if (_currentUser == null || string.IsNullOrWhiteSpace(_currentEmail))
             return;
 
-        isSendingVerification = true;
+        _isSendingVerification = true;
         StateHasChanged();
 
         try
         {
-            var userId = await UserManager.GetUserIdAsync(CurrentUser);
-            var code = await UserManager.GenerateEmailConfirmationTokenAsync(CurrentUser);
+            var userId = await UserManager.GetUserIdAsync(_currentUser);
+            var code = await UserManager.GenerateEmailConfirmationTokenAsync(_currentUser);
             code = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(code));
 
             var callbackUrl = NavigationManager.GetUriWithQueryParameters(
@@ -220,8 +217,8 @@
                 });
 
             await EmailSender.SendConfirmationLinkAsync(
-                CurrentUser,
-                CurrentEmail,
+                _currentUser,
+                _currentEmail,
                 HtmlEncoder.Default.Encode(callbackUrl));
 
             NotificationService.Notify(
@@ -240,7 +237,7 @@
         }
         finally
         {
-            isSendingVerification = false;
+            _isSendingVerification = false;
             StateHasChanged();
         }
     }

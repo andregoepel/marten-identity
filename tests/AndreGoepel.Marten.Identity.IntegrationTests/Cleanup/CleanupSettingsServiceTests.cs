@@ -1,5 +1,4 @@
 using AndreGoepel.Marten.Identity.IntegrationTests.Infrastructure;
-using Marten;
 using Microsoft.Extensions.Options;
 using NSubstitute;
 using Quartz;

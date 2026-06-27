@@ -1,5 +1,5 @@
 @implements IAsyncDisposable
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 
 @* When a handle is set, render a hidden form and POST it to the cookie sign-in
    middleware. The handle travels in the request body — never the URL (#40). CSRF
@@ -31,7 +31,7 @@
             return;
 
         _submitted = true;
-        _module ??= await JSRuntime.InvokeAsync<IJSObjectReference>(
+        _module ??= await JsRuntime.InvokeAsync<IJSObjectReference>(
             "import",
             "./_content/AndreGoepel.Marten.Identity.Blazor/Components/Account/Shared/SignInHandoff.razor.js");
         await _module.InvokeVoidAsync("submitForm", _form);

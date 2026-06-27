@@ -1,9 +1,6 @@
 ﻿@page "/Account/Manage/Profile"
 @rendermode InteractiveServer
 
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
-
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<User> UserManager
 @inject NotificationService NotificationService
@@ -63,7 +60,7 @@
                                   Text="Save Changes"
                                   ButtonStyle="ButtonStyle.Primary"
                                   Size="ButtonSize.Large"
-                                  IsBusy=@isSaving
+                                  IsBusy=@_isSaving
                                   BusyText="Saving..."
                                   Style="width: 100%; max-width: 300px; margin: 0 auto;" />
 
@@ -78,15 +75,15 @@
 
 @code {
     private ProfileModel Model { get; set; } = new();
-    private User? CurrentUser;
-    private bool isSaving;
+    private User? _currentUser;
+    private bool _isSaving;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        CurrentUser = await UserManager.GetUserAsync(authState.User);
+        _currentUser = await UserManager.GetUserAsync(authState.User);
 
-        if (CurrentUser == null)
+        if (_currentUser == null)
         {
             NotificationService.Notify(
                 NotificationSeverity.Error,
@@ -96,19 +93,19 @@
             return;
         }
 
-        Model.UserName = CurrentUser.UserName;
-        Model.PhoneNumber = CurrentUser.PhoneNumber ?? "";
+        Model.UserName = _currentUser.UserName;
+        Model.PhoneNumber = _currentUser.PhoneNumber ?? "";
     }
 
     private async Task OnValidSubmit(ProfileModel model)
     {
-        if (CurrentUser == null)
+        if (_currentUser == null)
         {
             NotificationService.Notify(NotificationSeverity.Error, "Error", "No user loaded.");
             return;
         }
 
-        isSaving = true;
+        _isSaving = true;
         StateHasChanged();
 
         try
@@ -116,9 +113,9 @@
             bool hasChanges = false;
 
             // Phone number changed?
-            if (model.PhoneNumber?.Trim() != CurrentUser.PhoneNumber?.Trim())
+            if (model.PhoneNumber?.Trim() != _currentUser.PhoneNumber?.Trim())
             {
-                var result = await UserManager.SetPhoneNumberAsync(CurrentUser, model.PhoneNumber);
+                var result = await UserManager.SetPhoneNumberAsync(_currentUser, model.PhoneNumber);
                 if (!result.Succeeded)
                 {
                     foreach (var error in result.Errors)
@@ -157,7 +154,7 @@
         }
         finally
         {
-            isSaving = false;
+            _isSaving = false;
             StateHasChanged();
         }
     }

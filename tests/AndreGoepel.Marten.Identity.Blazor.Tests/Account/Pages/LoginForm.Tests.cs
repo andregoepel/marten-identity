@@ -45,8 +45,7 @@ public class LoginFormTests : BunitContext
 
     private (
         IRenderedComponent<LoginForm> Cut,
-        UserManager<User> Um,
-        SignInManager<User> Sm
+        UserManager<User> Um
     ) Render(Action<UserManager<User>, SignInManager<User>>? configure = null)
     {
         JSInterop.Mode = JSRuntimeMode.Loose;
@@ -59,23 +58,22 @@ public class LoginFormTests : BunitContext
         Services.AddSingleton(Substitute.For<ILogger<Login>>());
         Services.AddSingleton(new LoginTokenProtector(DataProtectionProvider.Create("Tests")));
         var cut = Render<LoginForm>();
-        return (cut, um, sm);
+        return (cut, um);
     }
 
     private NotificationService Notifications => Services.GetRequiredService<NotificationService>();
 
     private NavigationManager Nav => Services.GetRequiredService<NavigationManager>();
 
-    private async Task<IRenderedComponent<LoginForm>> SubmitAsync(
+    private static async Task SubmitAsync(
         IRenderedComponent<LoginForm> cut,
         string email = "alice@example.com",
         string password = "pw"
     )
     {
-        cut.Find("input[name=Email]").Change(email);
-        cut.Find("input[name=Password]").Change(password);
+        await cut.Find("input[name=Email]").ChangeAsync(email);
+        await cut.Find("input[name=Password]").ChangeAsync(password);
         await cut.Find("form").SubmitAsync();
-        return cut;
     }
 
     #endregion
@@ -84,7 +82,7 @@ public class LoginFormTests : BunitContext
     public void RendersEmailPasswordRememberMeAndSubmit()
     {
         // Arrange / Act
-        var (cut, _, _) = Render();
+        var (cut, _) = Render();
 
         // Assert
         Assert.NotNull(cut.Find("input[name=Email]"));
@@ -97,8 +95,8 @@ public class LoginFormTests : BunitContext
     {
         // Arrange
         var startUri = "http://localhost/";
-        var (cut, um, _) = Render(
-            (um, sm) => um.FindByEmailAsync(Arg.Any<string>()).Returns((User?)null)
+        var (cut, _) = Render(
+            (um, _) => um.FindByEmailAsync(Arg.Any<string>()).Returns((User?)null)
         );
 
         // Act
@@ -114,7 +112,7 @@ public class LoginFormTests : BunitContext
     {
         // Arrange
         var user = new User { Email = "alice@example.com" };
-        var (cut, um, sm) = Render(
+        var (cut, _) = Render(
             (um, sm) =>
             {
                 um.FindByEmailAsync(Arg.Any<string>()).Returns(user);
@@ -135,7 +133,7 @@ public class LoginFormTests : BunitContext
     {
         // Arrange
         var user = new User { Email = "alice@example.com" };
-        var (cut, um, sm) = Render(
+        var (cut, um) = Render(
             (um, sm) =>
             {
                 um.FindByEmailAsync(Arg.Any<string>()).Returns(user);
@@ -158,7 +156,7 @@ public class LoginFormTests : BunitContext
     {
         // Arrange
         var user = new User { Email = "alice@example.com" };
-        var (cut, um, sm) = Render(
+        var (cut, _) = Render(
             (um, sm) =>
             {
                 um.FindByEmailAsync(Arg.Any<string>()).Returns(user);
@@ -177,7 +175,7 @@ public class LoginFormTests : BunitContext
 
         var tokenInput = form.QuerySelector("input[name=token]");
         Assert.NotNull(tokenInput);
-        Assert.False(string.IsNullOrEmpty(tokenInput!.GetAttribute("value")));
+        Assert.False(string.IsNullOrEmpty(tokenInput.GetAttribute("value")));
 
         // and the handle never appears in the URL
         Assert.DoesNotContain("token=", Nav.Uri);
