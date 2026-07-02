@@ -4,16 +4,16 @@
   </PropertyGroup>
 
   <ItemGroup Label="Marten">
-    <PackageVersion Include="Marten" Version="9.10.0" />
-    <PackageVersion Include="Marten.AspNetCore" Version="9.10.0" />
+    <PackageVersion Include="Marten" Version="9.12.0" />
+    <PackageVersion Include="Marten.AspNetCore" Version="9.12.0" />
   </ItemGroup>
 
   <ItemGroup Label="Scheduling">
-    <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.18.1" />
+    <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.18.2" />
   </ItemGroup>
 
   <ItemGroup Label="UI">
-    <PackageVersion Include="Radzen.Blazor" Version="11.0.4" />
+    <PackageVersion Include="Radzen.Blazor" Version="11.0.5" />
   </ItemGroup>
 
   <ItemGroup Label="Testing">
