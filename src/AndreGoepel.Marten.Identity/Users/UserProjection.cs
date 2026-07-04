@@ -135,6 +135,11 @@ internal partial class UserProjection : SingleStreamProjection<User, Guid>
     )]
     public void Apply(PasskeyCreated @event, User user)
     {
+        // Masked (erased) events carry a null payload; skip them so a projection
+        // rebuild over a GDPR-erased stream stays safe (#67).
+        if (@event.Passkey is null)
+            return;
+
         var passkeyInfo = new UserPasskey { PasskeyInfo = @event.Passkey };
         user.Passkeys[passkeyInfo.CredentialId] = passkeyInfo;
     }
@@ -146,6 +151,11 @@ internal partial class UserProjection : SingleStreamProjection<User, Guid>
     )]
     public void Apply(PasskeyUpdated @event, User user)
     {
+        // Masked (erased) events carry a null payload; skip them so a projection
+        // rebuild over a GDPR-erased stream stays safe (#67).
+        if (@event.Passkey is null)
+            return;
+
         var passkeyInfo = new UserPasskey { PasskeyInfo = @event.Passkey };
         user.Passkeys[passkeyInfo.CredentialId] = passkeyInfo;
     }

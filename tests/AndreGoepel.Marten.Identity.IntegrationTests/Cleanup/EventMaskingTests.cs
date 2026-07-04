@@ -1,6 +1,7 @@
 using AndreGoepel.Marten.Identity.IntegrationTests.Infrastructure;
 using AndreGoepel.Marten.Identity.Users;
 using AndreGoepel.Marten.Identity.Users.Events;
+using Microsoft.AspNetCore.Identity;
 
 namespace AndreGoepel.Marten.Identity.IntegrationTests.Cleanup;
 
@@ -92,4 +93,59 @@ public class EventMaskingTests(MartenFixture fixture) : IAsyncLifetime
         Assert.Null(updated.RecoveryCodes);
         Assert.Null(updated.SecurityStamp);
     }
+
+    [Fact]
+    public async Task ApplyEventDataMasking_ScrubsPasskeyPii()
+    {
+        // Arrange — a passkey carries the public key, credential id, and a user-chosen
+        // free-text name, all of which must not survive erasure (#67).
+        var userId = UserId.New();
+        var credentialId = new byte[] { 1, 2, 3, 4 };
+        await using (var session = fixture.Store.LightweightSession())
+        {
+            session.Events.Append(
+                userId.Value,
+                new UserCreated(userId, "carol", "carol@example.com", "hash"),
+                new PasskeyCreated(userId, MakePasskey(credentialId, "Carol's YubiKey")),
+                new PasskeyUpdated(userId, MakePasskey(credentialId, "Carol's renamed key")),
+                new PasskeyDeleted(userId, credentialId)
+            );
+            await session.SaveChangesAsync(Ct);
+        }
+
+        // Act
+        await fixture.Store.Advanced.ApplyEventDataMasking(
+            masking => masking.IncludeStream(userId.Value),
+            Ct
+        );
+
+        // Assert — the whole credential payload is gone, and the delete event's
+        // lingering credential id is cleared.
+        await using var query = fixture.Store.QuerySession();
+        var stream = await query.Events.FetchStreamAsync(userId.Value, token: Ct);
+        var created = stream.Select(e => e.Data).OfType<PasskeyCreated>().Single();
+        var updated = stream.Select(e => e.Data).OfType<PasskeyUpdated>().Single();
+        var deleted = stream.Select(e => e.Data).OfType<PasskeyDeleted>().Single();
+
+        Assert.Null(created.Passkey);
+        Assert.Null(updated.Passkey);
+        Assert.Empty(deleted.CredentialId);
+    }
+
+    private static UserPasskeyInfo MakePasskey(byte[] credentialId, string name) =>
+        new(
+            credentialId,
+            publicKey: [9, 9, 9],
+            createdAt: DateTimeOffset.UtcNow,
+            signCount: 0,
+            transports: null,
+            isUserVerified: true,
+            isBackupEligible: false,
+            isBackedUp: false,
+            attestationObject: [],
+            clientDataJson: []
+        )
+        {
+            Name = name,
+        };
 }
