@@ -148,7 +148,9 @@ Stated honestly so you can make an informed risk decision.
   `UpdateAsync` **cannot** be guarded there: ASP.NET Identity drives them through
   anonymous flows (registration, password reset, email confirmation, lockout), so
   their authorization remains the reset/confirmation **token** and the UI-layer guard.
-  A stale full-state `UpdateAsync` overwrite is tracked separately in **#70**.
+  `UpdateAsync` is now protected against silently reverting a concurrent change by an
+  optimistic-concurrency (content-version) check that rejects a stale write while still
+  merging the auto-managed lockout counters forward (#70).
 - **First-run setup is an unauthenticated bootstrap** by design — see the host
   obligation above. The actual `/Setup` page is host-provided and outside this
   library's control.

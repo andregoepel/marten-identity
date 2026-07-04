@@ -20,6 +20,14 @@ public class User : IdentityUser
     public bool RootUser { get; set; }
     public bool Deletable { get; set; } = true;
     public bool Deleted { get; set; }
+
+    /// <summary>
+    /// Optimistic-concurrency token for the user's non-lockout content (#70). Bumped by
+    /// the projection on every content-changing event (create excluded) but <b>not</b> by
+    /// the auto-managed lockout increments, so a stale generic update is detected while
+    /// concurrent failed-login counting never triggers a spurious conflict.
+    /// </summary>
+    public int ContentVersion { get; set; }
     public string? AuthenticatorKey { get; set; }
     public string? RecoveryCodes { get; set; }
 

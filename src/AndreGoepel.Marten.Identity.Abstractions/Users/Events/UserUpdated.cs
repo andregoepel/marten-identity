@@ -22,4 +22,12 @@ public record UserUpdated(UserId UserId)
     /// cookies stop revalidating, signing the user out everywhere.
     /// </summary>
     public string? SecurityStamp { get; init; }
+
+    /// <summary>
+    /// True when this update only carries auto-managed lockout state (failed-count /
+    /// lockout window) and no user-visible content change. The projection skips bumping
+    /// <see cref="Users.User.ContentVersion" /> for these, so lockout increments do not
+    /// trigger optimistic-concurrency conflicts on the generic update path (#70).
+    /// </summary>
+    public bool LockoutOnly { get; init; }
 }
