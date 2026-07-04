@@ -72,6 +72,7 @@ public static class Initialization
             .AddDefaultTokenProviders();
 
         services.AddScoped<ICurrentUserService, CurrentUserService>();
+        services.AddScoped<IIdentityAuthorizer, IdentityAuthorizer>();
         services.AddScoped<UserStore<User>>();
         services.AddScoped<RoleStore<Role>>();
         services.AddSingleton<LoginTokenProtector>();

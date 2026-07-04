@@ -47,7 +47,16 @@ public class RoleStoreTests
 
         var logger = Substitute.For<ILogger<RoleStore<Role>>>();
 
-        return new Harness(new RoleStore<Role>(session, currentUser, logger), session, appended);
+        // Persistence tests run with authorization satisfied; the authz guard itself is
+        // covered separately (#69).
+        var authorizer = Substitute.For<IIdentityAuthorizer>();
+        authorizer.IsCurrentUserAdministratorAsync(Arg.Any<CancellationToken>()).Returns(true);
+
+        return new Harness(
+            new RoleStore<Role>(session, currentUser, authorizer, logger),
+            session,
+            appended
+        );
     }
 
     #endregion

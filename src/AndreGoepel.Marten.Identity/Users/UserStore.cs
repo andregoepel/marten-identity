@@ -19,6 +19,7 @@ public class UserStore<TUser>(
     IQuerySession querySession,
     IDataProtectionProvider dataProtectionProvider,
     ICurrentUserService currentUserService,
+    IIdentityAuthorizer authorizer,
     IOptions<IdentityOptions> identityOptions,
     ILogger<UserStore<TUser>> logger
 )
@@ -36,6 +37,11 @@ public class UserStore<TUser>(
     where TUser : User
 {
     private const string UserDataProtectionPurpose = "UserDataProtection";
+
+    private static IdentityResult NotAuthorized(string description) =>
+        IdentityResult.Failed(
+            new IdentityError { Code = "NotAuthorized", Description = description }
+        );
 
     public IQueryable<TUser> Users => querySession.Query<TUser>();
 
@@ -253,6 +259,15 @@ public class UserStore<TUser>(
     {
         try
         {
+            // Defence in depth (#69/#41): deleting an account requires administrator
+            // authority or account ownership, independent of any UI [Authorize] guard.
+            var actor = await currentUserService.GetCurrentUserIdAsync(cancellationToken);
+            var isSelf = actor.Value != Guid.Empty && actor.Value == user.StreamId;
+            if (!isSelf && !await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
+                return NotAuthorized(
+                    "Deleting a user requires administrator authority or account ownership."
+                );
+
             if (!user.Deletable)
             {
                 return IdentityResult.Failed(
@@ -287,6 +302,11 @@ public class UserStore<TUser>(
     {
         try
         {
+            // Defence in depth (#69/#41): restoring a soft-deleted account is an
+            // administrator-only operation.
+            if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
+                return NotAuthorized("Restoring a user requires administrator authority.");
+
             var userId = UserId.Parse(user.Id);
 
             var stream = await querySession.Events.FetchStreamAsync(
@@ -676,6 +696,15 @@ public class UserStore<TUser>(
         if (string.IsNullOrWhiteSpace(roleName))
             throw new ArgumentException("Role name cannot be null or empty.", nameof(roleName));
 
+        // Defence in depth (#69/#41): assigning a role is an administrator-only operation,
+        // independent of any UI [Authorize] guard. This is the primary escalation vector
+        // (self-assigning Administrator), so it is refused for any non-admin caller —
+        // including one reaching the store directly.
+        if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
+            throw new IdentityAuthorizationException(
+                "Assigning a role requires administrator authority."
+            );
+
         var role =
             await querySession
                 .Query<Role>()
@@ -707,6 +736,13 @@ public class UserStore<TUser>(
 
         if (string.IsNullOrWhiteSpace(roleName))
             throw new ArgumentException("Role name cannot be null or empty.", nameof(roleName));
+
+        // Defence in depth (#69/#41): removing a role is an administrator-only operation,
+        // independent of any UI [Authorize] guard.
+        if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
+            throw new IdentityAuthorizationException(
+                "Removing a role requires administrator authority."
+            );
 
         // Domain-layer invariant (defence in depth, independent of any UI [Authorize]):
         // the root user is the un-removable administrator anchor created during setup.

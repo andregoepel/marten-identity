@@ -14,22 +14,38 @@ internal static class UserStoreTestHelpers
     public static UserStore<User> BuildStore(
         IDocumentStore store,
         UserId? currentUser = null,
-        IdentityOptions? identityOptions = null
+        IdentityOptions? identityOptions = null,
+        IIdentityAuthorizer? authorizer = null
     )
     {
-        var currentUserService = Substitute.For<ICurrentUserService>();
-        currentUserService
-            .GetCurrentUserIdAsync(Arg.Any<CancellationToken>())
-            .Returns(currentUser ?? UserId.New());
+        var currentUserService = CurrentUserServiceFor(currentUser ?? UserId.New());
 
         return new UserStore<User>(
             store,
             store.QuerySession(),
             DataProtectionProvider.Create("Tests"),
             currentUserService,
+            // Persistence/invariant tests default to a permissive authorizer; authz tests
+            // pass a real IdentityAuthorizer to exercise the DB-authoritative check (#69).
+            authorizer ?? PermissiveAuthorizer(),
             Options.Create(identityOptions ?? new IdentityOptions()),
             NullLogger<UserStore<User>>.Instance
         );
+    }
+
+    public static ICurrentUserService CurrentUserServiceFor(UserId currentUser)
+    {
+        var service = Substitute.For<ICurrentUserService>();
+        service.GetCurrentUserIdAsync(Arg.Any<CancellationToken>()).Returns(currentUser);
+        return service;
+    }
+
+    public static IIdentityAuthorizer PermissiveAuthorizer()
+    {
+        var authorizer = Substitute.For<IIdentityAuthorizer>();
+        authorizer.IsSystemScope.Returns(true);
+        authorizer.IsCurrentUserAdministratorAsync(Arg.Any<CancellationToken>()).Returns(true);
+        return authorizer;
     }
 
     public static User NewUser(string email = "alice@example.com") =>
