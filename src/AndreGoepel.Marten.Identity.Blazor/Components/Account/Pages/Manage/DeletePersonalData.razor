@@ -33,8 +33,8 @@
             </RadzenAlert>
 
             <RadzenTemplateForm TItem="InputModel"
-                                Data=@Model
-                                Submit=@OnValidSubmit>
+                                Data="@Model"
+                                Submit="@OnValidSubmit">
                 <RadzenStack Gap="2rem">
 
                     <RadzenFieldset Text="Confirmation">
@@ -42,7 +42,7 @@
 
                             <RadzenFormField Text="Enter your current password to confirm deletion" Style="width: 100%;">
                                 <ChildContent>
-                                    <RadzenPassword @bind-Value=@Model.Password
+                                    <RadzenPassword @bind-Value="@Model.Password"
                                                     Name="Password"
                                                     Placeholder="Enter your password to confirm"
                                                     Style="width:100%" />
@@ -68,9 +68,9 @@
                                       Text="Permanently Delete My Account"
                                       ButtonStyle="ButtonStyle.Danger"
                                       Size="ButtonSize.Large"
-                                      IsBusy=@isDeleting
+                                      IsBusy="@isDeleting"
                                       BusyText="Deleting account..."
-                                      Disabled=@isDeleting />
+                                      Disabled="@isDeleting" />
 
                         <RadzenButton Text="Cancel – Keep my account"
                                       ButtonStyle="ButtonStyle.Secondary"

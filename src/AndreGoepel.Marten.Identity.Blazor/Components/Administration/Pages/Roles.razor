@@ -29,14 +29,14 @@
             <RadzenColumn class="rz-text-align-right">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem" JustifyContent="JustifyContent.End">
                     <RadzenCheckBox Name="ShowDeleted"
-                                    @bind-Value=@ShowDeleted
-                                    Change=@((bool value) => ShowDeletedChangedAsync(value)) />
+                                    @bind-Value="@ShowDeleted"
+                                    Change="@((bool value) => ShowDeletedChangedAsync(value))" />
                     <RadzenLabel Text="Show deleted" Component="ShowDeleted" />
                     <RadzenButton Text="New role"
                                   Icon="add"
                                   ButtonStyle="ButtonStyle.Primary"
                                   Size="ButtonSize.Small"
-                                  Click=@NewRoleAsync />
+                                  Click="@NewRoleAsync" />
                 </RadzenStack>
             </RadzenColumn>
         </RadzenRow>

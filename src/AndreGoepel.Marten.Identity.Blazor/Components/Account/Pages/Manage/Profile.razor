@@ -22,15 +22,15 @@
             <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
 
             <RadzenTemplateForm TItem="ProfileModel"
-                                Data=@Model
-                                Submit=@OnValidSubmit>
+                                Data="@Model"
+                                Submit="@OnValidSubmit">
                 <RadzenStack Gap="2rem">
 
                     <RadzenFieldset Text="Account Information">
                         <RadzenStack Gap="1.5rem">
 
                             <RadzenFormField Text="Username" Style="width: 100%;">
-                                <RadzenTextBox @bind-Value=@Model.UserName
+                                <RadzenTextBox @bind-Value="@Model.UserName"
                                                Name="Username"
                                                ReadOnly="true"
                                                Style="width:100%; background-color: var(--rz-input-disabled-background);" />
@@ -41,7 +41,7 @@
 
                             <RadzenFormField Text="Phone number" Style="width: 100%;">
                                 <ChildContent>
-                                    <RadzenTextBox @bind-Value=@Model.PhoneNumber
+                                    <RadzenTextBox @bind-Value="@Model.PhoneNumber"
                                                    Name="PhoneNumber"
                                                    Placeholder="+49 123 4567890"
                                                    Style="width:100%" />
@@ -63,7 +63,7 @@
                                   Text="Save Changes"
                                   ButtonStyle="ButtonStyle.Primary"
                                   Size="ButtonSize.Large"
-                                  IsBusy=@isSaving
+                                  IsBusy="@isSaving"
                                   BusyText="Saving..."
                                   Style="width: 100%; max-width: 300px; margin: 0 auto;" />
 

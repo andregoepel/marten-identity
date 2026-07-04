@@ -18,13 +18,13 @@
 
 <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4">Resend email confirmation</RadzenText>
 
-<RadzenTemplateForm TItem="InputModel" Data=@Input Submit=@OnSubmitAsync>
+<RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@OnSubmitAsync">
     <RadzenStack Gap="1.25rem">
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
             <RadzenLabel Text="Email" Component="Email" Style="width: 8rem; flex-shrink: 0;" />
             <RadzenStack Gap="0.25rem" Style="flex: 1;">
-                <RadzenTextBox @bind-Value=@Input.Email
+                <RadzenTextBox @bind-Value="@Input.Email"
                                Name="Email"
                                Placeholder="name@example.com"
                                AutoCompleteType="AutoCompleteType.Email"
@@ -38,7 +38,7 @@
             <RadzenButton ButtonType="ButtonType.Submit"
                           Text="Resend"
                           ButtonStyle="ButtonStyle.Primary"
-                          IsBusy=@isProcessing
+                          IsBusy="@isProcessing"
                           BusyText="Sending..." />
         </div>
 

@@ -11,12 +11,12 @@
 <RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween">
     <RadzenStack>
     <RadzenListBox 
-        @bind-Value=@Values 
-        Data=@roles 
+        @bind-Value="@Values" 
+        Data="@roles" 
         TextProperty="@nameof(Role.Name)" 
         ValueProperty="@nameof(Role.RoleId)"
-        Multiple=true 
-        AllowClear=true 
+        Multiple="true" 
+        AllowClear="true" 
         Placeholder="Select Roles"
         Change="@(() => OnChange())"
         />

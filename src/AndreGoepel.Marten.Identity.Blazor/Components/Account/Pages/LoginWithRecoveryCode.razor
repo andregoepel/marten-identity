@@ -14,13 +14,13 @@
 
 <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4">Recovery code verification</RadzenText>
 
-<RadzenTemplateForm TItem="InputModel" Data=@Input Submit=@OnSubmitAsync>
+<RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@OnSubmitAsync">
     <RadzenStack Gap="1.25rem">
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
             <RadzenLabel Text="Recovery code" Component="RecoveryCode" Style="width: 10rem; flex-shrink: 0;" />
             <RadzenStack Gap="0.25rem" Style="flex: 1;">
-                <RadzenTextBox @bind-Value=@Input.RecoveryCode
+                <RadzenTextBox @bind-Value="@Input.RecoveryCode"
                                Name="RecoveryCode"
                                Placeholder="Enter recovery code"
                                AutoCompleteType="AutoCompleteType.Off"
@@ -33,7 +33,7 @@
             <RadzenButton ButtonType="ButtonType.Submit"
                           Text="Log in"
                           ButtonStyle="ButtonStyle.Primary"
-                          IsBusy=@_isProcessing
+                          IsBusy="@_isProcessing"
                           BusyText="Verifying..." />
 
             <RadzenLink Path="/Account/LoginWith2fa" Text="Use an authenticator code instead" />

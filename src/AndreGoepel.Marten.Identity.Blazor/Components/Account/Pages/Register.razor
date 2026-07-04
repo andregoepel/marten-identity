@@ -21,14 +21,14 @@
 
 <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4">Register</RadzenText>
 
-<RadzenTemplateForm TItem="InputModel" Data=@Input Submit=@RegisterUser>
+<RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@RegisterUser">
     <DataAnnotationsValidator />
     <RadzenStack Gap="1.25rem">
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
             <RadzenLabel Text="Email" Component="Email" Style="width: 10rem; flex-shrink: 0;" />
             <RadzenStack Gap="0.25rem" Style="flex: 1;">
-                <RadzenTextBox @bind-Value=@Input.Email
+                <RadzenTextBox @bind-Value="@Input.Email"
                                Name="Email"
                                AutoCompleteType="AutoCompleteType.Email"
                                Placeholder="name@example.com"

@@ -27,7 +27,7 @@
             </RadzenColumn>
             <RadzenColumn class="rz-text-align-right">
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem" JustifyContent="JustifyContent.End">
-                    <RadzenCheckBox Name="ShowDeleted" @bind-Value=@ShowDeleted Change=@((bool value) => ShowDeletedChangedAsync(value)) />
+                    <RadzenCheckBox Name="ShowDeleted" @bind-Value="@ShowDeleted" Change="@((bool value) => ShowDeletedChangedAsync(value))" />
                     <RadzenLabel Text="Show deleted" Component="ShowDeleted" />
                 </RadzenStack>
             </RadzenColumn>
@@ -46,7 +46,7 @@
                             ShowPagingSummary="true"
                             LogicalFilterOperator="LogicalFilterOperator.Or"
                             SelectionMode="DataGridSelectionMode.Single"
-                            @bind-Value=@selectedUsers
+                            @bind-Value="@selectedUsers"
                             Density="Density.Compact"
                             Style="width: 100%;">
                 <Columns>
