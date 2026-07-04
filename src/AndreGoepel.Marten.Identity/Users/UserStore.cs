@@ -183,19 +183,27 @@ public class UserStore<TUser>(
         {
             var userId = UserId.Parse(user.Id);
 
-            var existingUser = await querySession
-                .Query<TUser>()
-                .FirstOrDefaultAsync(x => x.Id == user.Id, token: cancellationToken);
+            using var session = documentStore.LightweightSession();
+
+            // Serialize the whole read-modify-write on the stream. Taking the exclusive
+            // stream lock *before* reading current state (rather than reading from an
+            // earlier, unlocked query) closes the window in which a concurrent lockout
+            // increment could land between the read and this full-state append and be
+            // silently overwritten — the same accumulation race guarded on the atomic
+            // lockout path (#22, #70). The re-read below therefore observes the latest
+            // committed state under the lock.
+            await session.Events.AppendExclusive(userId.Value);
+
+            var existingUser = await session.LoadAsync<User>(userId.Value, cancellationToken);
 
             if (existingUser != null)
             {
                 // Lockout state (AccessFailedCount / LockoutEnd) is owned exclusively
-                // by the atomic IUserLockoutStore methods, which serialize writes on
-                // the stream. The generic update path runs from a request-start
-                // snapshot with no concurrency control, so it must never carry a stale
-                // lockout value back into the stream — doing so would resurrect the
-                // failed-login accumulation race (#22). Treat the persisted values as
-                // authoritative here.
+                // by the atomic IUserLockoutStore methods. The generic update path
+                // carries the caller's request-start snapshot, so it must never write a
+                // stale lockout value back into the stream — doing so would resurrect the
+                // failed-login accumulation race (#22). Treat the just-read committed
+                // values as authoritative here.
                 user.AccessFailedCount = existingUser.AccessFailedCount;
                 user.LockoutEnd = existingUser.LockoutEnd;
 
@@ -206,10 +214,9 @@ public class UserStore<TUser>(
                     user.Deletable = false;
             }
 
+            // Nothing changed — release the lock without churning the stream.
             if (existingUser != null && existingUser.AreEqual(user))
                 return IdentityResult.Success;
-
-            using var session = documentStore.LightweightSession();
 
             session.Events.Append(
                 userId.Value,
