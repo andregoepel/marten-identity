@@ -1,0 +1,24 @@
+@using Microsoft.Extensions.Options
+@inject IServiceProvider Services
+
+<PageTitle>@ComposedTitle</PageTitle>
+
+@code {
+    /// <summary>The page-specific title, e.g. "Log in".</summary>
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = default!;
+
+    // Resolve optionally: the title must still render when the host (or a test) has not
+    // registered the options, in which case no brand suffix is appended.
+    private string ComposedTitle
+    {
+        get
+        {
+            var appName = Services
+                .GetService<IOptions<MartenIdentityBlazorOptions>>()
+                ?.Value.ApplicationName;
+
+            return string.IsNullOrWhiteSpace(appName) ? Title : $"{Title} – {appName}";
+        }
+    }
+}
