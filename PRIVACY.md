@@ -55,10 +55,17 @@ Account deletion is a **two-phase** process:
    user can no longer sign in. During the retention window an **administrator can
    still restore** the account.
 2. **Permanent erasure (after retention).** The `DeletedUserCleanupJob`
-   **hard-deletes** the user's event rows (`mt_events`), stream metadata
-   (`mt_streams`), the projected document, and the user's role assignments — so no
-   personal data survives in the live database. This is genuine erasure, not
-   archiving.
+   **scrubs the personal data out of the user's events in place** using Marten's
+   event-data masking (no raw SQL), and **deletes** the projected `User` document and
+   the user's role-assignment documents. The masking rules null every personal-data
+   field the events carry — email, username, password hash, phone number, 2FA
+   authenticator key, recovery codes, security stamp, and the passkey credentials
+   (public key, credential id, and the user-chosen passkey name). What remains are the
+   event *envelopes* (event type, version, timestamps, and pseudonymous actor GUIDs)
+   and the `mt_streams` metadata — now carrying **no personal data**. This is genuine
+   erasure of the personal data, not archiving; it is achieved by masking the
+   append-only events rather than deleting event rows, so the stream stays internally
+   coherent (and a projection rebuild over an erased stream is safe).
 
 > **Erasure requires the cleanup job.** Phase 2 only runs if you register it with
 > `services.AddMartenIdentityCleanup(...)`. **If you do not enable it, deleted
