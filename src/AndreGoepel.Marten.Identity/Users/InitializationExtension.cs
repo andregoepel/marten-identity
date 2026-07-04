@@ -61,5 +61,33 @@ internal static class InitializationExtension
                 SecurityStamp = null,
             }
         );
+
+        // Passkey events carry the full WebAuthn credential (public key, credential id,
+        // the user-chosen free-text name, attestation/client-data). None of it is
+        // scrubbed by the User* rules, so without these it would survive erasure forever
+        // (#67). Null the whole payload; the projection skips null-payload events so a
+        // rebuild over an erased stream stays safe.
+        options.Events.AddMaskingRuleForProtectedInformation<PasskeyCreated>(e =>
+            e with
+            {
+                Passkey = null,
+            }
+        );
+
+        options.Events.AddMaskingRuleForProtectedInformation<PasskeyUpdated>(e =>
+            e with
+            {
+                Passkey = null,
+            }
+        );
+
+        // The delete event only retains the opaque credential id; clear it too so no
+        // passkey identifier lingers after erasure.
+        options.Events.AddMaskingRuleForProtectedInformation<PasskeyDeleted>(e =>
+            e with
+            {
+                CredentialId = [],
+            }
+        );
     }
 }
