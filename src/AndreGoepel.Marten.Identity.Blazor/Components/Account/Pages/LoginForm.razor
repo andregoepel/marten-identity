@@ -1,5 +1,6 @@
 @inject UserManager<User> UserManager
 @inject SignInManager<User> SignInManager
+@inject IPasswordHasher<User> PasswordHasher
 @inject ILogger<Login> Logger
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
@@ -57,7 +58,18 @@
     {
         var user = await UserManager.FindByEmailAsync(model.Email);
 
-        if (user == null || !(await SignInManager.CanSignInAsync(user)))
+        if (user is null)
+        {
+            // Consume comparable time to a real password verification so a non-existent
+            // account is not distinguishable from a wrong password by response latency
+            // (user enumeration, CWE-208). The uniform message already hides it in the
+            // response body; this closes the timing side channel.
+            _ = PasswordHasher.HashPassword(new User(), model.Password);
+            NotificationService.Notify(NotificationSeverity.Error, "LoginError", "Invalid login attempt.");
+            return;
+        }
+
+        if (!await SignInManager.CanSignInAsync(user))
         {
             NotificationService.Notify(NotificationSeverity.Error, "LoginError", "Invalid login attempt.");
             return;
