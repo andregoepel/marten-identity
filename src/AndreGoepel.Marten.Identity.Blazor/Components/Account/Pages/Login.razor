@@ -6,6 +6,7 @@
 
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
+@inject IIdentityFeatureProvider Features
 
 <IdentityPageTitle Title="Log in" />
 
@@ -28,18 +29,24 @@
                   ButtonStyle="ButtonStyle.Primary"
                   form="login-form" />
 
-    <PasskeySubmit Operation="PasskeyOperation.Request"
-                   OptionsEndpointUrl="/Account/PasskeyRequestOptions"
-                   ActionEndpointUrl="@PasskeyAssertionUrl"
-                   OnSuccess="HandlePasskeySuccess"
-                   OnError="HandlePasskeyError">
-        Log in with a passkey
-    </PasskeySubmit>
+    @if (_flags.Passkey)
+    {
+        <PasskeySubmit Operation="PasskeyOperation.Request"
+                       OptionsEndpointUrl="/Account/PasskeyRequestOptions"
+                       ActionEndpointUrl="@PasskeyAssertionUrl"
+                       OnSuccess="HandlePasskeySuccess"
+                       OnError="HandlePasskeyError">
+            Log in with a passkey
+        </PasskeySubmit>
+    }
 </div>
 
 <RadzenStack Orientation="Orientation.Horizontal" Gap="1.5rem" Wrap="FlexWrap.Wrap">
     <RadzenLink Path="Account/ForgotPassword" Text="Forgot your password?" />
-    <RadzenLink Path="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" Text="Register as a new user" />
+    @if (_flags.UserRegistration)
+    {
+        <RadzenLink Path="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" Text="Register as a new user" />
+    }
     <RadzenLink Path="Account/ResendEmailConfirmation" Text="Resend email confirmation" />
 </RadzenStack>
 
@@ -47,6 +54,7 @@
     private string? _error;
     private DotNetObjectReference<Login>? _dotNetRef;
     private IJSObjectReference? _jsModule;
+    private IdentityFeatureFlags _flags = new();
 
     [SupplyParameterFromQuery]
     private string? ReturnUrl { get; set; }
@@ -56,9 +64,12 @@
             ? $"/Account/PasskeyAssertion?returnUrl={Uri.EscapeDataString(ReturnUrl)}"
             : "/Account/PasskeyAssertion";
 
+    protected override async Task OnInitializedAsync() => _flags = await Features.GetAsync();
+
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
-        if (!firstRender) return;
+        // Don't start passkey conditional mediation when passkeys are disabled (#66).
+        if (!firstRender || !_flags.Passkey) return;
 
         _jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
             "import", "./_content/AndreGoepel.Marten.Identity.Blazor/Components/Account/Shared/PasskeySubmit.razor.js");

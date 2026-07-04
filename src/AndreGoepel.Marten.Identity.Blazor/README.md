@@ -41,6 +41,63 @@ app.MapRazorComponents<App>()
 
 This makes the routable pages in the RCL (e.g. `/Account/Login`) discoverable by the Blazor router.
 
+## Feature flags (registration, 2FA, passkeys)
+
+The registration, two-factor and passkey features can be turned off. Disabling a feature
+hides its UI **and** makes its setup pages/endpoints unreachable by direct URL — the
+login-time 2FA/recovery challenge stays reachable so users who already enrolled can still
+sign in, and passkey login falls back to password.
+
+**1. Baseline from configuration** (all default `true`):
+
+```csharp
+builder.Services.AddMartenIdentityBlazor(options =>
+{
+    options.EnableUserRegistration = true;
+    options.EnableTwoFactor = true;
+    options.EnablePasskey = false; // e.g. passkeys off
+});
+```
+
+**2. Enforce the gate** — add the middleware after authentication/authorization and before
+`MapRazorComponents` / `MapAdditionalIdentityEndpoints` so it can block both pages and the
+passkey endpoints:
+
+```csharp
+app.UseAuthentication();
+app.UseAuthorization();
+app.UseMartenIdentityFeatureGate();   // blocks disabled-feature pages/endpoints
+app.MapAdditionalIdentityEndpoints();
+app.MapRazorComponents<App>() /* … */;
+```
+
+**3. Runtime override (optional).** To source the flags from a store (e.g. an admin
+settings page) where the persisted value beats configuration, register your own
+`IIdentityFeatureProvider` — it takes precedence over the built-in options-backed default:
+
+```csharp
+builder.Services.AddScoped<IIdentityFeatureProvider, MyDbFeatureProvider>();
+```
+
+```csharp
+public sealed class MyDbFeatureProvider(IMyStore store) : IIdentityFeatureProvider
+{
+    public async ValueTask<IdentityFeatureFlags> GetAsync(CancellationToken ct = default)
+    {
+        var saved = await store.GetIdentityFlagsAsync(ct); // DB value takes precedence
+        return new IdentityFeatureFlags
+        {
+            UserRegistration = saved.Registration,
+            TwoFactor = saved.TwoFactor,
+            Passkey = saved.Passkey,
+        };
+    }
+}
+```
+
+Your own account-navigation links should call the same provider to hide entry points to
+disabled features.
+
 ## What's included
 
 | Area | Components / Pages |
