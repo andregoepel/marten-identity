@@ -30,7 +30,7 @@
                         <RadzenStack Gap="1.25rem">
 
                             <RadzenFormField Text="Current email" Style="width: 100%;">
-                                <RadzenTextBox @bind-Value="@CurrentEmail"
+                                <RadzenTextBox @bind-Value="@_currentEmail"
                                                Name="CurrentEmail"
                                                ReadOnly="true"
                                                Style="width:100%; background-color: var(--rz-input-disabled-background);" />
@@ -75,7 +75,7 @@
                                 <Helper>
                                     <RadzenRequiredValidator Component="NewEmail" Text="New email is required" />
                                     <RadzenEmailValidator Component="NewEmail" Text="Please enter a valid email address" />
-                                    <RadzenCompareValidator Component="NewEmail" Value="@CurrentEmail" Text="New email must be different from current email" Operator="CompareOperator.NotEqual" />
+                                    <RadzenCompareValidator Component="NewEmail" Value="@_currentEmail" Text="New email must be different from current email" Operator="CompareOperator.NotEqual" />
                                 </Helper>
                             </RadzenFormField>
 
@@ -91,7 +91,7 @@
                                       Text="Change Email"
                                       ButtonStyle="ButtonStyle.Primary"
                                       Size="ButtonSize.Large"
-                                      IsBusy="@isChangingEmail"
+                                      IsBusy="@_isChangingEmail"
                                       BusyText="Processing..." />
 
                         <RadzenButton Text="Cancel"
