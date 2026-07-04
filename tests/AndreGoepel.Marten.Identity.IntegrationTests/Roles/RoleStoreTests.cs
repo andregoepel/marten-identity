@@ -160,10 +160,16 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
             .GetCurrentUserIdAsync(Arg.Any<CancellationToken>())
             .Returns(UserId.New());
 
+        // Persistence tests run with authorization satisfied; the authz guard itself is
+        // covered separately (#69).
+        var authorizer = Substitute.For<IIdentityAuthorizer>();
+        authorizer.IsCurrentUserAdministratorAsync(Arg.Any<CancellationToken>()).Returns(true);
+
         var session = fixture.Store.LightweightSession();
         return new RoleStore<Role>(
             session,
             currentUserService,
+            authorizer,
             NullLogger<RoleStore<Role>>.Instance
         );
     }

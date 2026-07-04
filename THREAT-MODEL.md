@@ -76,6 +76,16 @@ These are enforced by the library itself — you do not need to wire them up.
   blocked by middleware, so it cannot be used to mint a second root administrator.
 - **Authorization on built-in pages.** The administration pages require the
   `Administrator` role; every `/Account/Manage/*` page requires authentication.
+- **Domain-layer authorization (defense in depth).** The privileged store operations
+  re-check authorization themselves, independent of the page `[Authorize]` guards
+  (#41/#69): assigning/removing a role, restoring a user, and all role management
+  require the acting user to hold the `Administrator` role (verified against the live
+  projection, not claims); deleting a user requires administrator authority **or**
+  account ownership. These fail closed for an unidentified caller. Trusted server-side
+  code (seeding, bootstrap) can opt out via `IIdentityAuthorizer.BeginSystemScope()`.
+  *Not* guarded: `CreateAsync` and `UpdateAsync`, which ASP.NET Identity legitimately
+  drives through **anonymous** flows (registration, password reset, email confirmation,
+  lockout) — their authorization is the reset/confirmation **token** at the UI layer.
 - **PII erasure.** Past the retention period the cleanup job erases personal data
   from the event stream via Marten event-data masking (no raw SQL).
 - **Parameterized data access** throughout — no SQL injection surface in the library.
@@ -98,9 +108,11 @@ guarantees above. This is your deployment checklist.
       forms rely on the host wiring `AddAntiforgery()` / `UseAntiforgery()` and
       `MapRazorComponents<App>()` with antiforgery active.
 - [ ] **Set a default-deny authorization posture for *your* routes.** The library
-      guards its own pages, but a `FallbackPolicy` requiring an authenticated user
+      guards its own pages **and** re-checks authorization in the privileged store
+      operations (#41/#69), but a `FallbackPolicy` requiring an authenticated user
       (and an `AuthorizeRouteView`) ensures pages you add are not anonymous by
-      accident. (A library-level default-deny in the domain layer is tracked in #41.)
+      accident. The domain-layer guard is defense in depth, not a substitute for
+      guarding your own routes.
 - [ ] **Put rate limiting / anti-automation in front of login.** Per-account lockout
       is built in, but **IP-based / global** throttling is not — add ASP.NET Core
       rate limiting (or an edge WAF) on the login and password-reset paths to blunt
@@ -129,10 +141,14 @@ Stated honestly so you can make an informed risk decision.
   token to work around the Blazor-Server constraint that an interactive circuit
   cannot set cookies. Removing the client from the auth control flow entirely is the
   structural fix, tracked in **#40**.
-- **The domain layer trusts its callers.** Store methods (`UserStore`/`RoleStore`)
-  perform privileged operations without re-checking authorization; protection
-  currently relies on the page-level `[Authorize]` attributes. Default-deny +
-  defense-in-depth in the domain layer is tracked in **#41**.
+- **Domain-layer authorization is partial by necessity.** The privileged store
+  operations now re-check authorization in the domain layer (#41/#69) — role
+  assignment/removal, restore, and role management require the `Administrator` role;
+  delete requires administrator authority or ownership. But `CreateAsync` and
+  `UpdateAsync` **cannot** be guarded there: ASP.NET Identity drives them through
+  anonymous flows (registration, password reset, email confirmation, lockout), so
+  their authorization remains the reset/confirmation **token** and the UI-layer guard.
+  A stale full-state `UpdateAsync` overwrite is tracked separately in **#70**.
 - **First-run setup is an unauthenticated bootstrap** by design — see the host
   obligation above. The actual `/Setup` page is host-provided and outside this
   library's control.

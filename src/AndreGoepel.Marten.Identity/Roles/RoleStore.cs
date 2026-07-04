@@ -9,11 +9,23 @@ namespace AndreGoepel.Marten.Identity.Roles;
 public class RoleStore<TRole>(
     IDocumentSession session,
     ICurrentUserService currentUserService,
+    IIdentityAuthorizer authorizer,
     ILogger<RoleStore<TRole>> logger
 ) : IQueryableRoleStore<TRole>
     where TRole : Role
 {
     public IQueryable<TRole> Roles => session.Query<TRole>();
+
+    // Defence in depth (#69/#41): role management is an administrator-only operation,
+    // enforced here independently of any UI [Authorize] guard.
+    private static IdentityResult NotAuthorized() =>
+        IdentityResult.Failed(
+            new IdentityError
+            {
+                Code = "NotAuthorized",
+                Description = "Managing roles requires administrator authority.",
+            }
+        );
 
     public void Dispose()
     {
@@ -24,6 +36,9 @@ public class RoleStore<TRole>(
     {
         try
         {
+            if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
+                return NotAuthorized();
+
             if (role.Name == null)
                 return IdentityResult.Failed(
                     new IdentityError() { Description = "Role name cannot be null." }
@@ -57,6 +72,9 @@ public class RoleStore<TRole>(
     {
         try
         {
+            if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
+                return NotAuthorized();
+
             if (role.Name == null)
             {
                 return IdentityResult.Failed(
@@ -93,6 +111,9 @@ public class RoleStore<TRole>(
     {
         try
         {
+            if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
+                return NotAuthorized();
+
             if (!role.Deletable)
             {
                 return IdentityResult.Failed(
@@ -124,6 +145,9 @@ public class RoleStore<TRole>(
     {
         try
         {
+            if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
+                return NotAuthorized();
+
             session.Events.Append(
                 role.StreamId,
                 new RoleRestored(role.RoleId, await currentUserService.GetCurrentUserIdAsync())
