@@ -40,8 +40,18 @@ public static class IdentityComponentsEndpointRouteBuilderExtensions
 
         accountGroup.MapGet(
             "/SignOutAndRedirect",
-            async ([FromServices] SignInManager<User> signInManager) =>
+            async (HttpContext context, [FromServices] SignInManager<User> signInManager) =>
             {
+                // This GET sign-out exists because an interactive Blazor circuit cannot
+                // write the sign-out cookie itself (the DeletePersonalData flow force-
+                // navigates here). Reject cross-site requests so a third-party page cannot
+                // force a sign-out via <img>/link/prefetch (logout CSRF, #A-1). A same-
+                // origin top-level navigation reports Sec-Fetch-Site: same-origin; a
+                // cross-site request reports cross-site. Fail closed without signing out.
+                var site = context.Request.Headers["Sec-Fetch-Site"].FirstOrDefault();
+                if (string.Equals(site, "cross-site", StringComparison.OrdinalIgnoreCase))
+                    return TypedResults.LocalRedirect("~/");
+
                 await signInManager.SignOutAsync();
                 return TypedResults.LocalRedirect("~/");
             }

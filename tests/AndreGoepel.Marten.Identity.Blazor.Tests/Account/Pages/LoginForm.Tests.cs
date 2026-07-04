@@ -56,6 +56,7 @@ public class LoginFormTests : BunitContext
         Services.AddSingleton(new NotificationService());
         Services.AddSingleton(Substitute.For<ILogger<Login>>());
         Services.AddSingleton(new LoginTokenProtector(DataProtectionProvider.Create("Tests")));
+        Services.AddSingleton<IPasswordHasher<User>>(new PasswordHasher<User>());
         var cut = Render<LoginForm>();
         return (cut, um);
     }
