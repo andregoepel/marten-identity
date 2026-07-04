@@ -7,19 +7,19 @@
 @inject NotificationService NotificationService
 @inject LoginTokenProtector LoginTokens
 
-<PageTitle>Two-factor authentication – nerdventures.blog</PageTitle>
+<IdentityPageTitle Title="Two-factor authentication" />
 
 <SectionContent SectionName="login-tagline">Enter the code from your authenticator app.</SectionContent>
 
 <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4">Two-factor authentication</RadzenText>
 
-<RadzenTemplateForm TItem="InputModel" Data=@Input Submit=@OnSubmitAsync>
+<RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@OnSubmitAsync">
     <RadzenStack Gap="1.25rem">
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
             <RadzenLabel Text="Authenticator code" Component="TwoFactorCode" Style="width: 10rem; flex-shrink: 0;" />
             <RadzenStack Gap="0.25rem" Style="flex: 1;">
-                <RadzenTextBox @bind-Value=@Input.TwoFactorCode
+                <RadzenTextBox @bind-Value="@Input.TwoFactorCode"
                                Name="TwoFactorCode"
                                Placeholder="6-digit code"
                                AutoCompleteType="AutoCompleteType.Off"
@@ -31,7 +31,7 @@
         </RadzenStack>
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
-            <RadzenCheckBox @bind-Value=@Input.RememberMachine Name="RememberMachine" />
+            <RadzenCheckBox @bind-Value="@Input.RememberMachine" Name="RememberMachine" />
             <RadzenLabel Text="Remember this machine" Component="RememberMachine" />
         </RadzenStack>
 
@@ -39,7 +39,7 @@
             <RadzenButton ButtonType="ButtonType.Submit"
                           Text="Log in"
                           ButtonStyle="ButtonStyle.Primary"
-                          IsBusy=@_isProcessing
+                          IsBusy="@_isProcessing"
                           BusyText="Verifying..." />
 
             <RadzenLink Path="@($"/Account/LoginWithRecoveryCode?returnUrl={ReturnUrl}")"

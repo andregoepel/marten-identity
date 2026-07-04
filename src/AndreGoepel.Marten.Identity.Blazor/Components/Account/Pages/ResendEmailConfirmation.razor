@@ -9,19 +9,19 @@
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
 
-<PageTitle>Resend email confirmation – nerdventures.blog</PageTitle>
+<IdentityPageTitle Title="Resend email confirmation" />
 
 <SectionContent SectionName="login-tagline">We'll resend your confirmation email.</SectionContent>
 
 <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4">Resend email confirmation</RadzenText>
 
-<RadzenTemplateForm TItem="InputModel" Data=@Input Submit=@OnSubmitAsync>
+<RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@OnSubmitAsync">
     <RadzenStack Gap="1.25rem">
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
             <RadzenLabel Text="Email" Component="Email" Style="width: 8rem; flex-shrink: 0;" />
             <RadzenStack Gap="0.25rem" Style="flex: 1;">
-                <RadzenTextBox @bind-Value=@Input.Email
+                <RadzenTextBox @bind-Value="@Input.Email"
                                Name="Email"
                                Placeholder="name@example.com"
                                AutoCompleteType="AutoCompleteType.Email"
@@ -35,7 +35,7 @@
             <RadzenButton ButtonType="ButtonType.Submit"
                           Text="Resend"
                           ButtonStyle="ButtonStyle.Primary"
-                          IsBusy=@_isProcessing
+                          IsBusy="@_isProcessing"
                           BusyText="Sending..." />
         </div>
 

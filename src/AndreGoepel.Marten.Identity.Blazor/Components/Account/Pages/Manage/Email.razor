@@ -8,7 +8,7 @@
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
 
-<PageTitle>Manage Email – nerdventures.blog</PageTitle>
+<IdentityPageTitle Title="Manage Email" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
@@ -22,15 +22,15 @@
             <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
 
             <RadzenTemplateForm TItem="ChangeEmailModel"
-                                Data=@Model
-                                Submit=@OnValidSubmit>
+                                Data="@Model"
+                                Submit="@OnValidSubmit">
                 <RadzenStack Gap="2rem">
 
                     <RadzenFieldset Text="Current Email">
                         <RadzenStack Gap="1.25rem">
 
                             <RadzenFormField Text="Current email" Style="width: 100%;">
-                                <RadzenTextBox @bind-Value=@_currentEmail
+                                <RadzenTextBox @bind-Value="@_currentEmail"
                                                Name="CurrentEmail"
                                                ReadOnly="true"
                                                Style="width:100%; background-color: var(--rz-input-disabled-background);" />
@@ -66,16 +66,16 @@
 
                             <RadzenFormField Text="New email address *" Style="width: 100%;">
                                 <ChildContent>
-                                    <RadzenTextBox @bind-Value=@Model.NewEmail
+                                    <RadzenTextBox @bind-Value="@Model.NewEmail"
                                                    Name="NewEmail"
-                                                   Placeholder="new.email@nerdventures.blog"
+                                                   Placeholder="you@yourdomain.com"
                                                    AutoCompleteType="AutoCompleteType.Email"
                                                    Style="width:100%" />
                                 </ChildContent>
                                 <Helper>
                                     <RadzenRequiredValidator Component="NewEmail" Text="New email is required" />
                                     <RadzenEmailValidator Component="NewEmail" Text="Please enter a valid email address" />
-                                    <RadzenCompareValidator Component="NewEmail" Value=@_currentEmail Text="New email must be different from current email" Operator="CompareOperator.NotEqual" />
+                                    <RadzenCompareValidator Component="NewEmail" Value="@_currentEmail" Text="New email must be different from current email" Operator="CompareOperator.NotEqual" />
                                 </Helper>
                             </RadzenFormField>
 
@@ -91,7 +91,7 @@
                                       Text="Change Email"
                                       ButtonStyle="ButtonStyle.Primary"
                                       Size="ButtonSize.Large"
-                                      IsBusy=@_isChangingEmail
+                                      IsBusy="@_isChangingEmail"
                                       BusyText="Processing..." />
 
                         <RadzenButton Text="Cancel"

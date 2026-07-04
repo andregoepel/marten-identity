@@ -8,7 +8,7 @@
 @inject NavigationManager NavigationManager
 @inject DialogService DialogService
 
-<PageTitle>Delete Account – nerdventures.blog</PageTitle>
+<IdentityPageTitle Title="Delete Account" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
@@ -30,8 +30,8 @@
             </RadzenAlert>
 
             <RadzenTemplateForm TItem="InputModel"
-                                Data=@Model
-                                Submit=@OnValidSubmit>
+                                Data="@Model"
+                                Submit="@OnValidSubmit">
                 <RadzenStack Gap="2rem">
 
                     <RadzenFieldset Text="Confirmation">
@@ -39,7 +39,7 @@
 
                             <RadzenFormField Text="Enter your current password to confirm deletion" Style="width: 100%;">
                                 <ChildContent>
-                                    <RadzenPassword @bind-Value=@Model.Password
+                                    <RadzenPassword @bind-Value="@Model.Password"
                                                     Name="Password"
                                                     Placeholder="Enter your password to confirm"
                                                     Style="width:100%" />
@@ -65,9 +65,9 @@
                                       Text="Permanently Delete My Account"
                                       ButtonStyle="ButtonStyle.Danger"
                                       Size="ButtonSize.Large"
-                                      IsBusy=@_isDeleting
+                                      IsBusy="@_isDeleting"
                                       BusyText="Deleting account..."
-                                      Disabled=@_isDeleting />
+                                      Disabled="@_isDeleting" />
 
                         <RadzenButton Text="Cancel – Keep my account"
                                       ButtonStyle="ButtonStyle.Secondary"

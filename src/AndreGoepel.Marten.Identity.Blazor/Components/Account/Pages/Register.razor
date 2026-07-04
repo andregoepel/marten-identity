@@ -12,25 +12,25 @@
 @inject NotificationService NotificationService
 @inject LoginTokenProtector LoginTokens
 
-<PageTitle>Register – nerdventures.blog</PageTitle>
+<IdentityPageTitle Title="Register" />
 
 <SectionContent SectionName="login-tagline">Create your account to get started.</SectionContent>
 
 <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4">Register</RadzenText>
 
-<RadzenTemplateForm TItem="InputModel" Data=@Input Submit=@RegisterUser>
+<RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@RegisterUser">
+    <DataAnnotationsValidator />
     <RadzenStack Gap="1.25rem">
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
             <RadzenLabel Text="Email" Component="Email" Style="width: 10rem; flex-shrink: 0;" />
             <RadzenStack Gap="0.25rem" Style="flex: 1;">
-                <RadzenTextBox @bind-Value=@Input.Email
+                <RadzenTextBox @bind-Value="@Input.Email"
                                Name="Email"
                                AutoCompleteType="AutoCompleteType.Email"
                                Placeholder="name@example.com"
                                Style="width:100%" />
-                <RadzenRequiredValidator Component="Email" Text="Email is required" />
-                <RadzenEmailValidator Component="Email" Text="Please enter a valid email address" />
+                <ValidationMessage For="@(() => Input.Email)" class="rz-message rz-messages-error" />
             </RadzenStack>
         </RadzenStack>
 
@@ -38,9 +38,7 @@
             <RadzenLabel Text="Password" Component="NewPassword" Style="width: 10rem; flex-shrink: 0;" />
             <RadzenStack Gap="0.25rem" Style="flex: 1;">
                 <RadzenPassword @bind-Value="Input.Password" Name="NewPassword" Style="width:100%" />
-                <RadzenRequiredValidator Component="NewPassword" Text="Password is required" />
-                <RadzenLengthValidator Component="NewPassword" Min="12" Max="100"
-                                       Text="Password must be between 12 and 100 characters" />
+                <ValidationMessage For="@(() => Input.Password)" class="rz-message rz-messages-error" />
             </RadzenStack>
         </RadzenStack>
 
@@ -48,11 +46,7 @@
             <RadzenLabel Text="Confirm password" Component="ConfirmPassword" Style="width: 10rem; flex-shrink: 0;" />
             <RadzenStack Gap="0.25rem" Style="flex: 1;">
                 <RadzenPassword @bind-Value="Input.ConfirmPassword" Name="ConfirmPassword" Style="width:100%" />
-                <RadzenRequiredValidator Component="ConfirmPassword" Text="Please confirm your password" />
-                <RadzenCompareValidator Component="ConfirmPassword"
-                                       Value=@Input.Password
-                                       Text="The passwords do not match"
-                                       Operator="CompareOperator.Equal" />
+                <ValidationMessage For="@(() => Input.ConfirmPassword)" class="rz-message rz-messages-error" />
             </RadzenStack>
         </RadzenStack>
 
@@ -135,8 +129,16 @@
 
     private sealed class InputModel
     {
+        [Required(ErrorMessage = "Email is required")]
+        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
         public string Email { get; set; } = "";
+
+        [Required(ErrorMessage = "Password is required")]
+        [StringLength(100, MinimumLength = 12, ErrorMessage = "Password must be between 12 and 100 characters")]
         public string Password { get; set; } = "";
+
+        [Required(ErrorMessage = "Please confirm your password")]
+        [Compare(nameof(Password), ErrorMessage = "The passwords do not match")]
         public string ConfirmPassword { get; set; } = "";
     }
 }
