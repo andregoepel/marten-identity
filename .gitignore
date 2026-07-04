@@ -443,3 +443,8 @@ FodyWeavers.xsd
 *.msp
 /repomix-output.xml
 /.repomix
+
+# Local security-audit output: keep generated audit reports out of version
+# control, but allow the audit prompt itself to be committed.
+/audit/*
+!/audit/audit-prompt.md
