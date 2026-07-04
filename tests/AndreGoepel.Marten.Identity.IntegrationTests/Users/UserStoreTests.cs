@@ -384,6 +384,113 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
 
     #endregion
 
+    #region Optimistic concurrency (#70)
+
+    [Fact]
+    public async Task UpdateAsync_StaleSnapshot_IsRejectedWithConcurrencyFailure()
+    {
+        // A stale full-state update must not silently revert a change committed after the
+        // caller loaded — it is rejected so the caller reloads and retries.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+        var first = await store.FindByIdAsync(user.Id, Ct);
+        var second = await store.FindByIdAsync(user.Id, Ct); // same content version
+
+        // Act — the first update commits; the second is now stale.
+        first!.PhoneNumber = "+49 111 1111";
+        Assert.True((await store.UpdateAsync(first, Ct)).Succeeded);
+
+        second!.PhoneNumber = "+49 222 2222";
+        var result = await store.UpdateAsync(second, Ct);
+
+        // Assert — rejected, and the first writer's change survives.
+        Assert.False(result.Succeeded);
+        Assert.Contains(result.Errors, e => e.Code == "ConcurrencyFailure");
+        var persisted = await store.FindByIdAsync(user.Id, Ct);
+        Assert.Equal("+49 111 1111", persisted!.PhoneNumber);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_StaleProfileEdit_DoesNotClobberConcurrent2faEnable()
+    {
+        // The headline scenario: a stale profile edit must not turn 2FA back off after it
+        // was enabled concurrently.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+        var editor = await store.FindByIdAsync(user.Id, Ct);
+        var securitySnapshot = await store.FindByIdAsync(user.Id, Ct);
+
+        // Act — 2FA is enabled; then the stale profile edit lands.
+        securitySnapshot!.TwoFactorEnabled = true;
+        Assert.True((await store.UpdateAsync(securitySnapshot, Ct)).Succeeded);
+
+        editor!.PhoneNumber = "+49 555 5555";
+        var result = await store.UpdateAsync(editor, Ct);
+
+        // Assert — the stale edit is rejected and 2FA stays enabled.
+        Assert.False(result.Succeeded);
+        var persisted = await store.FindByIdAsync(user.Id, Ct);
+        Assert.True(persisted!.TwoFactorEnabled);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_SequentialUpdatesOnSameInstance_BothSucceed()
+    {
+        // ASP.NET Identity flows (e.g. ResetAuthenticator) call UpdateAsync more than once
+        // on the same in-memory instance without reloading; the content version must be
+        // refreshed after each write so the second call is not self-rejected.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+        var loaded = await store.FindByIdAsync(user.Id, Ct);
+
+        // Act
+        loaded!.TwoFactorEnabled = true;
+        Assert.True((await store.UpdateAsync(loaded, Ct)).Succeeded);
+        loaded.PhoneNumber = "+49 333 3333";
+        Assert.True((await store.UpdateAsync(loaded, Ct)).Succeeded);
+
+        // Assert
+        var persisted = await store.FindByIdAsync(user.Id, Ct);
+        Assert.True(persisted!.TwoFactorEnabled);
+        Assert.Equal("+49 333 3333", persisted.PhoneNumber);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_AfterConcurrentLockoutIncrement_StillSucceeds()
+    {
+        // A concurrent failed-login increment must not be seen as a content conflict:
+        // lockout-only updates do not advance the content version.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+        var loaded = await store.FindByIdAsync(user.Id, Ct);
+
+        await using (var session = fixture.Store.QuerySession())
+        {
+            var other = await session.LoadAsync<User>(user.UserId.Value, Ct);
+            await store.IncrementAccessFailedCountAsync(other!, Ct);
+        }
+
+        // Act
+        loaded!.PhoneNumber = "+49 444 4444";
+        var result = await store.UpdateAsync(loaded, Ct);
+
+        // Assert — the profile update commits, and the increment is preserved.
+        Assert.True(result.Succeeded);
+        var persisted = await store.FindByIdAsync(user.Id, Ct);
+        Assert.Equal("+49 444 4444", persisted!.PhoneNumber);
+        Assert.Equal(1, persisted.AccessFailedCount);
+    }
+
+    #endregion
+
     #region Security stamp (session invalidation)
 
     [Fact]

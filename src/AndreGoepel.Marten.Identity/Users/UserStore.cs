@@ -43,6 +43,15 @@ public class UserStore<TUser>(
             new IdentityError { Code = "NotAuthorized", Description = description }
         );
 
+    private static IdentityResult ConcurrencyFailure() =>
+        IdentityResult.Failed(
+            new IdentityError
+            {
+                Code = "ConcurrencyFailure",
+                Description = "The user was modified concurrently; reload and try again.",
+            }
+        );
+
     public IQueryable<TUser> Users => querySession.Query<TUser>();
 
     public Task<string> GetUserIdAsync(TUser user, CancellationToken cancellationToken) =>
@@ -220,9 +229,23 @@ public class UserStore<TUser>(
                     user.Deletable = false;
             }
 
-            // Nothing changed — release the lock without churning the stream.
+            // Nothing changed — release the lock without churning the stream. Keep the
+            // caller's content version in step with the projection so a follow-up update
+            // on this same instance is not spuriously rejected.
             if (existingUser != null && existingUser.AreEqual(user))
+            {
+                user.ContentVersion = existingUser.ContentVersion;
                 return IdentityResult.Success;
+            }
+
+            // Optimistic concurrency (#70): the non-lockout content is versioned. If it
+            // advanced since the caller loaded, this full-state write is based on a stale
+            // snapshot and would silently revert the concurrent change (e.g. a 2FA toggle
+            // overwritten by a stale profile save) — reject so the caller reloads and
+            // retries. Lockout increments do not bump ContentVersion, so concurrent
+            // failed-login counting never triggers a spurious conflict here.
+            if (existingUser != null && user.ContentVersion != existingUser.ContentVersion)
+                return ConcurrencyFailure();
 
             session.Events.Append(
                 userId.Value,
@@ -244,6 +267,11 @@ public class UserStore<TUser>(
                 }
             );
             await session.SaveChangesAsync(cancellationToken);
+
+            // The inline projection just advanced the persisted content version; mirror it
+            // so repeated updates on the same instance (some ASP.NET Identity flows call
+            // UpdateAsync more than once) keep matching instead of self-conflicting.
+            user.ContentVersion = (existingUser?.ContentVersion ?? 0) + 1;
             return IdentityResult.Success;
         }
         catch (Exception ex)
@@ -893,6 +921,9 @@ public class UserStore<TUser>(
                 LockoutEnabled = current.LockoutEnabled,
                 LockoutEnd = lockoutEnd,
                 AccessFailedCount = accessFailedCount,
+                // Lockout counting is auto-managed; don't advance the content-version
+                // token, or it would spuriously conflict with a concurrent update (#70).
+                LockoutOnly = true,
             }
         );
         await session.SaveChangesAsync(cancellationToken);

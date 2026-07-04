@@ -75,6 +75,9 @@ internal partial class UserProjection : SingleStreamProjection<User, Guid>
 
         if (@event.SecurityStamp is not null)
             user.SecurityStamp = @event.SecurityStamp;
+
+        // Restoring changes content — advance the optimistic-concurrency token (#70).
+        user.ContentVersion++;
     }
 
     [SuppressMessage(
@@ -126,6 +129,13 @@ internal partial class UserProjection : SingleStreamProjection<User, Guid>
 
         user.ChangedBy = @event.UpdatedBy;
         user.ChangedAt = @event.UpdatedAt;
+
+        // Advance the optimistic-concurrency token for genuine content changes only;
+        // lockout-only updates (failed-count / lockout window) must not bump it, or
+        // concurrent failed-login counting would spuriously conflict with a profile
+        // update (#70).
+        if (!@event.LockoutOnly)
+            user.ContentVersion++;
     }
 
     [SuppressMessage(
