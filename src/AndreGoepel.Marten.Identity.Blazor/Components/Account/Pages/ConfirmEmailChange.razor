@@ -1,12 +1,7 @@
 @page "/Account/ConfirmEmailChange"
 @attribute [AllowAnonymous]
 
-@using System.Text
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
 @using Microsoft.AspNetCore.WebUtilities
-@using Radzen
-@using Radzen.Blazor
 
 @inject UserManager<User> UserManager
 @inject SignInManager<User> SignInManager
@@ -20,7 +15,7 @@
 
             <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Email change confirmation</RadzenText>
 
-            @if (succeeded)
+            @if (_succeeded)
             {
                 <RadzenAlert AlertStyle="AlertStyle.Success" Shade="Shade.Lighter" Variant="Variant.Flat" AllowClose="false">
                     Thank you for confirming your email change. Your email has been updated.
@@ -32,7 +27,7 @@
             else
             {
                 <RadzenAlert AlertStyle="AlertStyle.Danger" Shade="Shade.Lighter" Variant="Variant.Flat" AllowClose="false">
-                    @error
+                    @_error
                 </RadzenAlert>
                 <RadzenButton Text="Go to home"
                               ButtonStyle="ButtonStyle.Primary"
@@ -44,8 +39,8 @@
 </div>
 
 @code {
-    private bool succeeded;
-    private string error = "An error occurred confirming your email change.";
+    private bool _succeeded;
+    private string _error = "An error occurred confirming your email change.";
 
     [SupplyParameterFromQuery]
     private string? UserId { get; set; }
@@ -60,7 +55,7 @@
     {
         if (UserId is null || Email is null || Code is null)
         {
-            error = "Invalid email change confirmation link.";
+            _error = "Invalid email change confirmation link.";
             return;
         }
 
@@ -68,7 +63,7 @@
         if (user is null)
         {
             // Do not reflect the supplied UserId back to the client (#13, CWE-204).
-            error = "Invalid email change confirmation link.";
+            _error = "Invalid email change confirmation link.";
             return;
         }
 
@@ -76,7 +71,7 @@
         var result = await UserManager.ChangeEmailAsync(user, Email, code);
         if (!result.Succeeded)
         {
-            error = "Error changing email. The link may have expired.";
+            _error = "Error changing email. The link may have expired.";
             return;
         }
 
@@ -84,11 +79,11 @@
         var setUserNameResult = await UserManager.SetUserNameAsync(user, Email);
         if (!setUserNameResult.Succeeded)
         {
-            error = "Error updating user name.";
+            _error = "Error updating user name.";
             return;
         }
 
         await SignInManager.RefreshSignInAsync(user);
-        succeeded = true;
+        _succeeded = true;
     }
 }

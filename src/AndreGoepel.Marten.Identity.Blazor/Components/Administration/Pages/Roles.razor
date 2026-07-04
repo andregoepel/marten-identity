@@ -1,16 +1,8 @@
 @page "/Administration/Roles"
 @rendermode InteractiveServer
-
-@using AndreGoepel.Marten.Identity.Roles
-@using AndreGoepel.Marten.Identity.Users
 @using AndreGoepel.Marten.Identity.Blazor.Components.Administration.Dialogs
-@using Microsoft.AspNetCore.Authorization
-@using Microsoft.AspNetCore.Identity
-@using Radzen
-@using Radzen.Blazor
 
 @inject RoleManager<Role> RoleManager
-@inject UserManager<User> UserManager
 @inject RoleStore<Role> RoleStore
 @inject DialogService DialogService
 
@@ -42,8 +34,8 @@
         </RadzenRow>
 
         <RadzenCard Style="padding: 0; overflow: hidden;">
-            <RadzenDataGrid @ref="rolesGrid"
-                            Data="@roles"
+            <RadzenDataGrid @ref="_rolesGrid"
+                            Data="@_roles"
                             AllowFiltering="true"
                             AllowColumnResize="true"
                             AllowAlternatingRows="false"
@@ -55,7 +47,7 @@
                             ShowPagingSummary="true"
                             LogicalFilterOperator="LogicalFilterOperator.Or"
                             SelectionMode="DataGridSelectionMode.Single"
-                            @bind-Value="@selectedRoles"
+                            @bind-Value="@_selectedRoles"
                             Density="Density.Compact"
                             Style="width: 100%;">
                 <Columns>
@@ -99,9 +91,9 @@
 </div>
 
 @code {
-    private IReadOnlyList<Role>? roles;
-    private IList<Role> selectedRoles = new List<Role>();
-    private RadzenDataGrid<Role>? rolesGrid;
+    private IReadOnlyList<Role>? _roles;
+    private IList<Role> _selectedRoles = new List<Role>();
+    private RadzenDataGrid<Role>? _rolesGrid;
 
     private bool ShowDeleted { get; set; }
 

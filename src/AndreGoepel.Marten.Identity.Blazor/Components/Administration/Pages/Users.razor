@@ -1,13 +1,6 @@
 @page "/Administration/Users"
 @rendermode InteractiveServer
-
-@using AndreGoepel.Marten.Identity.Users
 @using AndreGoepel.Marten.Identity.Blazor.Components.Administration.Dialogs
-@using Microsoft.AspNetCore.Authorization
-@using System.Security.Claims
-@using Microsoft.AspNetCore.Identity
-@using Radzen
-@using Radzen.Blazor
 
 @inject UserManager<User> UserManager
 @inject UserStore<User> UserStore
@@ -34,7 +27,7 @@
         </RadzenRow>
 
         <RadzenCard Style="padding: 0; overflow: hidden;">
-            <RadzenDataGrid Data="@users"
+            <RadzenDataGrid Data="@_users"
                             AllowFiltering="true"
                             AllowColumnResize="true"
                             AllowAlternatingRows="false"
@@ -83,8 +76,8 @@
 </div>
 
 @code {
-    private IReadOnlyList<User>? users;
-    private IList<User> selectedUsers = new List<User>();
+    private IReadOnlyList<User>? _users;
+    private IList<User> _selectedUsers = new List<User>();
     private bool ShowDeleted { get; set; }
 
     protected override async Task OnInitializedAsync()

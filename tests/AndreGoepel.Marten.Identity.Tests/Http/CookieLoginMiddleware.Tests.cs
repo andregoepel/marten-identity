@@ -67,7 +67,7 @@ public class CookieLoginMiddlewareTests
 
     private static CookieLoginMiddleware BuildMiddleware() => new(_ => Task.CompletedTask);
 
-    private static string? RedirectLocation(DefaultHttpContext context) =>
+    private static string RedirectLocation(DefaultHttpContext context) =>
         context.Response.Headers.Location.ToString();
 
     #endregion
@@ -596,7 +596,7 @@ public class CookieLoginMiddlewareTests
     private sealed class FailedAntiforgeryValidation : IAntiforgeryValidationFeature
     {
         public bool IsValid => false;
-        public Exception? Error => new InvalidOperationException("invalid token");
+        public Exception Error => new InvalidOperationException("invalid token");
     }
 
     [Fact]

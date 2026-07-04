@@ -1,14 +1,11 @@
-@using AndreGoepel.Marten.Identity.Users
-@using Radzen.Blazor
-
 @implements IAsyncDisposable
 
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 
 <button type="button"
         @attributes="AdditionalAttributes"
         class="rz-button rz-button-md rz-variant-filled rz-primary rz-shade-default"
-        disabled="@isBusy"
+        disabled="@_isBusy"
         @onclick="HandleClickAsync">
     @ChildContent
 </button>
@@ -22,13 +19,13 @@
     [Parameter] public RenderFragment? ChildContent { get; set; }
     [Parameter(CaptureUnmatchedValues = true)] public IDictionary<string, object>? AdditionalAttributes { get; set; }
 
-    private bool isBusy;
+    private bool _isBusy;
     private IJSObjectReference? _module;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         if (firstRender)
-            _module = await JSRuntime.InvokeAsync<IJSObjectReference>(
+            _module = await JsRuntime.InvokeAsync<IJSObjectReference>(
                 "import", "./_content/AndreGoepel.Marten.Identity.Blazor/Components/Account/Shared/PasskeySubmit.razor.js");
     }
 
@@ -36,7 +33,7 @@
     {
         if (_module is null) return;
 
-        isBusy = true;
+        _isBusy = true;
         StateHasChanged();
 
         try
@@ -58,7 +55,7 @@
         }
         finally
         {
-            isBusy = false;
+            _isBusy = false;
             StateHasChanged();
         }
     }

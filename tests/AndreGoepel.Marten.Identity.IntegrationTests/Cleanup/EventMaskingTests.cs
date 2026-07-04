@@ -1,7 +1,6 @@
 using AndreGoepel.Marten.Identity.IntegrationTests.Infrastructure;
 using AndreGoepel.Marten.Identity.Users;
 using AndreGoepel.Marten.Identity.Users.Events;
-using Marten;
 
 namespace AndreGoepel.Marten.Identity.IntegrationTests.Cleanup;
 

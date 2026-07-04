@@ -1,10 +1,4 @@
-﻿@using AndreGoepel.Marten.Identity.Roles
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
-@using Radzen
-@using Radzen.Blazor
-
-@inject DialogService DialogService
+﻿@inject DialogService DialogService
 @inject UserManager<User> UserManager
 @inject RoleManager<Role> RoleManager
 
@@ -30,36 +24,36 @@
 @code {
     [Parameter] public required string UserId { get; set; }
 
-    private IReadOnlyList<Role> roles = default!;
-    private User user = default!;
-    private List<RoleId> Values = [];
+    private IReadOnlyList<Role> _roles = default!;
+    private User _user = default!;
+    private List<RoleId> _values = [];
 
-    private RoleId AdminRole => roles.First(role => role.Name == Roles.Administrator).RoleId;
+    private RoleId AdminRole => _roles.First(role => role.Name == Roles.Administrator).RoleId;
 
     private async Task OnChange()
     {
-        if (user.RootUser && !Values.Contains(AdminRole))
+        if (_user.RootUser && !_values.Contains(AdminRole))
         {
             await DialogService.Alert("Root user must have Administrator role.", "Warning");
-            Values.Add(AdminRole);
+            _values.Add(AdminRole);
         }
     }
 
     private async Task SaveRoles()
     {
         var newRoles =
-            from value in Values.Except(user.Roles)
-            join role in roles on value equals role.RoleId
+            from value in _values.Except(_user.Roles)
+            join role in _roles on value equals role.RoleId
             select role.Name;
 
-        await UserManager.AddToRolesAsync(user, newRoles);
+        await UserManager.AddToRolesAsync(_user, newRoles);
 
         var removedRoles =
-            from value in user.Roles.Except(Values)
-            join role in roles on value equals role.RoleId
+            from value in _user.Roles.Except(_values)
+            join role in _roles on value equals role.RoleId
             select role.Name;
 
-        await UserManager.RemoveFromRolesAsync(user, removedRoles);
+        await UserManager.RemoveFromRolesAsync(_user, removedRoles);
 
         DialogService.Close(true);
     }

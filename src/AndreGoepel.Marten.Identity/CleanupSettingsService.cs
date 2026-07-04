@@ -10,11 +10,11 @@ public sealed class CleanupSettingsService(
     ISchedulerFactory schedulerFactory
 )
 {
-    private static readonly TriggerKey _triggerKey = new(
+    private static readonly TriggerKey TriggerKey = new(
         "DeletedUserCleanupTrigger",
         "MartenIdentity"
     );
-    private static readonly JobKey _jobKey = new("DeletedUserCleanup", "MartenIdentity");
+    private static readonly JobKey JobKey = new("DeletedUserCleanup", "MartenIdentity");
 
     /// <summary>Smallest accepted retention window. Zero/negative values are rejected because
     /// they produce a future cutoff that would purge every soft-deleted user.</summary>
@@ -68,7 +68,7 @@ public sealed class CleanupSettingsService(
     public async Task<DateTimeOffset?> GetNextFireTimeAsync(CancellationToken ct = default)
     {
         var scheduler = await schedulerFactory.GetScheduler(ct);
-        var trigger = await scheduler.GetTrigger(_triggerKey, ct);
+        var trigger = await scheduler.GetTrigger(TriggerKey, ct);
         return trigger?.GetNextFireTimeUtc();
     }
 
@@ -82,12 +82,12 @@ public sealed class CleanupSettingsService(
 
         var newTrigger = TriggerBuilder
             .Create()
-            .WithIdentity(_triggerKey)
-            .ForJob(_jobKey)
+            .WithIdentity(TriggerKey)
+            .ForJob(JobKey)
             .WithCronSchedule(settings.CronSchedule)
             .Build();
 
         var scheduler = await schedulerFactory.GetScheduler(ct);
-        await scheduler.RescheduleJob(_triggerKey, newTrigger, ct);
+        await scheduler.RescheduleJob(TriggerKey, newTrigger, ct);
     }
 }

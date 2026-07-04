@@ -2,7 +2,6 @@ using AndreGoepel.Marten.Identity.Blazor.Components.Account.Pages.Manage;
 using AndreGoepel.Marten.Identity.Blazor.Tests.TestSupport;
 using AndreGoepel.Marten.Identity.Users;
 using Bunit;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using NSubstitute;
@@ -57,7 +56,7 @@ public class ProfileTests : BunitContext
     {
         // Arrange
         var (cut, _, _) = Render(currentPhone: "+49 123 4567890");
-        cut.Find("input[name=PhoneNumber]").Change("+49 123 4567890");
+        await cut.Find("input[name=PhoneNumber]").ChangeAsync("+49 123 4567890");
 
         // Act
         await cut.Find("form").SubmitAsync();
@@ -75,7 +74,7 @@ public class ProfileTests : BunitContext
             configure: (um, user) =>
                 um.SetPhoneNumberAsync(user, Arg.Any<string>()).Returns(IdentityResult.Success)
         );
-        cut.Find("input[name=PhoneNumber]").Change("+49 999 9999999");
+        await cut.Find("input[name=PhoneNumber]").ChangeAsync("+49 999 9999999");
 
         // Act
         await cut.Find("form").SubmitAsync();
@@ -89,13 +88,13 @@ public class ProfileTests : BunitContext
     public async Task Submit_SetPhoneFails_NotifiesError()
     {
         // Arrange
-        var (cut, um, user) = Render(
+        var (cut, _, _) = Render(
             currentPhone: "+49 123 4567890",
             configure: (um, user) =>
                 um.SetPhoneNumberAsync(user, Arg.Any<string>())
                     .Returns(IdentityResult.Failed(new IdentityError { Description = "bad" }))
         );
-        cut.Find("input[name=PhoneNumber]").Change("+49 999 9999999");
+        await cut.Find("input[name=PhoneNumber]").ChangeAsync("+49 999 9999999");
 
         // Act
         await cut.Find("form").SubmitAsync();

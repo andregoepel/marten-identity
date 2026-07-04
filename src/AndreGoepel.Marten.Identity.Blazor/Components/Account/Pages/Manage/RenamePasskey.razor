@@ -2,8 +2,6 @@
 @rendermode InteractiveServer
 
 @using System.Buffers.Text
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<User> UserManager
@@ -16,14 +14,14 @@
     <RadzenStack Gap="1.5rem">
 
         <div>
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">@(passkey?.Name?.Length > 0 ? "Rename Passkey" : "Name Your New Passkey")</RadzenText>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">@(_passkey?.Name?.Length > 0 ? "Rename Passkey" : "Name Your New Passkey")</RadzenText>
             <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Choose a recognizable name for this security key</RadzenText>
         </div>
 
         <RadzenCard>
             <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
 
-            @if (isLoading)
+            @if (_isLoading)
             {
                 <div class="text-center my-8">
                     <RadzenProgressBar Mode="ProgressBarMode.Indeterminate" Style="width: 240px;" />
@@ -32,22 +30,22 @@
                     </RadzenText>
                 </div>
             }
-            else if (hasError || passkey is null)
+            else if (_hasError || _passkey is null)
             {
                 <RadzenAlert AlertStyle="AlertStyle.Danger" AllowClose="false" Icon="error">
-                    @(errorMessage ?? "Passkey not found or session expired.")
+                    @(_errorMessage ?? "Passkey not found or session expired.")
                 </RadzenAlert>
             }
             else
             {
                 <RadzenTemplateForm TItem="RenamePasskeyModel"
-                                    Data=@model
+                                    Data=@_model
                                     Submit=@OnValidSubmit>
                     <RadzenStack Gap="2rem">
 
                         <RadzenFormField Text="Passkey name *" Style="width: 100%;">
                             <ChildContent>
-                                <RadzenTextBox @bind-Value="model.Name"
+                                <RadzenTextBox @bind-Value="_model.Name"
                                                Name="NameField"
                                                Placeholder="e.g. My iPhone 15, Work Laptop Key, Blue YubiKey"
                                                Style="width: 100%;" />
@@ -66,13 +64,13 @@
                                           Text="Save Name"
                                           ButtonStyle="ButtonStyle.Primary"
                                           Size="ButtonSize.Large"
-                                          IsBusy="@isSaving"
+                                          IsBusy="@_isSaving"
                                           BusyText="Saving..." />
 
                             <RadzenButton Text="Cancel"
                                           ButtonStyle="ButtonStyle.Secondary"
                                           Size="ButtonSize.Large"
-                                          Disabled="@isSaving"
+                                          Disabled="@_isSaving"
                                           Click=@(() => NavigationManager.NavigateTo("/Account/Manage/Passkeys")) />
                         </RadzenStack>
 
@@ -90,20 +88,20 @@
     [Parameter]
     public string? Id { get; set; }
 
-    private RenamePasskeyModel model = new();
-    private UserPasskeyInfo? passkey;
-    private bool hasError;
-    private string? errorMessage;
-    private bool isLoading = true;
-    private bool isSaving;
+    private RenamePasskeyModel _model = new();
+    private UserPasskeyInfo? _passkey;
+    private bool _hasError;
+    private string? _errorMessage;
+    private bool _isLoading = true;
+    private bool _isSaving;
 
     protected override async Task OnInitializedAsync()
     {
         if (string.IsNullOrWhiteSpace(Id))
         {
-            hasError = true;
-            errorMessage = "Missing passkey identifier.";
-            isLoading = false;
+            _hasError = true;
+            _errorMessage = "Missing passkey identifier.";
+            _isLoading = false;
             return;
         }
 
@@ -114,9 +112,9 @@
         }
         catch (FormatException)
         {
-            hasError = true;
-            errorMessage = "Invalid passkey identifier format.";
-            isLoading = false;
+            _hasError = true;
+            _errorMessage = "Invalid passkey identifier format.";
+            _isLoading = false;
             return;
         }
 
@@ -125,36 +123,36 @@
 
         if (user is null)
         {
-            hasError = true;
-            errorMessage = "Cannot load user profile. Please sign in again.";
+            _hasError = true;
+            _errorMessage = "Cannot load user profile. Please sign in again.";
             NavigationManager.NavigateTo("/Account/Login", forceLoad: true);
-            isLoading = false;
+            _isLoading = false;
             return;
         }
 
-        passkey = await UserManager.GetPasskeyAsync(user, credentialId);
+        _passkey = await UserManager.GetPasskeyAsync(user, credentialId);
 
-        if (passkey is null)
+        if (_passkey is null)
         {
-            hasError = true;
-            errorMessage = "This passkey could not be found.";
-            isLoading = false;
+            _hasError = true;
+            _errorMessage = "This passkey could not be found.";
+            _isLoading = false;
             return;
         }
 
-        model.Name = passkey.Name ?? "";
-        isLoading = false;
+        _model.Name = _passkey.Name ?? "";
+        _isLoading = false;
     }
 
     private async Task OnValidSubmit(RenamePasskeyModel input)
     {
-        if (passkey is null)
+        if (_passkey is null)
         {
             NotificationService.Notify(NotificationSeverity.Error, "Error", "Passkey not loaded.");
             return;
         }
 
-        isSaving = true;
+        _isSaving = true;
         StateHasChanged();
 
         try
@@ -165,7 +163,7 @@
                 return;
             }
 
-            passkey.Name = input.Name.Trim();
+            _passkey.Name = input.Name.Trim();
 
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
             var user = await UserManager.GetUserAsync(authState.User);
@@ -177,7 +175,7 @@
                 return;
             }
 
-            var result = await UserManager.AddOrUpdatePasskeyAsync(user, passkey);
+            var result = await UserManager.AddOrUpdatePasskeyAsync(user, _passkey);
 
             if (result.Succeeded)
             {
@@ -197,7 +195,7 @@
         }
         finally
         {
-            isSaving = false;
+            _isSaving = false;
             StateHasChanged();
         }
     }

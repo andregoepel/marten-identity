@@ -1,5 +1,3 @@
-using AndreGoepel.Marten.Identity;
-
 namespace AndreGoepel.Marten.Identity.Tests;
 
 public class CleanupSettingsValidationTests

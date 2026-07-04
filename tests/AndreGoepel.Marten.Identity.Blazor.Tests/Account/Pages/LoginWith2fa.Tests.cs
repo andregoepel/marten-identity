@@ -8,7 +8,7 @@ using Radzen;
 
 namespace AndreGoepel.Marten.Identity.Blazor.Tests.Account.Pages;
 
-public class LoginWith2faTests : BunitContext
+public class LoginWith2FaTests : BunitContext
 {
     #region Helpers
 

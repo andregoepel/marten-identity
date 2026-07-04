@@ -1,11 +1,6 @@
 @page "/Account/Manage/GenerateRecoveryCodes"
 @rendermode InteractiveServer
 
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
-@using Radzen
-@using Radzen.Blazor
-
 @inject UserManager<User> UserManager
 @inject ILogger<GenerateRecoveryCodes> Logger
 @inject NotificationService NotificationService
@@ -24,9 +19,9 @@
         <RadzenCard>
             <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
 
-            @if (recoveryCodes is not null)
+            @if (_recoveryCodes is not null)
             {
-                <ShowRecoveryCodes RecoveryCodes="recoveryCodes.ToArray()" />
+                <ShowRecoveryCodes RecoveryCodes="_recoveryCodes.ToArray()" />
             }
             else
             {
@@ -42,7 +37,7 @@
                     <RadzenButton Text="Generate Recovery Codes"
                                   ButtonStyle="ButtonStyle.Danger"
                                   Size="ButtonSize.Large"
-                                  IsBusy="@isProcessing"
+                                  IsBusy="@_isProcessing"
                                   BusyText="Generating..."
                                   Style="width: 100%; max-width: 360px;"
                                   Click="OnGenerateAsync" />
@@ -56,21 +51,21 @@
 </div>
 
 @code {
-    private User? user;
-    private IEnumerable<string>? recoveryCodes;
-    private bool isProcessing;
+    private User? _user;
+    private IEnumerable<string>? _recoveryCodes;
+    private bool _isProcessing;
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        user = await UserManager.GetUserAsync(authState.User);
-        if (user is null)
+        _user = await UserManager.GetUserAsync(authState.User);
+        if (_user is null)
         {
             NotificationService.Notify(NotificationSeverity.Error, "Error", "Could not load user profile.");
             return;
         }
 
-        var isTwoFactorEnabled = await UserManager.GetTwoFactorEnabledAsync(user);
+        var isTwoFactorEnabled = await UserManager.GetTwoFactorEnabledAsync(_user);
         if (!isTwoFactorEnabled)
         {
             NotificationService.Notify(NotificationSeverity.Error, "Error", "You must have 2FA enabled to generate recovery codes.");
@@ -79,15 +74,15 @@
 
     private async Task OnGenerateAsync()
     {
-        if (user is null) return;
+        if (_user is null) return;
 
-        isProcessing = true;
+        _isProcessing = true;
 
-        var userId = await UserManager.GetUserIdAsync(user);
-        recoveryCodes = await UserManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+        var userId = await UserManager.GetUserIdAsync(_user);
+        _recoveryCodes = await UserManager.GenerateNewTwoFactorRecoveryCodesAsync(_user, 10);
         NotificationService.Notify(NotificationSeverity.Success, "Recovery codes generated", "You have generated new recovery codes.");
         Logger.LogInformation("User with ID '{UserId}' has generated new 2FA recovery codes.", userId);
 
-        isProcessing = false;
+        _isProcessing = false;
     }
 }

@@ -3,7 +3,6 @@ using AndreGoepel.Marten.Identity.Roles;
 using AndreGoepel.Marten.Identity.Services;
 using AndreGoepel.Marten.Identity.UserRoles;
 using AndreGoepel.Marten.Identity.Users;
-using Marten;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -75,7 +74,7 @@ public static class Initialization
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<UserStore<User>>();
         services.AddScoped<RoleStore<Role>>();
-        services.AddSingleton<Http.LoginTokenProtector>();
+        services.AddSingleton<LoginTokenProtector>();
 
         return services;
     }

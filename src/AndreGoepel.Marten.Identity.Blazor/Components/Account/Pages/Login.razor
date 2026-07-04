@@ -1,15 +1,11 @@
 @page "/Account/Login"
 @attribute [AllowAnonymous]
 @layout LoginLayout
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
-@using Radzen
-@using Radzen.Blazor
 
 @implements IAsyncDisposable
 
 @inject NavigationManager NavigationManager
-@inject IJSRuntime JSRuntime
+@inject IJSRuntime JsRuntime
 
 <IdentityPageTitle Title="Log in" />
 
@@ -19,10 +15,10 @@
 
 <LoginForm />
 
-@if (error is not null)
+@if (_error is not null)
 {
     <RadzenAlert AlertStyle="AlertStyle.Danger" Shade="Shade.Lighter" Variant="Variant.Flat" AllowClose="false">
-        @error
+        @_error
     </RadzenAlert>
 }
 
@@ -48,7 +44,7 @@
 </RadzenStack>
 
 @code {
-    private string? error;
+    private string? _error;
     private DotNetObjectReference<Login>? _dotNetRef;
     private IJSObjectReference? _jsModule;
 
@@ -64,7 +60,7 @@
     {
         if (!firstRender) return;
 
-        _jsModule = await JSRuntime.InvokeAsync<IJSObjectReference>(
+        _jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
             "import", "./_content/AndreGoepel.Marten.Identity.Blazor/Components/Account/Shared/PasskeySubmit.razor.js");
         _dotNetRef = DotNetObjectReference.Create(this);
 
@@ -78,7 +74,7 @@
     private void HandlePasskeySuccess(string redirectUrl) =>
         NavigationManager.NavigateTo(redirectUrl, forceLoad: true);
 
-    private void HandlePasskeyError(string message) => error = message;
+    private void HandlePasskeyError(string message) => _error = message;
 
     [JSInvokable]
     public async Task HandlePasskeyAutofill(string redirectUrl)

@@ -1,16 +1,10 @@
-﻿@using AndreGoepel.Marten.Identity.Roles
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
-@using Radzen
-@using Radzen.Blazor
-
-@inject Radzen.DialogService DialogService
+﻿@inject DialogService DialogService
 @inject UserManager<User> UserManager
 @inject RoleManager<Role> RoleManager
 
 <RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween">
     <RadzenStack>
-        <RadzenDataGrid Data="@users"
+        <RadzenDataGrid Data="@_users"
                         AllowFiltering="true"
                         AllowColumnResize="true"
                         AllowAlternatingRows="false"
@@ -39,26 +33,26 @@
 @code {
     [Parameter] public required string RoleId { get; set; }
 
-    private List<User> users = [];
-    private Role Role = default!;
+    private List<User> _users = [];
+    private Role _role = default!;
 
     private async Task RemoveUser(User user)
     {
-        if(string.IsNullOrEmpty(Role.Name))
+        if(string.IsNullOrEmpty(_role.Name))
             return;
 
         if (await DialogService.Confirm("Are you sure you want to remove this user?", "Remove User") == true)
         {
-            if (user.RootUser && Role.Name == Roles.Administrator)
-            { 
-                await DialogService.Alert($"User {user.UserName} cannot be removed from role {Role.Name}, because root user needs the role {Roles.Administrator}", "Error");
+            if (user.RootUser && _role.Name == Roles.Administrator)
+            {
+                await DialogService.Alert($"User {user.UserName} cannot be removed from role {_role.Name}, because root user needs the role {Roles.Administrator}", "Error");
                 return;
             }
 
-            var deleteResult = await UserManager.RemoveFromRoleAsync(user, Role.Name);
+            var deleteResult = await UserManager.RemoveFromRoleAsync(user, _role.Name);
             if (deleteResult.Succeeded)
             {
-                users = users.Where(u => u.Id != user.Id).ToList();
+                _users = _users.Where(u => u.Id != user.Id).ToList();
                 await InvokeAsync(StateHasChanged);
             }
             else
@@ -68,10 +62,10 @@
 
     protected override async Task OnInitializedAsync()
     {
-        Role = await RoleManager.FindByIdAsync(RoleId) ?? throw new InvalidOperationException("Role not found");
+        _role = await RoleManager.FindByIdAsync(RoleId) ?? throw new InvalidOperationException("Role not found");
 
-        if(!string.IsNullOrEmpty(Role.Name))
-            users = [.. await UserManager.GetUsersInRoleAsync(Role.Name)];
+        if(!string.IsNullOrEmpty(_role.Name))
+            _users = [.. await UserManager.GetUsersInRoleAsync(_role.Name)];
 
         await base.OnInitializedAsync();
     }

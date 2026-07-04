@@ -2,10 +2,6 @@
 @rendermode InteractiveServer
 
 @using System.Buffers.Text
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
-@using Radzen
-@using Radzen.Blazor
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<User> UserManager
@@ -30,13 +26,13 @@
             <RadzenStack Gap="1.5rem">
 
                 <!-- Passkey-Liste oder leerer Zustand -->
-                @if (isLoading)
+                @if (_isLoading)
                 {
                     <RadzenProgressBar Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
                 }
-                else if (currentPasskeys?.Count > 0)
+                else if (_currentPasskeys?.Count > 0)
                 {
-                    <RadzenDataGrid Data="@currentPasskeys"
+                    <RadzenDataGrid Data="@_currentPasskeys"
                                     AllowPaging="true"
                                     PageSize="8"
                                     PagerHorizontalAlign="HorizontalAlign.Left"
@@ -90,7 +86,7 @@
                              Wrap="FlexWrap.Wrap"
                              JustifyContent="JustifyContent.Center">
 
-                    @if (currentPasskeys?.Count >= MaxPasskeyCount)
+                    @if (_currentPasskeys?.Count >= MaxPasskeyCount)
                     {
                         <RadzenAlert AlertStyle="AlertStyle.Danger"
                                      AllowClose="false"
@@ -106,7 +102,7 @@
                                       ButtonStyle="ButtonStyle.Primary"
                                       Size="ButtonSize.Large"
                                       Icon="add"
-                                      Disabled="@isLoading"
+                                      Disabled="@_isLoading"
                                       Click="@AddNewPasskey" />
                     }
                 </RadzenStack>
@@ -122,28 +118,28 @@
 @code {
     private const int MaxPasskeyCount = 100;
 
-    private User? CurrentUser;
-    private IList<UserPasskeyInfo>? currentPasskeys;
-    private bool isLoading;
+    private User? _currentUser;
+    private IList<UserPasskeyInfo>? _currentPasskeys;
+    private bool _isLoading;
 
     protected override async Task OnInitializedAsync()
     {
-        isLoading = true;
+        _isLoading = true;
         StateHasChanged();
 
         try
         {
             var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-            CurrentUser = await UserManager.GetUserAsync(authState.User);
+            _currentUser = await UserManager.GetUserAsync(authState.User);
 
-            if (CurrentUser == null)
+            if (_currentUser == null)
             {
                 NotificationService.Notify(NotificationSeverity.Error, "Error", "Could not load user profile.");
                 NavigationManager.NavigateTo("/Account/Login", forceLoad: true);
                 return;
             }
 
-            currentPasskeys = await UserManager.GetPasskeysAsync(CurrentUser);
+            _currentPasskeys = await UserManager.GetPasskeysAsync(_currentUser);
         }
         catch (Exception)
         {
@@ -151,7 +147,7 @@
         }
         finally
         {
-            isLoading = false;
+            _isLoading = false;
             StateHasChanged();
         }
     }
@@ -171,7 +167,7 @@
 
     private async Task DeletePasskey(UserPasskeyInfo passkey)
     {
-        if (CurrentUser == null || passkey?.CredentialId == null) return;
+        if (_currentUser == null || passkey?.CredentialId == null) return;
 
         var confirmed = await DialogService.Confirm(
             $"Delete passkey **{passkey.Name}**?\n\nThis cannot be undone.",
@@ -186,12 +182,12 @@
 
         try
         {
-            var result = await UserManager.RemovePasskeyAsync(CurrentUser, passkey.CredentialId);
+            var result = await UserManager.RemovePasskeyAsync(_currentUser, passkey.CredentialId);
 
             if (result.Succeeded)
             {
                 NotificationService.Notify(NotificationSeverity.Success, "Success", "Passkey deleted.");
-                currentPasskeys = await UserManager.GetPasskeysAsync(CurrentUser);
+                _currentPasskeys = await UserManager.GetPasskeysAsync(_currentUser);
             }
             else
             {

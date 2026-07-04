@@ -3,7 +3,6 @@ using AndreGoepel.Marten.Identity.Blazor.Tests.TestSupport;
 using AndreGoepel.Marten.Identity.Users;
 using Bunit;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -16,7 +15,7 @@ public class ChangePasswordTests : BunitContext
 {
     #region Helpers
 
-    private (IRenderedComponent<ChangePassword> Cut, UserManager<User> Um, User CurrentUser) Render(
+    private IRenderedComponent<ChangePassword> Render(
         bool hasPassword = true,
         Action<UserManager<User>, User>? configure = null
     )
@@ -33,7 +32,7 @@ public class ChangePasswordTests : BunitContext
         Services.AddSingleton(um);
         Services.AddSingleton(Substitute.For<ILogger<ChangePassword>>());
         Services.AddSingleton(new NotificationService());
-        return (Render<ChangePassword>(), um, user);
+        return Render<ChangePassword>();
     }
 
     private NotificationService Notifications => Services.GetRequiredService<NotificationService>();
@@ -42,9 +41,9 @@ public class ChangePasswordTests : BunitContext
 
     private static async Task SubmitAsync(IRenderedComponent<ChangePassword> cut)
     {
-        cut.Find("input[name=OldPassword]").Change("old");
-        cut.Find("input[name=NewPassword]").Change("Br@ndNewPw123");
-        cut.Find("input[name=ConfirmPassword]").Change("Br@ndNewPw123");
+        await cut.Find("input[name=OldPassword]").ChangeAsync("old");
+        await cut.Find("input[name=NewPassword]").ChangeAsync("Br@ndNewPw123");
+        await cut.Find("input[name=ConfirmPassword]").ChangeAsync("Br@ndNewPw123");
         await cut.Find("form").SubmitAsync();
     }
 
@@ -54,7 +53,7 @@ public class ChangePasswordTests : BunitContext
     public void RendersThreePasswordInputs()
     {
         // Arrange / Act
-        var (cut, _, _) = Render();
+        var cut = Render();
 
         // Assert
         Assert.NotNull(cut.Find("input[name=OldPassword]"));
@@ -76,7 +75,7 @@ public class ChangePasswordTests : BunitContext
     public async Task Submit_Successful_ShowsSuccessNotification()
     {
         // Arrange
-        var (cut, um, user) = Render(
+        var cut = Render(
             configure: (um, user) =>
                 um.ChangePasswordAsync(user, Arg.Any<string>(), Arg.Any<string>())
                     .Returns(IdentityResult.Success)
@@ -93,7 +92,7 @@ public class ChangePasswordTests : BunitContext
     public async Task Submit_Fails_ShowsErrorNotification()
     {
         // Arrange
-        var (cut, um, user) = Render(
+        var cut = Render(
             configure: (um, user) =>
                 um.ChangePasswordAsync(user, Arg.Any<string>(), Arg.Any<string>())
                     .Returns(IdentityResult.Failed(new IdentityError { Description = "weak" }))

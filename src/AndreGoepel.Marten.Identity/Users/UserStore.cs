@@ -22,8 +22,7 @@ public class UserStore<TUser>(
     IOptions<IdentityOptions> identityOptions,
     ILogger<UserStore<TUser>> logger
 )
-    : IUserStore<TUser>,
-        IUserPasswordStore<TUser>,
+    : IUserPasswordStore<TUser>,
         IUserEmailStore<TUser>,
         IUserPhoneNumberStore<TUser>,
         IUserTwoFactorStore<TUser>,
@@ -36,7 +35,7 @@ public class UserStore<TUser>(
         IUserLockoutStore<TUser>
     where TUser : User
 {
-    private const string _userDataProtectionPurpose = "UserDataProtection";
+    private const string UserDataProtectionPurpose = "UserDataProtection";
 
     public IQueryable<TUser> Users => querySession.Query<TUser>();
 
@@ -493,7 +492,7 @@ public class UserStore<TUser>(
         CancellationToken cancellationToken
     )
     {
-        var protector = dataProtectionProvider.CreateProtector(_userDataProtectionPurpose);
+        var protector = dataProtectionProvider.CreateProtector(UserDataProtectionPurpose);
 
         user.AuthenticatorKey = protector.Protect(key);
         return Task.CompletedTask;
@@ -501,7 +500,7 @@ public class UserStore<TUser>(
 
     public Task<string?> GetAuthenticatorKeyAsync(TUser user, CancellationToken cancellationToken)
     {
-        var protector = dataProtectionProvider.CreateProtector(_userDataProtectionPurpose);
+        var protector = dataProtectionProvider.CreateProtector(UserDataProtectionPurpose);
         return Task.FromResult(
             user.AuthenticatorKey == null ? null : protector.Unprotect(user.AuthenticatorKey)
         );
@@ -515,7 +514,7 @@ public class UserStore<TUser>(
         CancellationToken cancellationToken
     )
     {
-        var protector = dataProtectionProvider.CreateProtector(_userDataProtectionPurpose);
+        var protector = dataProtectionProvider.CreateProtector(UserDataProtectionPurpose);
 
         user.RecoveryCodes = protector.Protect(string.Join(';', recoveryCodes));
         return Task.CompletedTask;
@@ -523,7 +522,7 @@ public class UserStore<TUser>(
 
     public Task<bool> RedeemCodeAsync(TUser user, string code, CancellationToken cancellationToken)
     {
-        var protector = dataProtectionProvider.CreateProtector(_userDataProtectionPurpose);
+        var protector = dataProtectionProvider.CreateProtector(UserDataProtectionPurpose);
 
         var codes = (user.RecoveryCodes == null ? "" : protector.Unprotect(user.RecoveryCodes))
             .Split(';', StringSplitOptions.RemoveEmptyEntries)
@@ -552,7 +551,7 @@ public class UserStore<TUser>(
 
     public Task<int> CountCodesAsync(TUser user, CancellationToken cancellationToken)
     {
-        var protector = dataProtectionProvider.CreateProtector(_userDataProtectionPurpose);
+        var protector = dataProtectionProvider.CreateProtector(UserDataProtectionPurpose);
         var recoveryCodes = (
             user.RecoveryCodes == null ? "" : protector.Unprotect(user.RecoveryCodes)
         );
@@ -608,8 +607,6 @@ public class UserStore<TUser>(
         CancellationToken cancellationToken
     )
     {
-        var userId = UserId.Parse(user.Id);
-
         var userEntity =
             await querySession
                 .Query<TUser>()

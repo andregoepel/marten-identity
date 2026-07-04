@@ -2,8 +2,6 @@
 @rendermode InteractiveServer
 
 @using System.Globalization
-@using AndreGoepel.Marten.Identity.Users
-@using Microsoft.AspNetCore.Identity
 
 @inject UserManager<User> UserManager
 @inject UrlEncoder UrlEncoder
@@ -14,7 +12,7 @@
 
 <PageTitle>Configure authenticator app</PageTitle>
 
-@if (recoveryCodes is not null)
+@if (_recoveryCodes is not null)
 {
     <div class="rz-p-4 rz-p-md-6">
         <RadzenStack Gap="1.5rem">
@@ -24,7 +22,7 @@
             </div>
 
             <RadzenCard>
-                <ShowRecoveryCodes RecoveryCodes="recoveryCodes.ToArray()" />
+                <ShowRecoveryCodes RecoveryCodes="_recoveryCodes.ToArray()" />
             </RadzenCard>
 
         </RadzenStack>
@@ -56,9 +54,9 @@ else
 
                     <RadzenText TextStyle="TextStyle.Subtitle1">Step 2 — Scan the QR code</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body2">
-                        Scan the QR code below or enter the key <strong>@sharedKey</strong> into your app. Spaces and casing do not matter.
+                        Scan the QR code below or enter the key <strong>@_sharedKey</strong> into your app. Spaces and casing do not matter.
                     </RadzenText>
-                    <RadzenQRCode style="max-width: 200px" Value="@authenticatorUri" />
+                    <RadzenQRCode style="max-width: 200px" Value="@_authenticatorUri" />
 
                     <RadzenText TextStyle="TextStyle.Subtitle1">Step 3 — Enter the verification code</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body2">
@@ -102,29 +100,29 @@ else
 @code {
     private const string AuthenticatorUriFormat = "otpauth://totp/{0}:{1}?secret={2}&issuer={0}&digits=6";
 
-    private User? user;
-    private string? sharedKey;
-    private string? authenticatorUri;
-    private IEnumerable<string>? recoveryCodes;
+    private User? _user;
+    private string? _sharedKey;
+    private string? _authenticatorUri;
+    private IEnumerable<string>? _recoveryCodes;
 
     private InputModel Input { get; set; } = new();
 
     protected override async Task OnInitializedAsync()
     {
         var authState = await AuthenticationStateProvider.GetAuthenticationStateAsync();
-        user = await UserManager.GetUserAsync(authState.User);
-        if (user is null)
+        _user = await UserManager.GetUserAsync(authState.User);
+        if (_user is null)
         {
             NavigationManager.NavigateTo("/Account/InvalidUser");
             return;
         }
 
-        await LoadSharedKeyAndQrCodeUriAsync(user);
+        await LoadSharedKeyAndQrCodeUriAsync(_user);
     }
 
     private async Task Submit(InputModel model)
     {
-        if (user is null)
+        if (_user is null)
         {
             NavigationManager.NavigateTo("/Account/InvalidUser");
             return;
@@ -133,22 +131,22 @@ else
         // Strip spaces and hyphens
         var verificationCode = model.Code?.Replace(" ", string.Empty).Replace("-", string.Empty) ?? "";
 
-        var is2faTokenValid = await UserManager.VerifyTwoFactorTokenAsync(
-            user, UserManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
+        var is2FaTokenValid = await UserManager.VerifyTwoFactorTokenAsync(
+            _user, UserManager.Options.Tokens.AuthenticatorTokenProvider, verificationCode);
 
-        if (!is2faTokenValid)
+        if (!is2FaTokenValid)
         {
             NotificationService.Notify(NotificationSeverity.Error, "Verification Error", "Verification code is invalid.");
             return;
         }
 
-        await UserManager.SetTwoFactorEnabledAsync(user, true);
-        var userId = await UserManager.GetUserIdAsync(user);
+        await UserManager.SetTwoFactorEnabledAsync(_user, true);
+        var userId = await UserManager.GetUserIdAsync(_user);
         Logger.LogInformation("User with ID '{UserId}' has enabled 2FA with an authenticator app.", userId);
 
-        if (await UserManager.CountRecoveryCodesAsync(user) == 0)
+        if (await UserManager.CountRecoveryCodesAsync(_user) == 0)
         {
-            recoveryCodes = await UserManager.GenerateNewTwoFactorRecoveryCodesAsync(user, 10);
+            _recoveryCodes = await UserManager.GenerateNewTwoFactorRecoveryCodesAsync(_user, 10);
             NotificationService.Notify(NotificationSeverity.Success, "Authenticator verified", "Your authenticator app has been verified.");
         }
         else
@@ -168,10 +166,10 @@ else
             unformattedKey = await UserManager.GetAuthenticatorKeyAsync(user);
         }
 
-        sharedKey = FormatKey(unformattedKey!);
+        _sharedKey = FormatKey(unformattedKey!);
 
         var email = await UserManager.GetEmailAsync(user);
-        authenticatorUri = GenerateQrCodeUri(email!, unformattedKey!);
+        _authenticatorUri = GenerateQrCodeUri(email!, unformattedKey!);
     }
 
     private string FormatKey(string unformattedKey)

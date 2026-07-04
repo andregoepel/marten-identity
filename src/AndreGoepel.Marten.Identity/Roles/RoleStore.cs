@@ -1,6 +1,5 @@
 ﻿using AndreGoepel.Marten.Identity.Roles.Events;
 using AndreGoepel.Marten.Identity.Services;
-using AndreGoepel.Marten.Identity.Users;
 using Marten;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -11,7 +10,7 @@ public class RoleStore<TRole>(
     IDocumentSession session,
     ICurrentUserService currentUserService,
     ILogger<RoleStore<TRole>> logger
-) : IRoleStore<TRole>, IQueryableRoleStore<TRole>
+) : IQueryableRoleStore<TRole>
     where TRole : Role
 {
     public IQueryable<TRole> Roles => session.Query<TRole>();
