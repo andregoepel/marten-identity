@@ -336,6 +336,52 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
         Assert.Equal(3, persisted.AccessFailedCount);
     }
 
+    [Fact]
+    public async Task UpdateAsync_ConcurrentWithLockoutIncrements_LosesNoIncrements()
+    {
+        // #70: the generic update path reads current state then appends a full-state
+        // event. Without holding the exclusive stream lock across that read-modify-write,
+        // a lockout increment landing in between would be silently overwritten by the
+        // stale counter — the #22 race re-entering through UpdateAsync. Both paths now
+        // serialize on the same stream lock, so no increment is lost even when profile
+        // updates run concurrently with failed-login counting.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+
+        const int increments = 15;
+        const int updates = 15;
+
+        // Act — interleave failed-login increments with unrelated profile updates,
+        // each from its own freshly loaded snapshot (as independent requests would).
+        var incrementTasks = Enumerable
+            .Range(0, increments)
+            .Select(async _ =>
+            {
+                await using var session = fixture.Store.QuerySession();
+                var snapshot = await session.LoadAsync<User>(user.UserId.Value, Ct);
+                await store.IncrementAccessFailedCountAsync(snapshot!, Ct);
+            });
+
+        var updateTasks = Enumerable
+            .Range(0, updates)
+            .Select(async i =>
+            {
+                await using var session = fixture.Store.QuerySession();
+                var snapshot = await session.LoadAsync<User>(user.UserId.Value, Ct);
+                snapshot!.PhoneNumber = $"+49 555 {i:0000}";
+                await store.UpdateAsync(snapshot, Ct);
+            });
+
+        await Task.WhenAll(incrementTasks.Concat(updateTasks));
+
+        // Assert — every increment accumulated despite the concurrent updates.
+        await using var verify = fixture.Store.QuerySession();
+        var persisted = await verify.LoadAsync<User>(user.UserId.Value, Ct);
+        Assert.Equal(increments, persisted!.AccessFailedCount);
+    }
+
     #endregion
 
     #region Security stamp (session invalidation)
