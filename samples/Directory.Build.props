@@ -1,0 +1,16 @@
+<Project>
+  <!--
+    This nested Directory.Build.props deliberately does NOT import the repository root.
+    The library projects under /src are packable, use lock files, and ship NuGet metadata;
+    the samples are none of those, so they get their own self-contained build settings and
+    their own Directory.Packages.props (which likewise shadows the root one).
+  -->
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>false</IsPackable>
+    <!-- Samples are apps, not packages, and don't need the repo's reproducible-restore gating. -->
+    <RestorePackagesWithLockFile>false</RestorePackagesWithLockFile>
+  </PropertyGroup>
+</Project>

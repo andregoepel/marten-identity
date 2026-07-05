@@ -1,0 +1,147 @@
+@page "/Setup"
+@rendermode InteractiveServer
+@attribute [AllowAnonymous]
+
+@using AndreGoepel.Marten.Identity
+@using AndreGoepel.Marten.Identity.Services
+@using Marten
+@using Microsoft.AspNetCore.Identity
+
+@inject UserManager<User> UserManager
+@inject RoleManager<Role> RoleManager
+@inject IIdentityAuthorizer Authorizer
+@inject IQuerySession QuerySession
+@inject NavigationManager Nav
+
+<PageTitle>First-run setup</PageTitle>
+
+<RadzenStack Gap="1rem" Style="max-width: 480px; margin: 2rem auto;">
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4">Create the first administrator</RadzenText>
+    <RadzenText TextStyle="TextStyle.Body2">
+        No administrator exists yet. The account you create here becomes the un-deletable
+        root administrator, so complete this step on a trusted network before exposing the app.
+    </RadzenText>
+
+    @if (errors.Count > 0)
+    {
+        <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false">
+            <ul style="margin: 0; padding-left: 1.2rem;">
+                @foreach (var error in errors)
+                {
+                    <li>@error</li>
+                }
+            </ul>
+        </RadzenAlert>
+    }
+
+    <RadzenTemplateForm TItem="Model" Data="@model" Submit="@OnSubmitAsync">
+        <RadzenStack Gap="1rem">
+            <RadzenFormField Text="Email">
+                <RadzenTextBox @bind-Value="model.Email" Name="Email" autocomplete="username" />
+            </RadzenFormField>
+            <RadzenFormField Text="Password (at least 12 characters)">
+                <RadzenPassword @bind-Value="model.Password" Name="Password" autocomplete="new-password" />
+            </RadzenFormField>
+            <RadzenFormField Text="Confirm password">
+                <RadzenPassword @bind-Value="model.ConfirmPassword" Name="ConfirmPassword" autocomplete="new-password" />
+            </RadzenFormField>
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Create administrator"
+                          Disabled="@busy" IsBusy="@busy" BusyText="Creating…" />
+        </RadzenStack>
+    </RadzenTemplateForm>
+</RadzenStack>
+
+@code {
+    private readonly Model model = new();
+    private readonly List<string> errors = new();
+    private bool busy;
+
+    protected override async Task OnInitializedAsync()
+    {
+        // Defence in depth: the redirect middleware already blocks /Setup once an
+        // administrator exists, but re-check here too (per the library's guidance).
+        if (await SetupCompletion.IsCompleteAsync(QuerySession))
+        {
+            Nav.NavigateTo("/", forceLoad: true);
+        }
+    }
+
+    private async Task OnSubmitAsync(Model _)
+    {
+        errors.Clear();
+
+        if (string.IsNullOrWhiteSpace(model.Email))
+            errors.Add("Email is required.");
+        if (string.IsNullOrEmpty(model.Password) || model.Password.Length < 12)
+            errors.Add("Password must be at least 12 characters.");
+        if (model.Password != model.ConfirmPassword)
+            errors.Add("The passwords do not match.");
+        if (errors.Count > 0)
+            return;
+
+        busy = true;
+        try
+        {
+            // Trusted first-run bootstrap: BeginSystemScope lets the store operations that
+            // normally require an administrator (creating and assigning the role) run while
+            // no administrator exists yet. The scope is ambient across the awaits below.
+            using (Authorizer.BeginSystemScope())
+            {
+                if (!await RoleManager.RoleExistsAsync(Roles.Administrator))
+                {
+                    var roleResult = await RoleManager.CreateAsync(new Role { Name = Roles.Administrator });
+                    if (!roleResult.Succeeded)
+                    {
+                        AddIdentityErrors(roleResult);
+                        return;
+                    }
+                }
+
+                var user = new User { UserName = model.Email, Email = model.Email };
+                var createResult = await UserManager.CreateAsync(user, model.Password);
+                if (!createResult.Succeeded)
+                {
+                    AddIdentityErrors(createResult);
+                    return;
+                }
+
+                // Sign-in requires a confirmed account (RequireConfirmedAccount = true).
+                var token = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+                var confirmResult = await UserManager.ConfirmEmailAsync(user, token);
+                if (!confirmResult.Succeeded)
+                {
+                    AddIdentityErrors(confirmResult);
+                    return;
+                }
+
+                var roleAssign = await UserManager.AddToRoleAsync(user, Roles.Administrator);
+                if (!roleAssign.Succeeded)
+                {
+                    AddIdentityErrors(roleAssign);
+                    return;
+                }
+            }
+
+            // Setup is complete. A full-page navigation lets the redirect middleware
+            // re-evaluate and route the now-unreachable /Setup path onward.
+            Nav.NavigateTo("Account/Login", forceLoad: true);
+        }
+        finally
+        {
+            busy = false;
+        }
+    }
+
+    private void AddIdentityErrors(IdentityResult result)
+    {
+        foreach (var error in result.Errors)
+            errors.Add(error.Description);
+    }
+
+    private sealed class Model
+    {
+        public string Email { get; set; } = "";
+        public string Password { get; set; } = "";
+        public string ConfirmPassword { get; set; } = "";
+    }
+}
