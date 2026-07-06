@@ -10,7 +10,8 @@
 <RadzenTooltip @rendermode="InteractiveServer" />
 <RadzenContextMenu @rendermode="InteractiveServer" />
 
-<div class="af-shell">
+<div class="af-shell" data-nav-open="false">
+    <div class="af-backdrop" onclick="afNav.close()"></div>
     <nav class="af-sidebar">
         <div class="af-brand">
             <div class="af-brand-mark">@AppInitial</div>
@@ -49,7 +50,10 @@
 
     <div class="af-main">
         <div class="af-topbar">
-            <span class="af-topbar-title">@Breadcrumb()</span>
+            <div class="af-topbar-left">
+                <button class="af-hamburger" type="button" onclick="afNav.toggle()" aria-label="Toggle navigation">☰</button>
+                <span class="af-topbar-title">@Breadcrumb()</span>
+            </div>
             <div class="af-topbar-actions">
                 <ThemeToggle />
                 <AuthorizeView>

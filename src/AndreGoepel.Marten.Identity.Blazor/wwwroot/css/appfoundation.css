@@ -721,6 +721,38 @@ a:hover, .rz-link:hover {
   gap: 16px;
 }
 
+.af-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Hamburger + backdrop: hidden on desktop, shown when the sidebar collapses. */
+.af-hamburger {
+  display: none;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid var(--af-border2);
+  color: var(--af-text);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  padding: 0;
+}
+
+.af-hamburger:hover {
+  background: var(--af-hover);
+}
+
+.af-backdrop {
+  display: none;
+}
+
 .af-content {
   padding: 32px 28px;
 }
@@ -945,4 +977,72 @@ a:hover, .rz-link:hover {
   outline: none;
   background: none;
   padding: 0;
+}
+
+/* ==================================================== RESPONSIVE ========== */
+
+/* Under 1000px the sidebar becomes an off-canvas drawer toggled by the
+   hamburger; a backdrop covers the content while it's open. */
+@media (max-width: 1000px) {
+  .af-hamburger {
+    display: inline-flex;
+  }
+
+  .af-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 60;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+
+  .af-shell[data-nav-open="true"] .af-sidebar {
+    transform: translateX(0);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .af-shell[data-nav-open="true"] .af-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Under 700px: tighter padding, hide the user email, single-column grids and
+   horizontally scrollable data tables. */
+@media (max-width: 700px) {
+  .af-topbar {
+    padding: 0 14px;
+  }
+
+  .af-content {
+    padding: 20px 14px;
+  }
+
+  .af-user-email {
+    display: none;
+  }
+
+  .af-topbar-actions {
+    gap: 10px;
+  }
+
+  .af-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Keep data grids usable: give the table a min width and let the cell area
+     scroll horizontally instead of crushing the columns. */
+  .rz-data-grid .rz-grid-table {
+    min-width: 620px !important;
+  }
+
+  .rz-data-grid-data {
+    overflow-x: auto;
+  }
 }

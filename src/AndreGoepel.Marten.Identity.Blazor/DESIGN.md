@@ -315,7 +315,25 @@ A page just provides the heading block + form + a centred footer link:
 | `af-row-actions`, `af-icon-btn` | grid row actions + compact `⋯` button |
 | `af-cell-name`, `af-cell-id` | name/email + truncated mono id in a grid cell |
 | `af-login-*` | login-card building blocks (provided by `LoginLayout`) |
-| `af-shell`, `af-sidebar`, `af-topbar`, `af-nav-item`, `af-theme-toggle`, … | app shell (host layout) |
+| `af-shell`, `af-sidebar`, `af-topbar`, `af-topbar-left`, `af-nav-item`, `af-theme-toggle`, `af-hamburger`, `af-backdrop`, … | app shell (host layout) |
+
+### Responsive
+
+The shell is responsive via two breakpoints (no JS layout logic — just CSS media
+queries plus a tiny toggle script):
+
+- **≤ 1000px** — the sidebar becomes a fixed off-canvas drawer. The topbar shows
+  a `af-hamburger` button (`onclick="afNav.toggle()"`); an `af-backdrop`
+  (`onclick="afNav.close()"`) dims the content while it's open. The drawer state
+  is `data-nav-open` on `.af-shell`, flipped by `appfoundation-nav.js`, which
+  also closes it on Escape and after a sidebar link is followed.
+- **≤ 700px** — tighter page/topbar padding, the user email is hidden (avatar
+  only), `af-form-grid` collapses to one column, and data grids get a
+  `min-width` with horizontal scroll so columns don't crush.
+
+A host that renders the shell must include `appfoundation-nav.js` and give
+`.af-shell` a `data-nav-open="false"` plus the `af-backdrop` element (see the
+Aspire sample's `MainLayout`).
 
 ---
 
