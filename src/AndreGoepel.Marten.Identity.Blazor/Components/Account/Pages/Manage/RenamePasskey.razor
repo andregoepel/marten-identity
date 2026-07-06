@@ -43,18 +43,15 @@
                                     Submit=@OnValidSubmit>
                     <RadzenStack Gap="2rem">
 
-                        <RadzenFormField Text="Passkey name *" Style="width: 100%;">
-                            <ChildContent>
-                                <RadzenTextBox @bind-Value="_model.Name"
-                                               Name="NameField"
-                                               Placeholder="e.g. My iPhone 15, Work Laptop Key, Blue YubiKey"
-                                               Style="width: 100%;" />
-                            </ChildContent>
-                            <Helper>
-                                <RadzenRequiredValidator Component="NameField" Text="Name is required" />
-                                <RadzenLengthValidator Component="NameField" Min="3" Max="100" Text="Name must be 3–100 characters long" />
-                            </Helper>
-                        </RadzenFormField>
+                        <RadzenStack Gap="0.4rem">
+                            <RadzenLabel Text="Passkey name" Component="NameField" />
+                            <RadzenTextBox @bind-Value="_model.Name"
+                                           Name="NameField"
+                                           Placeholder="e.g. My iPhone 15, Work Laptop Key, Blue YubiKey"
+                                           Style="width: 100%;" />
+                            <RadzenRequiredValidator Component="NameField" Text="Name is required" />
+                            <RadzenLengthValidator Component="NameField" Min="3" Max="100" Text="Name must be 3–100 characters long" />
+                        </RadzenStack>
 
                         <RadzenStack Orientation="Orientation.Horizontal"
                                      Gap="1rem"

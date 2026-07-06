@@ -70,33 +70,32 @@
                 </RadzenAlert>
             }
 
-            <RadzenFieldset Text="Authenticator App" class="mt-8">
-                <RadzenStack Gap="1.5rem">
-                    <RadzenText TextStyle="TextStyle.Body1">
-                        Use a time-based one-time password (TOTP) app such as Google Authenticator,
-                        Microsoft Authenticator, Authy, Bitwarden, 1Password, etc.
-                    </RadzenText>
+            <RadzenStack Gap="1.5rem" class="mt-8">
+                <RadzenText TextStyle="TextStyle.Subtitle1">Authenticator app</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body1">
+                    Use a time-based one-time password (TOTP) app such as Google Authenticator,
+                    Microsoft Authenticator, Authy, Bitwarden, 1Password, etc.
+                </RadzenText>
 
-                    @if (!_hasAuthenticator)
-                    {
-                        <LinkButton Text="Add Authenticator App"
+                @if (!_hasAuthenticator)
+                {
+                    <LinkButton Text="Add Authenticator App"
+                                ButtonStyle="ButtonStyle.Primary"
+                                Path="/Account/Manage/EnableAuthenticator" />
+                }
+                else
+                {
+                    <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap">
+                        <LinkButton Text="Reconfigure Authenticator App"
                                     ButtonStyle="ButtonStyle.Primary"
                                     Path="/Account/Manage/EnableAuthenticator" />
-                    }
-                    else
-                    {
-                        <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap">
-                            <LinkButton Text="Reconfigure Authenticator App"
-                                        ButtonStyle="ButtonStyle.Primary"
-                                        Path="/Account/Manage/EnableAuthenticator" />
 
-                            <LinkButton Text="Reset Authenticator App"
-                                        ButtonStyle="ButtonStyle.Danger"
-                                        Path="/Account/Manage/ResetAuthenticator" />
-                        </RadzenStack>
-                    }
-                </RadzenStack>
-            </RadzenFieldset>
+                        <LinkButton Text="Reset Authenticator App"
+                                    ButtonStyle="ButtonStyle.Danger"
+                                    Path="/Account/Manage/ResetAuthenticator" />
+                    </RadzenStack>
+                }
+            </RadzenStack>
 
             </RadzenStack>
         </RadzenCard>

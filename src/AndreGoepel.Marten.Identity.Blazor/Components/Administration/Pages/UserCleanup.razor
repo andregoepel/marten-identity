@@ -21,18 +21,20 @@
         <RadzenCard>
             <RadzenStack Gap="1.25rem">
 
-                <RadzenFormField Text="Retention period (days)" Style="width: 100%;">
-                    <RadzenNumeric @bind-Value="@_input.RetentionDays" Min="1" Max="3650" Style="width: 100%;" />
-                </RadzenFormField>
+                <RadzenStack Gap="0.4rem">
+                    <RadzenLabel Text="Retention period (days)" Component="RetentionDays" />
+                    <RadzenNumeric @bind-Value="@_input.RetentionDays" Name="RetentionDays" Min="1" Max="3650" Style="width: 100%;" />
+                </RadzenStack>
 
-                <RadzenFormField Text="Cron schedule" Style="width: 100%;">
-                    <RadzenTextBox @bind-Value="@_input.CronSchedule" Style="width: 100%;" />
-                </RadzenFormField>
-                <RadzenText TextStyle="TextStyle.Caption" Style="color: var(--rz-text-secondary-color); margin-top: -0.75rem;">
-                    Quartz cron format: seconds minutes hours day-of-month month day-of-week.
-                    Example: <code>0 0 3 * * ?</code> runs daily at 03:00 UTC.
-                    Changes take effect immediately.
-                </RadzenText>
+                <RadzenStack Gap="0.4rem">
+                    <RadzenLabel Text="Cron schedule" Component="CronSchedule" />
+                    <RadzenTextBox @bind-Value="@_input.CronSchedule" Name="CronSchedule" Style="width: 100%;" />
+                    <RadzenText TextStyle="TextStyle.Caption" Style="color: var(--rz-text-secondary-color);">
+                        Quartz cron format: seconds minutes hours day-of-month month day-of-week.
+                        Example: <code>0 0 3 * * ?</code> runs daily at 03:00 UTC.
+                        Changes take effect immediately.
+                    </RadzenText>
+                </RadzenStack>
 
                 @if (_nextFireTime.HasValue)
                 {
