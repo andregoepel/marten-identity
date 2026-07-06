@@ -2,6 +2,7 @@
 @attribute [AllowAnonymous]
 @layout LoginLayout
 
+@using AndreGoepel.Marten.Identity.Blazor.Features
 @implements IAsyncDisposable
 
 @inject NavigationManager NavigationManager
@@ -10,9 +11,10 @@
 
 <IdentityPageTitle Title="Log in" />
 
-<SectionContent SectionName="login-tagline">Fill in your login credentials to proceed.</SectionContent>
-
-<RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4">Log in</RadzenText>
+<div class="af-login-head">
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Welcome back" />
+    <RadzenText TextStyle="TextStyle.Body2" class="af-login-sub" Text="Fill in your login credentials to proceed." />
+</div>
 
 <LoginForm />
 
@@ -23,7 +25,7 @@
     </RadzenAlert>
 }
 
-<div class="login-action-row">
+<div class="af-login-actions">
     <RadzenButton ButtonType="ButtonType.Submit"
                   Text="Log in"
                   ButtonStyle="ButtonStyle.Primary"
@@ -35,20 +37,24 @@
                        OptionsEndpointUrl="/Account/PasskeyRequestOptions"
                        ActionEndpointUrl="@PasskeyAssertionUrl"
                        OnSuccess="HandlePasskeySuccess"
-                       OnError="HandlePasskeyError">
-            Log in with a passkey
+                       OnError="HandlePasskeyError"
+                       data-af="passkey">
+            <span style="font-size:15px">🔑&#xFE0E;</span> Log in with a passkey
         </PasskeySubmit>
     }
 </div>
 
-<RadzenStack Orientation="Orientation.Horizontal" Gap="1.5rem" Wrap="FlexWrap.Wrap">
-    <RadzenLink Path="Account/ForgotPassword" Text="Forgot your password?" />
+<div class="af-login-footer-links">
     @if (_flags.UserRegistration)
     {
-        <RadzenLink Path="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" Text="Register as a new user" />
+        <span class="af-login-resend">
+            Don't have an account? <RadzenLink Path="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" Text="Create account" />
+        </span>
     }
-    <RadzenLink Path="Account/ResendEmailConfirmation" Text="Resend email confirmation" />
-</RadzenStack>
+    <span class="af-login-resend">
+        Didn't get the email? <RadzenLink Path="Account/ResendEmailConfirmation" Text="Resend confirmation" />
+    </span>
+</div>
 
 @code {
     private string? _error;

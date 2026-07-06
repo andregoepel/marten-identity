@@ -14,103 +14,85 @@
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <div>
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Manage Passkeys</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Add, rename or remove your security keys (WebAuthn / passkeys)</RadzenText>
+        <div class="af-page-head">
+            <div>
+                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Manage Passkeys</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Add, rename or remove your security keys (WebAuthn / passkeys)</RadzenText>
+            </div>
+            @if (!_isLoading && (_currentPasskeys?.Count ?? 0) < MaxPasskeyCount)
+            {
+                <RadzenButton Text="Register passkey"
+                              ButtonStyle="ButtonStyle.Primary"
+                              Icon="add"
+                              Disabled="@_isLoading"
+                              Click="@AddNewPasskey" />
+            }
         </div>
 
-        <RadzenCard>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
+        @if (_currentPasskeys?.Count >= MaxPasskeyCount)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Danger" AllowClose="false" Icon="block">
+                You have reached the maximum number of passkeys (@MaxPasskeyCount).
+                Delete one before adding a new one.
+            </RadzenAlert>
+        }
 
-            <!-- Status & Actions -->
-            <RadzenStack Gap="1.5rem">
+        @if (_isLoading)
+        {
+            <RadzenCard>
+                <RadzenProgressBar Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
+            </RadzenCard>
+        }
+        else if (_currentPasskeys?.Count > 0)
+        {
+            <RadzenCard Style="padding: 0; overflow: hidden;">
+                <RadzenDataGrid Data="@_currentPasskeys"
+                                AllowPaging="true"
+                                PageSize="8"
+                                PagerHorizontalAlign="HorizontalAlign.Left"
+                                ShowPagingSummary="true"
+                                Density="Density.Compact"
+                                Style="width: 100%;">
+                    <Columns>
+                        <RadzenDataGridColumn Property="@nameof(UserPasskeyInfo.Name)"
+                                              Title="Passkey name"
+                                              Width="280px" />
 
-                <!-- Passkey-Liste oder leerer Zustand -->
-                @if (_isLoading)
-                {
-                    <RadzenProgressBar Value="100" ShowValue="false" Mode="ProgressBarMode.Indeterminate" />
-                }
-                else if (_currentPasskeys?.Count > 0)
-                {
-                    <RadzenDataGrid Data="@_currentPasskeys"
-                                    AllowPaging="true"
-                                    PageSize="8"
-                                    PagerHorizontalAlign="HorizontalAlign.Left"
-                                    ShowPagingSummary="true"
-                                    Density="Density.Compact"
-                                    Style="width: 100%;">
-                        <Columns>
-                            <RadzenDataGridColumn Property="@nameof(UserPasskeyInfo.Name)"
-                                                  Title="Passkey Name"
-                                                  Width="280px" />
+                        <RadzenDataGridColumn Property="@nameof(UserPasskeyInfo.CreatedAt)"
+                                              Title="Registered"
+                                              FormatString="{0:MMM dd, yyyy}"
+                                              Width="140px" />
 
-                            <RadzenDataGridColumn Property="@nameof(UserPasskeyInfo.CreatedAt)"
-                                                  Title="Registered"
-                                                  FormatString="{0:MMM dd, yyyy}"
-                                                  Width="140px" />
+                        <RadzenDataGridColumn Title="Actions"
+                                              Sortable="false"
+                                              Filterable="false"
+                                              Width="220px">
+                            <Template Context="data">
+                                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                    <RadzenButton Text="Rename"
+                                                  ButtonStyle="ButtonStyle.Light"
+                                                  Size="ButtonSize.Small"
+                                                  Click="@(() => RenamePasskey(data))" />
 
-                            <RadzenDataGridColumn Title="Actions"
-                                                  Sortable="false"
-                                                  Filterable="false"
-                                                  Width="220px">
-                                <Template Context="data">
-                                    <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem">
-                                        <RadzenButton Text="Rename"
-                                                      ButtonStyle="ButtonStyle.Secondary"
-                                                      Size="ButtonSize.Small"
-                                                      Click="@(() => RenamePasskey(data))" />
-
-                                        <RadzenButton Text="Delete"
-                                                      ButtonStyle="ButtonStyle.Danger"
-                                                      Size="ButtonSize.Small"
-                                                      Click="@(() => DeletePasskey(data))" />
-                                    </RadzenStack>
-                                </Template>
-                            </RadzenDataGridColumn>
-                        </Columns>
-                    </RadzenDataGrid>
-                }
-                else
-                {
-                    <RadzenAlert AlertStyle="AlertStyle.Info"
-                                 AllowClose="false"
-                                 Icon="info">
-                        You don't have any passkeys registered yet.
-                    </RadzenAlert>
-                }
-
-                <!-- Limit-Warnung & Add-Button -->
-                <RadzenStack Orientation="Orientation.Horizontal"
-                             Gap="1rem"
-                             AlignItems="AlignItems.Center"
-                             Wrap="FlexWrap.Wrap"
-                             JustifyContent="JustifyContent.Center">
-
-                    @if (_currentPasskeys?.Count >= MaxPasskeyCount)
-                    {
-                        <RadzenAlert AlertStyle="AlertStyle.Danger"
-                                     AllowClose="false"
-                                     Icon="block"
-                                     Style="margin: 0;">
-                            You have reached the maximum number of passkeys (@MaxPasskeyCount).
-                            Delete one before adding a new one.
-                        </RadzenAlert>
-                    }
-                    else
-                    {
-                        <RadzenButton Text="Register New Passkey"
-                                      ButtonStyle="ButtonStyle.Primary"
-                                      Size="ButtonSize.Large"
-                                      Icon="add"
-                                      Disabled="@_isLoading"
-                                      Click="@AddNewPasskey" />
-                    }
-                </RadzenStack>
-
-            </RadzenStack>
-
-            </RadzenStack>
-        </RadzenCard>
+                                    <RadzenButton Text="Delete"
+                                                  ButtonStyle="ButtonStyle.Danger"
+                                                  Size="ButtonSize.Small"
+                                                  Click="@(() => DeletePasskey(data))" />
+                                </RadzenStack>
+                            </Template>
+                        </RadzenDataGridColumn>
+                    </Columns>
+                </RadzenDataGrid>
+            </RadzenCard>
+        }
+        else
+        {
+            <div class="af-empty">
+                <span class="af-empty-icon">🔑&#xFE0E;</span>
+                <span class="af-empty-title">No passkeys registered yet</span>
+                <span class="af-empty-text">Passkeys let you sign in without a password, using your device.</span>
+            </div>
+        }
 
     </RadzenStack>
 </div>

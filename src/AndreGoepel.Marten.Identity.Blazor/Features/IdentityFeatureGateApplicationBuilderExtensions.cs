@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Builder;
 
-namespace AndreGoepel.Marten.Identity.Blazor;
+namespace AndreGoepel.Marten.Identity.Blazor.Features;
 
 public static class IdentityFeatureGateApplicationBuilderExtensions
 {

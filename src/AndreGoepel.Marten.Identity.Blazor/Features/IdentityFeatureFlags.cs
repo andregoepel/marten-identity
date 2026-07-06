@@ -1,4 +1,4 @@
-namespace AndreGoepel.Marten.Identity.Blazor;
+namespace AndreGoepel.Marten.Identity.Blazor.Features;
 
 /// <summary>
 /// A snapshot of which identity features are enabled (#66). Every flag defaults to

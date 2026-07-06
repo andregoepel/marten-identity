@@ -49,7 +49,7 @@ public class RoleStore<TRole>(
                 new RoleCreated(
                     role.RoleId,
                     role.Name,
-                    await currentUserService.GetCurrentUserIdAsync()
+                    await currentUserService.GetCurrentUserIdAsync(cancellationToken)
                 )
                 {
                     Deletable = role.Deletable,
@@ -87,7 +87,7 @@ public class RoleStore<TRole>(
                 new RoleChanged(
                     role.RoleId,
                     role.Name,
-                    await currentUserService.GetCurrentUserIdAsync()
+                    await currentUserService.GetCurrentUserIdAsync(cancellationToken)
                 )
                 {
                     Deletable = role.Deletable,
@@ -123,7 +123,10 @@ public class RoleStore<TRole>(
 
             session.Events.Append(
                 role.StreamId,
-                new RoleDeleted(role.RoleId, await currentUserService.GetCurrentUserIdAsync())
+                new RoleDeleted(
+                    role.RoleId,
+                    await currentUserService.GetCurrentUserIdAsync(cancellationToken)
+                )
             );
             await session.SaveChangesAsync(cancellationToken);
 
@@ -150,7 +153,10 @@ public class RoleStore<TRole>(
 
             session.Events.Append(
                 role.StreamId,
-                new RoleRestored(role.RoleId, await currentUserService.GetCurrentUserIdAsync())
+                new RoleRestored(
+                    role.RoleId,
+                    await currentUserService.GetCurrentUserIdAsync(cancellationToken)
+                )
             );
             await session.SaveChangesAsync(cancellationToken);
 

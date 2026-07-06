@@ -1,4 +1,5 @@
 using AndreGoepel.Marten.Identity.Blazor.Components.Account;
+using AndreGoepel.Marten.Identity.Blazor.Features;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;

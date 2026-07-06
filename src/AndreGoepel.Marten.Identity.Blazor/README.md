@@ -108,6 +108,18 @@ disabled features.
 | **Shared** | `RedirectToLogin`, `ShowRecoveryCodes`, `PasskeySubmit` |
 | **Layout** | `LoginLayout` |
 
+## Theming & design
+
+The UI ships with the **AppFoundation** theme — an emerald-accented design with
+matching light and dark modes, built by remapping Radzen's variables onto a
+token system in [`wwwroot/css/appfoundation.css`](wwwroot/css/appfoundation.css).
+Reference that stylesheet **after** Radzen's `material-base.css` in your host.
+
+To build new pages or controls that fit the existing look, follow
+[`DESIGN.md`](DESIGN.md) — it documents the tokens, typography, component recipes
+(forms, buttons, cards, badges, tables, alerts, empty states), the `af-*` helper
+classes, and the Radzen overrides to be aware of.
+
 ## License
 
 MIT

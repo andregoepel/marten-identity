@@ -1,15 +1,6 @@
 html, body {
     margin: 0;
-    font-family: var(--rz-text-font-family, "Roboto", sans-serif);
-}
-
-.rz-header {
-    background: var(--rz-primary, #3f51b5);
-}
-
-.rz-header a,
-.rz-header .rz-text {
-    color: #fff;
+    font-family: var(--rz-text-font-family, "Manrope", sans-serif);
 }
 
 #blazor-error-ui {

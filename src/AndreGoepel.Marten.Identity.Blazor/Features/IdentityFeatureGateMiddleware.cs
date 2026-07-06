@@ -1,6 +1,6 @@
 using Microsoft.AspNetCore.Http;
 
-namespace AndreGoepel.Marten.Identity.Blazor;
+namespace AndreGoepel.Marten.Identity.Blazor.Features;
 
 /// <summary>
 /// Blocks the pages and endpoints of a disabled identity feature so it is unreachable by

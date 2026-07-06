@@ -10,24 +10,23 @@
     <DataAnnotationsValidator />
     <RadzenStack Gap="1.25rem">
 
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
-            <RadzenLabel Text="Email" Component="Email" Style="width: 8rem; flex-shrink: 0;" />
-            <RadzenStack Gap="0.25rem" Style="flex: 1;">
-                <RadzenTextBox @bind-Value="@Input.Email"
-                               Name="Email"
-                               AutoCompleteType="AutoCompleteType.Username"
-                               Placeholder="name@example.com"
-                               Style="width:100%" />
-                <ValidationMessage For="@(() => Input.Email)" class="rz-message rz-messages-error" />
-            </RadzenStack>
+        <RadzenStack Gap="0.4rem">
+            <RadzenLabel Text="Email" Component="Email" />
+            <RadzenTextBox @bind-Value="@Input.Email"
+                           Name="Email"
+                           AutoCompleteType="AutoCompleteType.Username"
+                           Placeholder="name@example.com"
+                           Style="width:100%" />
+            <ValidationMessage For="@(() => Input.Email)" class="rz-message rz-messages-error" />
         </RadzenStack>
 
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
-            <RadzenLabel Text="Password" Component="Password" Style="width: 8rem; flex-shrink: 0;" />
-            <RadzenStack Gap="0.25rem" Style="flex: 1;">
-                <RadzenPassword @bind-Value="Input.Password" Name="Password" Style="width:100%" />
-                <ValidationMessage For="@(() => Input.Password)" class="rz-message rz-messages-error" />
-            </RadzenStack>
+        <RadzenStack Gap="0.4rem">
+            <div class="af-login-field-head">
+                <RadzenLabel Text="Password" Component="Password" />
+                <RadzenLink Path="Account/ForgotPassword" Text="Forgot password?" class="af-login-forgot" />
+            </div>
+            <RadzenPassword @bind-Value="Input.Password" Name="Password" Style="width:100%" />
+            <ValidationMessage For="@(() => Input.Password)" class="rz-message rz-messages-error" />
         </RadzenStack>
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">

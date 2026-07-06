@@ -1,4 +1,4 @@
-using AndreGoepel.Marten.Identity.Blazor;
+using AndreGoepel.Marten.Identity.Blazor.Features;
 using Microsoft.AspNetCore.Http;
 
 namespace AndreGoepel.Marten.Identity.Blazor.Tests.Features;

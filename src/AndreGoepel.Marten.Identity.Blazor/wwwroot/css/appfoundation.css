@@ -1,0 +1,1048 @@
+/*
+ * AppFoundation theme for the Marten Identity Blazor UI.
+ *
+ * Imported from the "AppFoundation Screens" Claude Design project. It remaps
+ * Radzen's --rz-* design tokens onto an emerald-accented neutral palette with
+ * matching light + dark themes, and provides the shell / login / control classes
+ * the sample host uses to reproduce the mockup.
+ *
+ * Load order matters: reference this file AFTER Radzen's material-base.css so the
+ * variable overrides win.
+ *
+ * Theme is selected with a `data-theme` attribute on <html>: "dark" (default) or
+ * "light". "auto" is resolved to one of those by the theme-toggle script.
+ */
+
+/* ------------------------------------------------------------------ tokens */
+:root,
+:root[data-theme="dark"] {
+  --af-bg: #101619;
+  --af-bg-sidebar: #0c1114;
+  --af-surface: #131a1e;
+  --af-input: #151c20;
+  --af-hover: #182226;
+  --af-border: #1e262b;
+  --af-border2: #263137;
+  --af-text: #eef2f3;
+  --af-text2: #d3dadd;
+  --af-muted: #7d8a91;
+  --af-faint: #536066;
+  --af-accent: #10b981;
+  --af-on-accent: #06281c;
+  --af-accent-text: #5eead4;
+  --af-accent-soft: rgba(16, 185, 129, 0.12);
+  --af-warn: #f5a524;
+  --af-warn-soft: rgba(245, 165, 36, 0.12);
+  --af-danger: #f47171;
+  --af-danger-soft: rgba(244, 113, 113, 0.12);
+  --af-info: #4cb8e8;
+  --af-info-soft: rgba(76, 184, 232, 0.12);
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  --af-bg: #f7faf9;
+  --af-bg-sidebar: #ffffff;
+  --af-surface: #ffffff;
+  --af-input: #ffffff;
+  --af-hover: #eef4f1;
+  --af-border: #e0e8e4;
+  --af-border2: #d0dcd6;
+  --af-text: #141d19;
+  --af-text2: #37413e;
+  --af-muted: #68766f;
+  --af-faint: #9aa6a1;
+  --af-accent: #0e9f6e;
+  --af-on-accent: #ffffff;
+  --af-accent-text: #0b8a60;
+  --af-accent-soft: rgba(14, 159, 110, 0.1);
+  --af-warn: #b45309;
+  --af-warn-soft: rgba(180, 83, 9, 0.1);
+  --af-danger: #dc2626;
+  --af-danger-soft: rgba(220, 38, 38, 0.08);
+  --af-info: #0369a1;
+  --af-info-soft: rgba(3, 105, 161, 0.08);
+  color-scheme: light;
+}
+
+/* --------------------------------------------------- Radzen variable remap */
+:root {
+  /* typography */
+  --rz-text-font-family: "Manrope", system-ui, -apple-system, sans-serif;
+  --rz-body-font-family: "Manrope", system-ui, -apple-system, sans-serif;
+
+  /* accent / primary */
+  --rz-primary: var(--af-accent);
+  --rz-primary-light: var(--af-accent);
+  --rz-primary-lighter: var(--af-accent-soft);
+  --rz-primary-dark: var(--af-accent);
+  --rz-primary-darker: var(--af-accent);
+  --rz-primary-contrast-text: var(--af-on-accent);
+  --rz-secondary: var(--af-muted);
+
+  /* surfaces */
+  --rz-body-background-color: var(--af-bg);
+  --rz-base-background-color: var(--af-bg);
+  --rz-content-background-color: var(--af-bg);
+  --rz-panel-background-color: var(--af-surface);
+  --rz-card-background-color: var(--af-surface);
+  --rz-input-background-color: var(--af-input);
+  --rz-series-1: var(--af-accent);
+
+  /* text */
+  --rz-text-color: var(--af-text2);
+  --rz-text-title-color: var(--af-text);
+  --rz-text-secondary-color: var(--af-muted);
+  --rz-text-tertiary-color: var(--af-faint);
+  --rz-text-disabled-color: var(--af-faint);
+  --rz-input-value-color: var(--af-text);
+  --rz-input-placeholder-color: var(--af-faint);
+  --rz-label-color: var(--af-muted);
+
+  /* borders */
+  --rz-border-color: var(--af-border);
+  --rz-base-300: var(--af-border);
+  --rz-input-border-color: var(--af-border2);
+  --rz-input-disabled-background: var(--af-hover);
+  --rz-border-radius: 6px;
+  --rz-card-border-radius: 10px;
+
+  /* data grid surfaces (Radzen defaults are white — break dark mode row hover) */
+  --rz-grid-background-color: var(--af-surface);
+  --rz-grid-hover-background-color: var(--af-hover);
+
+  /* status colours */
+  --rz-success: var(--af-accent);
+  --rz-info: var(--af-info);
+  --rz-warning: var(--af-warn);
+  --rz-danger: var(--af-danger);
+}
+
+/* ---------------------------------------------------------- global element */
+html,
+body {
+  margin: 0;
+  background: var(--af-bg);
+  color: var(--af-text2);
+  font-family: "Manrope", system-ui, -apple-system, sans-serif;
+}
+
+h1, h2, h3, h4, h5, h6,
+.rz-text-h1, .rz-text-h2, .rz-text-h3, .rz-text-h4, .rz-text-h5, .rz-text-h6,
+.af-display {
+  font-family: "Space Grotesk", system-ui, sans-serif;
+  color: var(--af-text);
+  letter-spacing: -0.01em;
+}
+
+code, .af-mono, .rz-text-mono {
+  font-family: "JetBrains Mono", ui-monospace, monospace;
+}
+
+/* Blazor's FocusOnNavigate focuses the page heading on navigation; that's for
+   screen readers/keyboard, but the browser paints a focus ring on the (non-
+   interactive) heading. Suppress the visible ring — focus still moves. */
+h1:focus, h2:focus, h3:focus, h4:focus, h5:focus, h6:focus,
+h1:focus-visible, h2:focus-visible, h3:focus-visible,
+h4:focus-visible, h5:focus-visible, h6:focus-visible {
+  outline: none;
+}
+
+/* Inputs picked up by Radzen textboxes / dropdowns */
+.rz-textbox,
+.rz-inputtext,
+.rz-dropdown,
+.rz-lookup {
+  background: var(--af-input);
+  border: 1px solid var(--af-border2);
+  border-radius: 6px;
+  color: var(--af-text);
+}
+
+.rz-textbox:focus,
+.rz-inputtext:focus,
+.rz-textbox:focus-within,
+.rz-inputtext:focus-within {
+  border-color: var(--af-accent);
+  box-shadow: 0 0 0 3px var(--af-accent-soft);
+  outline: none;
+}
+
+/* Read-only / disabled fields read as greyed out (design's muted look). */
+.rz-textbox[readonly],
+.rz-textbox:disabled,
+.rz-textbox.rz-state-disabled {
+  background: var(--af-hover);
+  color: var(--af-muted);
+  border-color: var(--af-border);
+  cursor: not-allowed;
+}
+
+/* Cards / panels */
+.rz-card,
+.rz-panel {
+  background: var(--af-surface);
+  border: 1px solid var(--af-border);
+  border-radius: 10px;
+  color: var(--af-text2);
+}
+
+/* Field labels: small, semibold, muted (the design's form label style). */
+.rz-label {
+  font: 600 12.5px "Manrope", sans-serif;
+  color: var(--af-muted);
+}
+
+/* The design uses sentence case everywhere; Radzen's Material theme upper-cases. */
+.rz-button {
+  text-transform: none;
+  font-size: 13px;
+}
+
+/* Primary buttons keep the emerald accent with dark on-accent text. The
+   !important beats Radzen's own filled-variant contrast colour (white). */
+.rz-button.rz-primary,
+.rz-button.rz-success {
+  background-color: var(--af-accent);
+  color: var(--af-on-accent) !important;
+  font-weight: 800;
+}
+
+.rz-button.rz-primary:hover,
+.rz-button.rz-success:hover {
+  filter: brightness(1.08);
+}
+
+.rz-button.rz-secondary,
+.rz-button.rz-light {
+  background: transparent;
+  border: 1px solid var(--af-border2);
+  color: var(--af-text);
+}
+
+.rz-button.rz-secondary:hover,
+.rz-button.rz-light:hover {
+  background: var(--af-hover);
+}
+
+.rz-button.rz-danger {
+  background: var(--af-danger-soft) !important;
+  color: var(--af-danger) !important;
+  border: 1px solid transparent;
+}
+
+.rz-button.rz-danger:hover {
+  border-color: var(--af-danger);
+}
+
+/* Data grid */
+.rz-datatable,
+.rz-grid-table {
+  background: var(--af-surface);
+  color: var(--af-text2);
+}
+
+.rz-datatable thead th,
+.rz-grid-table thead th {
+  background: var(--af-surface);
+  color: var(--af-faint);
+  font: 700 11px "Manrope", sans-serif;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  border-bottom: 1px solid var(--af-border);
+}
+
+/* RadzenDataGrid renders header labels in .rz-column-title-content. */
+.rz-column-title-content {
+  text-transform: uppercase;
+  font: 700 11px "Manrope", sans-serif;
+  letter-spacing: 0.07em;
+  color: var(--af-faint);
+}
+
+.rz-datatable tbody td,
+.rz-grid-table tbody td {
+  border-bottom: 1px solid var(--af-border);
+}
+
+.rz-datatable tbody tr:hover,
+.rz-grid-table tbody tr:hover {
+  background: var(--af-hover);
+}
+
+/* Let the grid fill the card and fit its columns instead of sizing to the sum
+   of the fixed column widths (which overflowed the card horizontally). */
+.rz-data-grid .rz-grid-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: auto !important;
+}
+
+/* In-card grid toolbar: a filter box on the left, a row count on the right. */
+.af-grid-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 20px;
+  border-bottom: 1px solid var(--af-border);
+}
+
+.af-search {
+  flex: 1;
+  max-width: 280px;
+  height: 34px;
+  border-radius: 6px;
+  background: var(--af-input);
+  border: 1px solid var(--af-border);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 0 11px;
+  box-sizing: border-box;
+}
+
+.af-search:focus-within {
+  border-color: var(--af-accent);
+  box-shadow: 0 0 0 3px var(--af-accent-soft);
+}
+
+.af-search-icon {
+  color: var(--af-faint);
+  font-size: 13px;
+}
+
+.af-search-input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: var(--af-text);
+  font: 400 12.5px "Manrope", sans-serif;
+}
+
+.af-search-input::placeholder {
+  color: var(--af-faint);
+}
+
+.af-grid-count {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--af-faint);
+  white-space: nowrap;
+}
+
+/* Inline info box (e.g. "Next scheduled run …") — a soft tinted pill. */
+.af-info-box {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-radius: 8px;
+  background: var(--af-hover);
+  font-size: 13px;
+}
+
+.af-info-box-label {
+  color: var(--af-muted);
+}
+
+.af-info-box-value {
+  font-weight: 700;
+  color: var(--af-text);
+}
+
+/* Roomier header/row cells (Radzen's compact density is too tight — the design
+   uses generous horizontal padding around the cell text). */
+.rz-density-compact .rz-grid-table th {
+  padding: 12px 20px;
+}
+
+.rz-density-compact .rz-grid-table td {
+  padding: 13px 20px;
+}
+
+/* Context menus (grid row overflow "⋯" menus). Radzen's default hover is a
+   near-white block that erases the text in dark mode — make it a dark hover. */
+.rz-menu {
+  background: var(--af-surface);
+  border: 1px solid var(--af-border);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 4px;
+}
+
+.rz-navigation-item-link {
+  color: var(--af-text2);
+  border-radius: 5px;
+}
+
+.rz-navigation-item-text {
+  color: inherit;
+}
+
+.rz-navigation-item-icon {
+  color: var(--af-muted);
+}
+
+.rz-navigation-item:hover > .rz-navigation-item-wrapper > .rz-navigation-item-link,
+.rz-navigation-item-link:hover {
+  background: var(--af-hover) !important;
+  color: var(--af-text) !important;
+}
+
+/* Radzen also fills the (sharp-cornered) wrapper/item near-white on hover, which
+   showed as white corners behind the rounded link — keep those transparent. */
+.rz-navigation-item:hover,
+.rz-navigation-item:hover > .rz-navigation-item-wrapper,
+.rz-navigation-item-wrapper:hover {
+  background: transparent !important;
+}
+
+/* Destructive item (Delete): the icon carries an inline colour via IconColor,
+   so tint the whole row — icon and text — the danger red, hover included. */
+.rz-navigation-item-link:has(.rz-navigation-item-icon[style*="color"]),
+.rz-navigation-item:hover > .rz-navigation-item-wrapper
+  > .rz-navigation-item-link:has(.rz-navigation-item-icon[style*="color"]) {
+  color: var(--af-danger) !important;
+}
+
+/* Alerts: soften Radzen's filled variant into the design's tinted banners —
+   13px body text in --af-text2, and an icon tinted to the status colour. */
+.rz-alert {
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.rz-alert .rz-alert-icon {
+  font-size: 18px;
+}
+
+.rz-alert.rz-info {
+  background: var(--af-info-soft);
+  border: 1px solid var(--af-info);
+  color: var(--af-text2);
+}
+
+.rz-alert.rz-warning {
+  background: var(--af-warn-soft);
+  border: 1px solid var(--af-warn);
+  color: var(--af-text2);
+}
+
+.rz-alert.rz-danger {
+  background: var(--af-danger-soft);
+  border: 1px solid var(--af-danger);
+  color: var(--af-text2);
+}
+
+.rz-alert.rz-success {
+  background: var(--af-accent-soft);
+  border: 1px solid var(--af-accent);
+  color: var(--af-text2);
+}
+
+.rz-alert.rz-info .rz-alert-icon {
+  color: var(--af-info);
+}
+
+.rz-alert.rz-warning .rz-alert-icon {
+  color: var(--af-warn);
+}
+
+.rz-alert.rz-danger .rz-alert-icon {
+  color: var(--af-danger);
+}
+
+.rz-alert.rz-success .rz-alert-icon {
+  color: var(--af-accent);
+}
+
+/* Inline (non-footer) button group; align-self stops the parent column stack
+   (align-items:stretch) from stretching a lone button to full width. */
+.af-actions-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-self: flex-start;
+}
+
+/* Status pills (email confirmed, role status, …). */
+.af-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 4px 11px;
+  border-radius: 5px;
+  font: 700 11.5px "Manrope", sans-serif;
+  white-space: nowrap;
+}
+
+.af-badge-success {
+  background: var(--af-accent-soft);
+  color: var(--af-accent-text);
+}
+
+.af-badge-danger {
+  background: var(--af-danger-soft);
+  color: var(--af-danger);
+}
+
+/* Table row actions: a primary action plus a compact overflow (⋯) button. */
+.af-row-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.af-icon-btn.rz-button {
+  width: 30px;
+  min-width: 30px;
+  padding: 0;
+}
+
+/* Name + id stacked cell (id is monospace, muted, truncated). */
+.af-cell-name {
+  font-weight: 700;
+  color: var(--af-text);
+}
+
+.af-cell-id {
+  display: block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 400 10.5px "JetBrains Mono", monospace;
+  color: var(--af-faint);
+}
+
+/* Two-column field grid (collapses to one column when narrow). */
+.af-form-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px 24px;
+}
+
+@media (max-width: 640px) {
+  .af-form-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Page header row with a heading on the left and an action on the right. */
+.af-page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Dashed empty-state card (no passkeys, no data, …). */
+.af-empty {
+  background: var(--af-surface);
+  border: 1px dashed var(--af-border2);
+  border-radius: 10px;
+  padding: 44px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.af-empty-icon {
+  font-size: 22px;
+  color: var(--af-faint);
+}
+
+.af-empty-title {
+  font: 600 14px "Manrope", sans-serif;
+  color: var(--af-text);
+}
+
+.af-empty-text {
+  font-size: 12.5px;
+  color: var(--af-muted);
+}
+
+/* Links */
+a, .rz-link {
+  color: var(--af-accent-text);
+}
+
+a:hover, .rz-link:hover {
+  text-decoration: underline;
+}
+
+/* Card footer action row: bordered separator, natural-width buttons, aligned to
+   the end (forms) or start (destructive/data pages), matching the design. */
+.af-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid var(--af-border);
+  padding-top: 18px;
+  margin-top: 2px;
+}
+
+.af-card-actions.af-start {
+  justify-content: flex-start;
+}
+
+/* ===================================================== APP SHELL (host) === */
+.af-shell {
+  display: flex;
+  min-height: 100vh;
+}
+
+.af-sidebar {
+  width: 232px;
+  flex: none;
+  background: var(--af-bg-sidebar);
+  border-right: 1px solid var(--af-border);
+  display: flex;
+  flex-direction: column;
+  padding: 20px 12px;
+  gap: 3px;
+  box-sizing: border-box;
+}
+
+.af-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0 8px 20px;
+}
+
+.af-brand-mark {
+  width: 30px;
+  height: 30px;
+  border-radius: 7px;
+  background: var(--af-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--af-on-accent);
+  font: 700 15px "Space Grotesk", sans-serif;
+  flex: none;
+}
+
+.af-brand-name {
+  font: 700 14px "Space Grotesk", sans-serif;
+  color: var(--af-text);
+}
+
+.af-nav-section {
+  padding: 16px 11px 6px;
+  font: 700 10.5px "Manrope", sans-serif;
+  letter-spacing: 0.1em;
+  color: var(--af-faint);
+}
+
+.af-nav-group {
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+}
+
+.af-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 11px;
+  font: 600 12.5px "Manrope", sans-serif;
+  color: var(--af-muted);
+  border-left: 2px solid transparent;
+  border-radius: 0 5px 5px 0;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.af-nav-item:hover {
+  color: var(--af-text);
+  text-decoration: none;
+}
+
+/* Blazor's NavLink applies the "active" class on the matched route. */
+.af-nav-item.active {
+  color: var(--af-accent-text);
+  background: var(--af-accent-soft);
+  border-left-color: var(--af-accent);
+}
+
+.af-nav-item.af-home {
+  padding: 9px 11px;
+  border-radius: 6px;
+  font-size: 13px;
+  border-left: none;
+}
+
+.af-sidebar-footer {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 12px 8px 0;
+}
+
+.af-sidebar-note {
+  font-size: 11px;
+  color: var(--af-faint);
+  padding: 0 2px;
+}
+
+.af-main {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.af-topbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  height: 58px;
+  border-bottom: 1px solid var(--af-border);
+}
+
+.af-topbar-title {
+  font: 600 17px "Space Grotesk", sans-serif;
+  color: var(--af-text);
+}
+
+.af-topbar-actions {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.af-topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+/* Hamburger + backdrop: hidden on desktop, shown when the sidebar collapses. */
+.af-hamburger {
+  display: none;
+  width: 34px;
+  height: 34px;
+  flex: none;
+  border-radius: 6px;
+  background: transparent;
+  border: 1px solid var(--af-border2);
+  color: var(--af-text);
+  cursor: pointer;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  padding: 0;
+}
+
+.af-hamburger:hover {
+  background: var(--af-hover);
+}
+
+.af-backdrop {
+  display: none;
+}
+
+.af-content {
+  padding: 32px 28px;
+}
+
+/* theme toggle pill */
+.af-theme-toggle {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border-radius: 16px;
+  background: var(--af-input);
+  border: 1px solid var(--af-border);
+}
+
+.af-theme-btn {
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  border: 1px solid transparent;
+  background: transparent;
+  color: var(--af-muted);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12.5px;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.af-theme-btn.af-active {
+  background: var(--af-accent-soft);
+  border-color: var(--af-accent);
+  color: var(--af-accent-text);
+}
+
+/* user chip */
+.af-user-chip {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  padding: 5px 8px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.af-user-chip:hover {
+  background: var(--af-hover);
+}
+
+.af-avatar {
+  width: 29px;
+  height: 29px;
+  border-radius: 50%;
+  background: var(--af-accent-soft);
+  border: 1px solid var(--af-accent);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--af-accent-text);
+  font: 700 11px "Manrope", sans-serif;
+  flex: none;
+}
+
+.af-user-email {
+  font: 600 12.5px "Manrope", sans-serif;
+  color: var(--af-text2);
+}
+
+/* ==================================================== LOGIN (auth pages) == */
+.af-login {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 40px 20px;
+  box-sizing: border-box;
+  background: var(--af-bg);
+}
+
+.af-login-inner {
+  width: 100%;
+  max-width: 420px;
+  display: flex;
+  flex-direction: column;
+}
+
+.af-login-brand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 28px;
+  justify-content: center;
+}
+
+.af-login-brand .af-brand-mark {
+  width: 38px;
+  height: 38px;
+  border-radius: 9px;
+  font-size: 19px;
+}
+
+.af-login-brand .af-brand-name {
+  font-size: 18px;
+}
+
+.af-login-card {
+  width: 100%;
+  max-width: 420px;
+  background: var(--af-surface);
+  border: 1px solid var(--af-border);
+  border-radius: 10px;
+  padding: 36px 36px 32px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  box-sizing: border-box;
+}
+
+.af-login-head {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.af-login-head h1,
+.af-login-head .rz-text-h4 {
+  margin: 0;
+  font: 600 24px "Space Grotesk", sans-serif;
+  color: var(--af-text);
+}
+
+.af-login-sub {
+  margin: 0;
+  font-size: 13.5px;
+  color: var(--af-muted);
+}
+
+.af-login-footer {
+  font-size: 12px;
+  color: var(--af-faint);
+}
+
+/* The auth pages stack their form controls; give them the design's rhythm. */
+.af-login-card .rz-label {
+  font: 600 12.5px "Manrope", sans-serif;
+  color: var(--af-muted);
+}
+
+.af-login-card .rz-textbox,
+.af-login-card .rz-password,
+.af-login-card .rz-password input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 42px;
+}
+
+/* Full-width, stacked, sentence-case (Radzen's Material theme upper-cases). */
+.af-login-card .rz-button {
+  height: 44px;
+  border-radius: 6px;
+  width: 100%;
+  text-transform: none;
+  justify-content: center;
+  font-size: 14px;
+}
+
+.af-login-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Second action ("Log in with a passkey") is an outline button, not filled. */
+.af-login-card .rz-button[data-af="passkey"] {
+  background: transparent;
+  border: 1px solid var(--af-border2);
+  color: var(--af-text);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.af-login-card .rz-button[data-af="passkey"]:hover {
+  background: var(--af-hover);
+  filter: none;
+}
+
+/* Password label row with the inline "Forgot password?" link. */
+.af-login-field-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.af-login-forgot {
+  font: 600 12px "Manrope", sans-serif;
+  color: var(--af-accent-text);
+}
+
+.af-login-footer-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.af-login-resend {
+  font: 600 12.5px "Manrope", sans-serif;
+  color: var(--af-muted);
+}
+
+/* The heading is a plain h1 — never let a theme give it a control border. */
+.af-login-head .rz-text-h4 {
+  border: none;
+  outline: none;
+  background: none;
+  padding: 0;
+}
+
+/* ==================================================== RESPONSIVE ========== */
+
+/* Under 1000px the sidebar becomes an off-canvas drawer toggled by the
+   hamburger; a backdrop covers the content while it's open. */
+@media (max-width: 1000px) {
+  .af-hamburger {
+    display: inline-flex;
+  }
+
+  .af-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    z-index: 60;
+    overflow-y: auto;
+    transform: translateX(-100%);
+    transition: transform 0.2s ease;
+  }
+
+  .af-shell[data-nav-open="true"] .af-sidebar {
+    transform: translateX(0);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.4);
+  }
+
+  .af-shell[data-nav-open="true"] .af-backdrop {
+    display: block;
+    position: fixed;
+    inset: 0;
+    z-index: 50;
+    background: rgba(0, 0, 0, 0.5);
+  }
+}
+
+/* Under 700px: tighter padding, hide the user email, single-column grids and
+   horizontally scrollable data tables. */
+@media (max-width: 700px) {
+  .af-topbar {
+    padding: 0 14px;
+  }
+
+  .af-content {
+    padding: 20px 14px;
+  }
+
+  .af-user-email {
+    display: none;
+  }
+
+  .af-topbar-actions {
+    gap: 10px;
+  }
+
+  .af-form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Keep data grids usable: give the table a min width and let the cell area
+     scroll horizontally instead of crushing the columns. */
+  .rz-data-grid .rz-grid-table {
+    min-width: 620px !important;
+  }
+
+  .rz-data-grid-data {
+    overflow-x: auto;
+  }
+}

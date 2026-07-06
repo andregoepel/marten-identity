@@ -1,5 +1,5 @@
-using AndreGoepel.Marten.Identity.Blazor;
 using AndreGoepel.Marten.Identity.Blazor.Components.Account.Pages;
+using AndreGoepel.Marten.Identity.Blazor.Features;
 using AndreGoepel.Marten.Identity.Http;
 using AndreGoepel.Marten.Identity.Users;
 using Bunit;
@@ -17,7 +17,7 @@ namespace AndreGoepel.Marten.Identity.Blazor.Tests.Account.Pages;
 
 public class LoginTests : BunitContext
 {
-    private const string RegisterLink = "Register as a new user";
+    private const string RegisterLink = "Create account";
     private const string PasskeyButton = "Log in with a passkey";
 
     [Fact]

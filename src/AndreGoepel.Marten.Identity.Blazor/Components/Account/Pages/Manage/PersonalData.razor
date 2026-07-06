@@ -34,30 +34,21 @@
                 — including all content, settings and history. After erasure this <strong>cannot be undone</strong>.
             </RadzenAlert>
 
-            <!-- Action-Buttons -->
-            <RadzenStack Orientation="Orientation.Horizontal"
-                         Gap="1.5rem"
-                         JustifyContent="JustifyContent.Center"
-                         AlignItems="AlignItems.Center"
-                         Wrap="FlexWrap.Wrap">
-
-                <!-- Download (POST-Formular) -->
+            <div class="af-card-actions af-start">
+                <!-- Download (POST form) -->
                 <form action="/Account/Manage/DownloadPersonalData" method="post">
                     <AntiforgeryToken />
                     <RadzenButton ButtonType="ButtonType.Submit"
-                                  Text="Download My Data"
+                                  Text="Download my data"
                                   ButtonStyle="ButtonStyle.Primary"
-                                  Size="ButtonSize.Large"
                                   Icon="download" />
                 </form>
 
-                <!-- Delete-Link -->
-                <RadzenButton Text="Delete My Account & All Data"
+                <RadzenButton Text="Delete my account &amp; all data"
                               ButtonStyle="ButtonStyle.Danger"
-                              Size="ButtonSize.Large"
                               Icon="delete_forever"
                               Click=@(() => NavigationManager.NavigateTo("/Account/Manage/DeletePersonalData")) />
-            </RadzenStack>
+            </div>
 
             <RadzenText TextStyle="TextStyle.Caption" class="rz-color-muted text-center mt-4">
                 The downloaded file usually contains your data in JSON or ZIP format.

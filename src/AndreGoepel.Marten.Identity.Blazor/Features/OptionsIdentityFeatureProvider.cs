@@ -1,6 +1,6 @@
 using Microsoft.Extensions.Options;
 
-namespace AndreGoepel.Marten.Identity.Blazor;
+namespace AndreGoepel.Marten.Identity.Blazor.Features;
 
 /// <summary>
 /// Default <see cref="IIdentityFeatureProvider"/> that reads the flags from

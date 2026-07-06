@@ -67,25 +67,17 @@ else
                 <RadzenTemplateForm TItem="InputModel" Data=@Input Submit=@Submit>
                     <RadzenStack Gap="1.5rem">
 
-                        <RadzenFormField Text="Verification code *" Style="width: 100%;">
-                            <ChildContent>
-                                <RadzenTextBox @bind-Value="Input.Code" Name="VerificationCode" Style="width:100%" />
-                            </ChildContent>
-                            <Helper>
-                                <RadzenRequiredValidator Component="VerificationCode" Text="Verification code is required" />
-                            </Helper>
-                        </RadzenFormField>
+                        <RadzenStack Gap="0.4rem">
+                            <RadzenLabel Text="Verification code" Component="VerificationCode" />
+                            <RadzenTextBox @bind-Value="Input.Code" Name="VerificationCode" Style="width:100%" />
+                            <RadzenRequiredValidator Component="VerificationCode" Text="Verification code is required" />
+                        </RadzenStack>
 
-                        <RadzenStack Orientation="Orientation.Horizontal"
-                                     Gap="1rem"
-                                     JustifyContent="JustifyContent.Center"
-                                     Wrap="FlexWrap.Wrap">
+                        <div class="af-card-actions">
                             <RadzenButton ButtonType="ButtonType.Submit"
                                           Text="Verify"
-                                          ButtonStyle="ButtonStyle.Primary"
-                                          Size="ButtonSize.Large"
-                                          Style="width: 100%; max-width: 360px;" />
-                        </RadzenStack>
+                                          ButtonStyle="ButtonStyle.Primary" />
+                        </div>
 
                     </RadzenStack>
                 </RadzenTemplateForm>
