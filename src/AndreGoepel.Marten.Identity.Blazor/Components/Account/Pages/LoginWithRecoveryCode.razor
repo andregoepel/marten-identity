@@ -9,9 +9,9 @@
 
 <IdentityPageTitle Title="Recovery code verification" />
 
-<div class="af-login-head">
+<div class="ag-login-head">
     <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Recovery code verification" />
-    <RadzenText TextStyle="TextStyle.Body2" class="af-login-sub" Text="Use a recovery code to regain access." />
+    <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub" Text="Use a recovery code to regain access." />
 </div>
 
 <RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@OnSubmitAsync">
@@ -27,7 +27,7 @@
             <RadzenRequiredValidator Component="RecoveryCode" Text="Recovery code is required" />
         </RadzenStack>
 
-        <div class="af-login-actions">
+        <div class="ag-login-actions">
             <RadzenButton ButtonType="ButtonType.Submit"
                           Text="Log in"
                           ButtonStyle="ButtonStyle.Primary"
@@ -38,8 +38,8 @@
     </RadzenStack>
 </RadzenTemplateForm>
 
-<div class="af-login-footer-links">
-    <span class="af-login-resend">
+<div class="ag-login-footer-links">
+    <span class="ag-login-resend">
         <RadzenLink Path="/Account/LoginWith2fa" Text="Use an authenticator code instead" />
     </span>
 </div>

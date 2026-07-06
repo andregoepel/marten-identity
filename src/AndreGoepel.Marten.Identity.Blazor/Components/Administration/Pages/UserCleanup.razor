@@ -39,13 +39,13 @@
 
                 @if (_nextFireTime.HasValue)
                 {
-                    <div class="af-info-box">
-                        <span class="af-info-box-label">Next scheduled run</span>
-                        <span class="af-info-box-value">@_nextFireTime.Value.ToString("f") UTC</span>
+                    <div class="ag-info-box">
+                        <span class="ag-info-box-label">Next scheduled run</span>
+                        <span class="ag-info-box-value">@_nextFireTime.Value.ToString("f") UTC</span>
                     </div>
                 }
 
-                <div class="af-card-actions">
+                <div class="ag-card-actions">
                     <RadzenButton Text="Save changes"
                                   ButtonStyle="ButtonStyle.Primary"
                                   Click="@SaveAsync"

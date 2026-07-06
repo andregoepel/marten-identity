@@ -153,6 +153,12 @@
           "Weasel.Core": "9.3.0"
         }
       },
+      "andregoepel.design.blazor": {
+        "type": "Project",
+        "dependencies": {
+          "Radzen.Blazor": "[11.1.0, )"
+        }
+      },
       "andregoepel.marten.identity": {
         "type": "Project",
         "dependencies": {

@@ -9,9 +9,9 @@
 
 <IdentityPageTitle Title="Two-factor authentication" />
 
-<div class="af-login-head">
+<div class="ag-login-head">
     <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Two-factor authentication" />
-    <RadzenText TextStyle="TextStyle.Body2" class="af-login-sub" Text="Enter the code from your authenticator app." />
+    <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub" Text="Enter the code from your authenticator app." />
 </div>
 
 <RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@OnSubmitAsync">
@@ -34,7 +34,7 @@
             <RadzenLabel Text="Remember this machine" Component="RememberMachine" />
         </RadzenStack>
 
-        <div class="af-login-actions">
+        <div class="ag-login-actions">
             <RadzenButton ButtonType="ButtonType.Submit"
                           Text="Log in"
                           ButtonStyle="ButtonStyle.Primary"
@@ -45,8 +45,8 @@
     </RadzenStack>
 </RadzenTemplateForm>
 
-<div class="af-login-footer-links">
-    <span class="af-login-resend">
+<div class="ag-login-footer-links">
+    <span class="ag-login-resend">
         <RadzenLink Path="@($"/Account/LoginWithRecoveryCode?returnUrl={ReturnUrl}")"
                     Text="Use a recovery code instead" />
     </span>

@@ -13,57 +13,57 @@
 @* Cascade the breadcrumb state so each page can declare its own topbar crumb.
    IsFixed: the instance never changes, only its Value (we re-render on Changed). *@
 <CascadingValue Value="_breadcrumb" IsFixed="true">
-<div class="af-shell" data-nav-open="false">
-    <div class="af-backdrop" onclick="afNav.close()"></div>
-    <nav class="af-sidebar">
-        <div class="af-brand">
-            <div class="af-brand-mark">@AppInitial</div>
-            <span class="af-brand-name">@AppName</span>
+<div class="ag-shell" data-nav-open="false">
+    <div class="ag-backdrop" onclick="agNav.close()"></div>
+    <nav class="ag-sidebar">
+        <div class="ag-brand">
+            <div class="ag-brand-mark">@AppInitial</div>
+            <span class="ag-brand-name">@AppName</span>
         </div>
 
-        <NavLink class="af-nav-item af-home" href="" Match="NavLinkMatch.All">⌂&nbsp;&nbsp;Home</NavLink>
+        <NavLink class="ag-nav-item ag-home" href="" Match="NavLinkMatch.All">⌂&nbsp;&nbsp;Home</NavLink>
 
         <AuthorizeView>
             <Authorized>
-                <div class="af-nav-section">ACCOUNT</div>
-                <div class="af-nav-group">
-                    <NavLink class="af-nav-item" href="Account/Manage/Profile">Profile</NavLink>
-                    <NavLink class="af-nav-item" href="Account/Manage/Email">Email</NavLink>
-                    <NavLink class="af-nav-item" href="Account/Manage/ChangePassword">Password</NavLink>
-                    <NavLink class="af-nav-item" href="Account/Manage/TwoFactorAuthentication">Two-factor authentication</NavLink>
-                    <NavLink class="af-nav-item" href="Account/Manage/Passkeys">Passkeys</NavLink>
-                    <NavLink class="af-nav-item" href="Account/Manage/PersonalData">Personal data</NavLink>
+                <div class="ag-nav-section">ACCOUNT</div>
+                <div class="ag-nav-group">
+                    <NavLink class="ag-nav-item" href="Account/Manage/Profile">Profile</NavLink>
+                    <NavLink class="ag-nav-item" href="Account/Manage/Email">Email</NavLink>
+                    <NavLink class="ag-nav-item" href="Account/Manage/ChangePassword">Password</NavLink>
+                    <NavLink class="ag-nav-item" href="Account/Manage/TwoFactorAuthentication">Two-factor authentication</NavLink>
+                    <NavLink class="ag-nav-item" href="Account/Manage/Passkeys">Passkeys</NavLink>
+                    <NavLink class="ag-nav-item" href="Account/Manage/PersonalData">Personal data</NavLink>
                 </div>
 
                 <AuthorizeView Roles="@Roles.Administrator" Context="admin">
-                    <div class="af-nav-section">ADMINISTRATION</div>
-                    <div class="af-nav-group">
-                        <NavLink class="af-nav-item" href="Administration/Users">Users</NavLink>
-                        <NavLink class="af-nav-item" href="Administration/Roles">Roles</NavLink>
-                        <NavLink class="af-nav-item" href="Administration/UserCleanup">User cleanup</NavLink>
+                    <div class="ag-nav-section">ADMINISTRATION</div>
+                    <div class="ag-nav-group">
+                        <NavLink class="ag-nav-item" href="Administration/Users">Users</NavLink>
+                        <NavLink class="ag-nav-item" href="Administration/Roles">Roles</NavLink>
+                        <NavLink class="ag-nav-item" href="Administration/UserCleanup">User cleanup</NavLink>
                     </div>
                 </AuthorizeView>
             </Authorized>
         </AuthorizeView>
 
-        <div class="af-sidebar-footer">
-            <span class="af-sidebar-note">© 2026 @AppName</span>
+        <div class="ag-sidebar-footer">
+            <span class="ag-sidebar-note">© 2026 @AppName</span>
         </div>
     </nav>
 
-    <div class="af-main">
-        <div class="af-topbar">
-            <div class="af-topbar-left">
-                <button class="af-hamburger" type="button" onclick="afNav.toggle()" aria-label="Toggle navigation">☰</button>
-                <span class="af-topbar-title">@_breadcrumb.Value</span>
+    <div class="ag-main">
+        <div class="ag-topbar">
+            <div class="ag-topbar-left">
+                <button class="ag-hamburger" type="button" onclick="agNav.toggle()" aria-label="Toggle navigation">☰</button>
+                <span class="ag-topbar-title">@_breadcrumb.Value</span>
             </div>
-            <div class="af-topbar-actions">
+            <div class="ag-topbar-actions">
                 <ThemeToggle />
                 <AuthorizeView>
                     <Authorized>
-                        <div class="af-user-chip">
-                            <span class="af-avatar">@Initials(context.User.Identity?.Name)</span>
-                            <span class="af-user-email">@context.User.Identity?.Name</span>
+                        <div class="ag-user-chip">
+                            <span class="ag-avatar">@Initials(context.User.Identity?.Name)</span>
+                            <span class="ag-user-email">@context.User.Identity?.Name</span>
                         </div>
                         <form action="Account/Logout" method="post">
                             <AntiforgeryToken />
@@ -82,7 +82,7 @@
             </div>
         </div>
 
-        <div class="af-content">
+        <div class="ag-content">
             @Body
         </div>
     </div>

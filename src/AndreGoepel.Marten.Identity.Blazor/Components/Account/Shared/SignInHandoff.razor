@@ -33,7 +33,7 @@
         _submitted = true;
         _module ??= await JsRuntime.InvokeAsync<IJSObjectReference>(
             "import",
-            "./_content/AndreGoepel.Marten.Identity.Blazor/Components/Account/Shared/SignInHandoff.razor.js");
+            "./_content/AndreGoepel.Design.Blazor/Components/Account/Shared/SignInHandoff.razor.js");
         await _module.InvokeVoidAsync("submitForm", _form);
     }
 

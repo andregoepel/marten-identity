@@ -28,12 +28,12 @@
         </RadzenRow>
 
         <RadzenCard Style="padding: 0; overflow: hidden;">
-            <div class="af-grid-toolbar">
-                <div class="af-search">
-                    <span class="af-search-icon">⌕</span>
-                    <input class="af-search-input" placeholder="Filter users…" value="@_filter" @oninput="OnFilterInput" />
+            <div class="ag-grid-toolbar">
+                <div class="ag-search">
+                    <span class="ag-search-icon">⌕</span>
+                    <input class="ag-search-input" placeholder="Filter users…" value="@_filter" @oninput="OnFilterInput" />
                 </div>
-                <span class="af-grid-count">@FilteredUsers.Count of @(_users?.Count ?? 0) users</span>
+                <span class="ag-grid-count">@FilteredUsers.Count of @(_users?.Count ?? 0) users</span>
             </div>
             <RadzenDataGrid @ref="_usersGrid"
                             Data="@FilteredUsers"
@@ -51,8 +51,8 @@
                     <RadzenDataGridColumn Property="@nameof(User.Email)" Title="Email" Width="240px">
                         <Template Context="user">
                             <div style="display:flex; flex-direction:column; gap:2px;">
-                                <span class="af-cell-name">@user.Email</span>
-                                <span class="af-cell-id">@user.Id</span>
+                                <span class="ag-cell-name">@user.Email</span>
+                                <span class="ag-cell-id">@user.Id</span>
                             </div>
                         </Template>
                     </RadzenDataGridColumn>
@@ -62,11 +62,11 @@
                         <Template Context="user">
                             @if (user.EmailConfirmed)
                             {
-                                <span class="af-badge af-badge-success">Confirmed</span>
+                                <span class="ag-badge ag-badge-success">Confirmed</span>
                             }
                             else
                             {
-                                <span class="af-badge af-badge-danger">Unconfirmed</span>
+                                <span class="ag-badge ag-badge-danger">Unconfirmed</span>
                             }
                         </Template>
                     </RadzenDataGridColumn>
@@ -74,11 +74,11 @@
                         <Template Context="user">
                             @if (user.Deleted)
                             {
-                                <span class="af-badge af-badge-danger">Deleted</span>
+                                <span class="ag-badge ag-badge-danger">Deleted</span>
                             }
                             else
                             {
-                                <span class="af-badge af-badge-success">Active</span>
+                                <span class="ag-badge ag-badge-success">Active</span>
                             }
                         </Template>
                     </RadzenDataGridColumn>
@@ -87,7 +87,7 @@
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false" Width="150px" TextAlign="TextAlign.Right">
                         <Template Context="data">
-                            <div class="af-row-actions">
+                            <div class="ag-row-actions">
                                 <RadzenButton Text="Roles"
                                               ButtonStyle="ButtonStyle.Light"
                                               Size="ButtonSize.Small"
@@ -98,7 +98,7 @@
                                     <RadzenButton Icon="more_horiz"
                                                   ButtonStyle="ButtonStyle.Light"
                                                   Size="ButtonSize.Small"
-                                                  class="af-icon-btn"
+                                                  class="ag-icon-btn"
                                                   Click="@(args => OpenRowMenu(args, data))" />
                                 }
                             </div>
@@ -199,7 +199,7 @@
         }
         else if (user.Deletable)
         {
-            items.Add(new ContextMenuItem { Text = "Delete", Value = "delete", Icon = "delete", IconColor = "var(--af-danger)" });
+            items.Add(new ContextMenuItem { Text = "Delete", Value = "delete", Icon = "delete", IconColor = "var(--ag-danger)" });
         }
 
         ContextMenuService.Open(args, items, async e =>

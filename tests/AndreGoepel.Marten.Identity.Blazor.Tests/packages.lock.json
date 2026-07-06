@@ -369,6 +369,12 @@
           "xunit.v3.runner.common": "[3.2.2]"
         }
       },
+      "andregoepel.design.blazor": {
+        "type": "Project",
+        "dependencies": {
+          "Radzen.Blazor": "[11.1.0, )"
+        }
+      },
       "andregoepel.marten.identity": {
         "type": "Project",
         "dependencies": {
@@ -384,6 +390,7 @@
       "andregoepel.marten.identity.blazor": {
         "type": "Project",
         "dependencies": {
+          "AndreGoepel.Design.Blazor": "[1.0.0, )",
           "AndreGoepel.Marten.Identity": "[1.0.0, )",
           "Marten": "[9.12.0, )",
           "Radzen.Blazor": "[11.1.0, )"

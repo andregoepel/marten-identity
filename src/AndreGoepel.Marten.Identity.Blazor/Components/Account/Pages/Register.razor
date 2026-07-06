@@ -14,9 +14,9 @@
 
 <IdentityPageTitle Title="Register" />
 
-<div class="af-login-head">
+<div class="ag-login-head">
     <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Register" />
-    <RadzenText TextStyle="TextStyle.Body2" class="af-login-sub" Text="Create your account to get started." />
+    <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub" Text="Create your account to get started." />
 </div>
 
 <RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@RegisterUser">
@@ -45,7 +45,7 @@
             <ValidationMessage For="@(() => Input.ConfirmPassword)" class="rz-message rz-messages-error" />
         </RadzenStack>
 
-        <div class="af-login-actions">
+        <div class="ag-login-actions">
             <RadzenButton ButtonType="ButtonType.Submit"
                           Text="Register"
                           ButtonStyle="ButtonStyle.Primary" />
@@ -54,8 +54,8 @@
     </RadzenStack>
 </RadzenTemplateForm>
 
-<div class="af-login-footer-links">
-    <span class="af-login-resend">
+<div class="ag-login-footer-links">
+    <span class="ag-login-resend">
         Already have an account? <RadzenLink Path="Account/Login" Text="Log in" />
     </span>
 </div>

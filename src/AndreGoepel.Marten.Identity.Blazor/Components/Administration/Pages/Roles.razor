@@ -35,12 +35,12 @@
         </RadzenRow>
 
         <RadzenCard Style="padding: 0; overflow: hidden;">
-            <div class="af-grid-toolbar">
-                <div class="af-search">
-                    <span class="af-search-icon">⌕</span>
-                    <input class="af-search-input" placeholder="Filter roles…" value="@_filter" @oninput="OnFilterInput" />
+            <div class="ag-grid-toolbar">
+                <div class="ag-search">
+                    <span class="ag-search-icon">⌕</span>
+                    <input class="ag-search-input" placeholder="Filter roles…" value="@_filter" @oninput="OnFilterInput" />
                 </div>
-                <span class="af-grid-count">@FilteredRoles.Count of @(_roles?.Count ?? 0) roles</span>
+                <span class="ag-grid-count">@FilteredRoles.Count of @(_roles?.Count ?? 0) roles</span>
             </div>
             <RadzenDataGrid @ref="_rolesGrid"
                             Data="@FilteredRoles"
@@ -58,8 +58,8 @@
                     <RadzenDataGridColumn Property="@nameof(Role.Name)" Title="Role name" Width="260px">
                         <Template Context="role">
                             <div style="display:flex; flex-direction:column; gap:2px;">
-                                <span class="af-cell-name">@role.Name</span>
-                                <span class="af-cell-id">@role.Id</span>
+                                <span class="ag-cell-name">@role.Name</span>
+                                <span class="ag-cell-id">@role.Id</span>
                             </div>
                         </Template>
                     </RadzenDataGridColumn>
@@ -69,17 +69,17 @@
                         <Template Context="role">
                             @if (role.Deleted)
                             {
-                                <span class="af-badge af-badge-danger">Deleted</span>
+                                <span class="ag-badge ag-badge-danger">Deleted</span>
                             }
                             else
                             {
-                                <span class="af-badge af-badge-success">Active</span>
+                                <span class="ag-badge ag-badge-success">Active</span>
                             }
                         </Template>
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false" Width="150px" TextAlign="TextAlign.Right">
                         <Template Context="data">
-                            <div class="af-row-actions">
+                            <div class="ag-row-actions">
                                 <RadzenButton Text="Users"
                                               ButtonStyle="ButtonStyle.Light"
                                               Size="ButtonSize.Small"
@@ -90,7 +90,7 @@
                                     <RadzenButton Icon="more_horiz"
                                                   ButtonStyle="ButtonStyle.Light"
                                                   Size="ButtonSize.Small"
-                                                  class="af-icon-btn"
+                                                  class="ag-icon-btn"
                                                   Click="@(args => OpenRowMenu(args, data))" />
                                 }
                             </div>
@@ -214,7 +214,7 @@
         }
         else if (role.Deletable)
         {
-            items.Add(new ContextMenuItem { Text = "Delete", Value = "delete", Icon = "delete", IconColor = "var(--af-danger)" });
+            items.Add(new ContextMenuItem { Text = "Delete", Value = "delete", Icon = "delete", IconColor = "var(--ag-danger)" });
         }
 
         ContextMenuService.Open(args, items, async e =>
