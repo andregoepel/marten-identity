@@ -28,10 +28,16 @@
 
                     <RadzenStack Gap="0.4rem">
                         <RadzenLabel Text="Current email" Component="CurrentEmail" />
-                        <RadzenTextBox @bind-Value="@_currentEmail"
-                                       Name="CurrentEmail"
-                                       ReadOnly="true"
-                                       Style="width:100%; background-color: var(--rz-input-disabled-background);" />
+                        <div style="display:flex; align-items:center; gap:12px;">
+                            <RadzenTextBox @bind-Value="@_currentEmail"
+                                           Name="CurrentEmail"
+                                           ReadOnly="true"
+                                           Style="flex:1; background-color: var(--rz-input-disabled-background);" />
+                            @if (_isEmailConfirmed)
+                            {
+                                <span class="af-badge af-badge-success">✓ Confirmed</span>
+                            }
+                        </div>
                         @if (!_isEmailConfirmed)
                         {
                             <div>
@@ -46,12 +52,6 @@
                                               Click=@SendVerificationEmail
                                               Style="margin-top: 0.75rem;" />
                             </div>
-                        }
-                        else
-                        {
-                            <RadzenText TextStyle="TextStyle.Body2" class="rz-color-success">
-                                Email confirmed ✓
-                            </RadzenText>
                         }
                     </RadzenStack>
 

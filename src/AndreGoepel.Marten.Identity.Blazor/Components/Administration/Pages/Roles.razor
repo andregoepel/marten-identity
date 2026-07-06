@@ -55,7 +55,18 @@
                     <RadzenDataGridColumn Property="@nameof(Role.Name)" Title="Role Name" Width="180px" />
                     <RadzenDataGridColumn Property="@nameof(Role.CreatedAt)" FormatString="{0:d} {0:t}" Title="Created at" Width="160px" />
                     <RadzenDataGridColumn Property="@nameof(Role.ChangedAt)" FormatString="{0:d} {0:t}" Title="Changed at" Width="160px" />
-                    <RadzenDataGridColumn Property="@nameof(Role.Deleted)" Title="Deleted" Width="100px" />
+                    <RadzenDataGridColumn Property="@nameof(Role.Deleted)" Title="Status" Width="110px">
+                        <Template Context="role">
+                            @if (role.Deleted)
+                            {
+                                <span class="af-badge af-badge-danger">Deleted</span>
+                            }
+                            else
+                            {
+                                <span class="af-badge af-badge-success">Active</span>
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
                     <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false" Width="220px">
                         <Template Context="data">
                             <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
