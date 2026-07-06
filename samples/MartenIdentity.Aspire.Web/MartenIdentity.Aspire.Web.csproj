@@ -1,5 +1,4 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
-
   <ItemGroup>
     <PackageReference Include="Marten" />
     <PackageReference Include="Radzen.Blazor" />
@@ -10,5 +9,4 @@
     <ProjectReference Include="..\..\src\AndreGoepel.Marten.Identity.Blazor\AndreGoepel.Marten.Identity.Blazor.csproj" />
     <ProjectReference Include="..\MartenIdentity.Aspire.ServiceDefaults\MartenIdentity.Aspire.ServiceDefaults.csproj" />
   </ItemGroup>
-
 </Project>
