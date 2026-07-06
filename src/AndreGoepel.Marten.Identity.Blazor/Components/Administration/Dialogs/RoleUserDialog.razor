@@ -3,30 +3,35 @@
 @inject RoleManager<Role> RoleManager
 
 <RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween">
-    <RadzenStack>
+    <RadzenCard Style="padding: 0; overflow: hidden;">
         <RadzenDataGrid Data="@_users"
-                        AllowFiltering="true"
-                        AllowColumnResize="true"
+                        AllowFiltering="false"
+                        AllowColumnResize="false"
                         AllowAlternatingRows="false"
-                        FilterMode="FilterMode.Advanced"
                         AllowSorting="true"
                         PageSize="5"
                         AllowPaging="true"
                         PagerHorizontalAlign="HorizontalAlign.Left"
                         ShowPagingSummary="true"
-                        LogicalFilterOperator="LogicalFilterOperator.Or">
+                        Density="Density.Compact"
+                        Style="width: 100%;">
             <Columns>
                 <RadzenDataGridColumn Property="@nameof(User.UserName)" Title="Name" />
-                <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false">
+                <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false" Width="120px" TextAlign="TextAlign.Right">
                     <Template Context="data">
-                            <RadzenButton Text="Remove" Click="@(() => RemoveUser(data))" />
+                        <div class="ag-row-actions">
+                            <RadzenButton Text="Remove"
+                                          ButtonStyle="ButtonStyle.Danger"
+                                          Size="ButtonSize.Small"
+                                          Click="@(() => RemoveUser(data))" />
+                        </div>
                     </Template>
                 </RadzenDataGridColumn>
             </Columns>
         </RadzenDataGrid>
-    </RadzenStack>
+    </RadzenCard>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
-        <RadzenButton Click="@(() => DialogService.Close(true))" Variant="Variant.Flat" Text="Close" Style="width: 120px" />
+        <RadzenButton Click="@(() => DialogService.Close(true))" ButtonStyle="ButtonStyle.Light" Text="Close" Style="width: 120px" />
     </RadzenStack>
 </RadzenStack>
 
