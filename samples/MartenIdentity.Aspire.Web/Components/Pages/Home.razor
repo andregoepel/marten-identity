@@ -1,0 +1,36 @@
+@page "/"
+
+<PageTitle>Marten Identity Sample</PageTitle>
+
+<RadzenStack Gap="1rem" Style="max-width: 720px;">
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H3">Marten Identity Sample</RadzenText>
+
+    <RadzenText TextStyle="TextStyle.Body1">
+        This .NET Aspire sample hosts the event-sourced ASP.NET Core Identity stack from
+        <RadzenLink Path="https://github.com/andregoepel/marten-identity"
+                    Text="AndreGoepel.Marten.Identity" Target="_blank" />,
+        backed by a PostgreSQL container provisioned by the Aspire AppHost and projected
+        with Marten. The full Blazor Identity UI — login, registration, 2FA, passkeys, and
+        user/role administration — is wired up out of the box.
+    </RadzenText>
+
+    <AuthorizeView>
+        <Authorized>
+            <RadzenText TextStyle="TextStyle.Body1">
+                You are signed in as <strong>@context.User.Identity?.Name</strong>.
+            </RadzenText>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
+                <RadzenLink Path="Account/Manage/Profile" Text="Manage account" />
+                <AuthorizeView Roles="@Roles.Administrator" Context="admin">
+                    <RadzenLink Path="Administration/Users" Text="Administer users" />
+                </AuthorizeView>
+            </RadzenStack>
+        </Authorized>
+        <NotAuthorized>
+            <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
+                <RadzenLink Path="Account/Login" Text="Log in" />
+                <RadzenLink Path="Account/Register" Text="Register" />
+            </RadzenStack>
+        </NotAuthorized>
+    </AuthorizeView>
+</RadzenStack>
