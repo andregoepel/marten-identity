@@ -172,16 +172,24 @@ h4:focus-visible, h5:focus-visible, h6:focus-visible {
   color: var(--af-text2);
 }
 
+/* Field labels: small, semibold, muted (the design's form label style). */
+.rz-label {
+  font: 600 12.5px "Manrope", sans-serif;
+  color: var(--af-muted);
+}
+
 /* The design uses sentence case everywhere; Radzen's Material theme upper-cases. */
 .rz-button {
   text-transform: none;
+  font-size: 13px;
 }
 
-/* Primary buttons keep the emerald accent with dark on-accent text */
+/* Primary buttons keep the emerald accent with dark on-accent text. The
+   !important beats Radzen's own filled-variant contrast colour (white). */
 .rz-button.rz-primary,
 .rz-button.rz-success {
   background-color: var(--af-accent);
-  color: var(--af-on-accent);
+  color: var(--af-on-accent) !important;
   font-weight: 800;
 }
 
@@ -227,6 +235,14 @@ h4:focus-visible, h5:focus-visible, h6:focus-visible {
   letter-spacing: 0.07em;
   text-transform: uppercase;
   border-bottom: 1px solid var(--af-border);
+}
+
+/* RadzenDataGrid renders header labels in .rz-column-title-content. */
+.rz-column-title-content {
+  text-transform: uppercase;
+  font: 700 11px "Manrope", sans-serif;
+  letter-spacing: 0.07em;
+  color: var(--af-faint);
 }
 
 .rz-datatable tbody td,
@@ -303,6 +319,43 @@ h4:focus-visible, h5:focus-visible, h6:focus-visible {
   .af-form-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Page header row with a heading on the left and an action on the right. */
+.af-page-head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 20px;
+  flex-wrap: wrap;
+}
+
+/* Dashed empty-state card (no passkeys, no data, …). */
+.af-empty {
+  background: var(--af-surface);
+  border: 1px dashed var(--af-border2);
+  border-radius: 10px;
+  padding: 44px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  text-align: center;
+}
+
+.af-empty-icon {
+  font-size: 22px;
+  color: var(--af-faint);
+}
+
+.af-empty-title {
+  font: 600 14px "Manrope", sans-serif;
+  color: var(--af-text);
+}
+
+.af-empty-text {
+  font-size: 12.5px;
+  color: var(--af-muted);
 }
 
 /* Links */
@@ -626,6 +679,7 @@ a:hover, .rz-link:hover {
   width: 100%;
   text-transform: none;
   justify-content: center;
+  font-size: 14px;
 }
 
 .af-login-actions {

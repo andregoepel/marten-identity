@@ -28,10 +28,9 @@
 
         <RadzenCard Style="padding: 0; overflow: hidden;">
             <RadzenDataGrid Data="@_users"
-                            AllowFiltering="true"
-                            AllowColumnResize="true"
+                            AllowFiltering="false"
+                            AllowColumnResize="false"
                             AllowAlternatingRows="false"
-                            FilterMode="FilterMode.Advanced"
                             AllowSorting="true"
                             PageSize="10"
                             AllowPaging="true"
@@ -43,13 +42,43 @@
                             Density="Density.Compact"
                             Style="width: 100%;">
                 <Columns>
-                    <RadzenDataGridColumn Property="@nameof(User.Id)" Title="Id" Sortable="false" Filterable="false" Width="100px" />
-                    <RadzenDataGridColumn Property="@nameof(User.Email)" Title="Email" Width="200px" />
-                    <RadzenDataGridColumn Property="@nameof(User.CreatedAt)" FormatString="{0:d} {0:t}" Title="Created at" Width="150px" />
-                    <RadzenDataGridColumn Property="@nameof(User.ChangedAt)" FormatString="{0:d} {0:t}" Title="Changed at" Width="150px" />
-                    <RadzenDataGridColumn Property="@nameof(User.EmailConfirmed)" Title="Email confirmed" Width="120px" />
-                    <RadzenDataGridColumn Property="@nameof(User.Deleted)" Title="Deleted" Width="100px" />
-                    <RadzenDataGridColumn Property="@nameof(User.Deletable)" Title="Deletable" Width="100px" />
+                    <RadzenDataGridColumn Property="@nameof(User.Email)" Title="Email" Width="240px">
+                        <Template Context="user">
+                            <div style="display:flex; flex-direction:column; gap:2px;">
+                                <span style="font-weight:700; color:var(--af-text);">@user.Email</span>
+                                <span style="font:400 10.5px 'JetBrains Mono', monospace; color:var(--af-faint);">@user.Id</span>
+                            </div>
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(User.CreatedAt)" FormatString="{0:d} {0:t}" Title="Created" Width="150px" />
+                    <RadzenDataGridColumn Property="@nameof(User.ChangedAt)" FormatString="{0:d} {0:t}" Title="Changed" Width="150px" />
+                    <RadzenDataGridColumn Property="@nameof(User.EmailConfirmed)" Title="Confirmed" Width="110px">
+                        <Template Context="user">
+                            @if (user.EmailConfirmed)
+                            {
+                                <span class="af-badge af-badge-success">Confirmed</span>
+                            }
+                            else
+                            {
+                                <span class="af-badge af-badge-danger">Unconfirmed</span>
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(User.Deleted)" Title="Status" Width="100px">
+                        <Template Context="user">
+                            @if (user.Deleted)
+                            {
+                                <span class="af-badge af-badge-danger">Deleted</span>
+                            }
+                            else
+                            {
+                                <span class="af-badge af-badge-success">Active</span>
+                            }
+                        </Template>
+                    </RadzenDataGridColumn>
+                    <RadzenDataGridColumn Property="@nameof(User.Deletable)" Title="Deletable" Width="100px">
+                        <Template Context="user">@(user.Deletable ? "Yes" : "No")</Template>
+                    </RadzenDataGridColumn>
                     <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false" Width="200px">
                         <Template Context="data">
                             <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">

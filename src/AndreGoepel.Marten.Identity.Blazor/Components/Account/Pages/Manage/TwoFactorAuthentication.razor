@@ -14,46 +14,50 @@
             <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Add an extra layer of security to your account</RadzenText>
         </div>
 
+        @if (_is2FaEnabled)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Success" Icon="shield" AllowClose="false">
+                Two-factor authentication is <strong>currently enabled</strong>.
+            </RadzenAlert>
+
+            @if (_recoveryCodesLeft == 0)
+            {
+                <RadzenAlert AlertStyle="AlertStyle.Danger" Icon="error_outline" AllowClose="false">
+                    <strong>You have no recovery codes left!</strong><br />
+                    Generate a new set before you can use recovery codes to log in.
+                    <div class="mt-4">
+                        <RadzenButton Text="Generate new recovery codes"
+                                      ButtonStyle="ButtonStyle.Danger"
+                                      Click="@(() => NavigationManager.NavigateTo("/Account/Manage/GenerateRecoveryCodes"))" />
+                    </div>
+                </RadzenAlert>
+            }
+            else if (_recoveryCodesLeft <= 3)
+            {
+                <RadzenAlert AlertStyle="AlertStyle.Warning" Icon="warning" AllowClose="false">
+                    <strong>@_recoveryCodesLeft recovery code@(_recoveryCodesLeft == 1 ? "" : "s") remaining</strong><br />
+                    Consider generating a new set soon.
+                    <div class="mt-4">
+                        <RadzenButton Text="Generate new recovery codes"
+                                      ButtonStyle="ButtonStyle.Warning"
+                                      Click="@(() => NavigationManager.NavigateTo("/Account/Manage/GenerateRecoveryCodes"))" />
+                    </div>
+                </RadzenAlert>
+            }
+        }
+        else
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Warning" Icon="warning" AllowClose="false">
+                Two-factor authentication is currently <strong>disabled</strong>.
+            </RadzenAlert>
+        }
+
         <RadzenCard>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
+            <RadzenStack Orientation="Orientation.Vertical" Gap="1.5rem" AlignItems="AlignItems.Stretch">
 
             @if (_is2FaEnabled)
             {
-                <RadzenAlert AlertStyle="AlertStyle.Success" Icon="shield" AllowClose="false">
-                    Two-factor authentication is <strong>currently enabled</strong>.
-                </RadzenAlert>
-
-                @if (_recoveryCodesLeft == 0)
-                {
-                    <RadzenAlert AlertStyle="AlertStyle.Danger" Icon="error_outline">
-                        <strong>You have no recovery codes left!</strong><br />
-                        Generate a new set before you can use recovery codes to log in.
-                        <div class="mt-4">
-                            <RadzenButton Text="Generate new recovery codes"
-                                          ButtonStyle="ButtonStyle.Danger"
-                                          Size="ButtonSize.Large"
-                                          Click="@(() => NavigationManager.NavigateTo("/Account/Manage/GenerateRecoveryCodes"))" />
-                        </div>
-                    </RadzenAlert>
-                }
-                else if (_recoveryCodesLeft <= 3)
-                {
-                    <RadzenAlert AlertStyle="AlertStyle.Warning" Icon="warning">
-                        <strong>@_recoveryCodesLeft recovery code@(_recoveryCodesLeft == 1 ? "" : "s") remaining</strong><br />
-                        Consider generating a new set soon.
-                        <div class="mt-4">
-                            <RadzenButton Text="Generate new recovery codes"
-                                          ButtonStyle="ButtonStyle.Warning"
-                                          Size="ButtonSize.Large"
-                                          Click="@(() => NavigationManager.NavigateTo("/Account/Manage/GenerateRecoveryCodes"))" />
-                        </div>
-                    </RadzenAlert>
-                }
-
-                <RadzenStack Orientation="Orientation.Horizontal"
-                             Gap="1rem"
-                             Wrap="FlexWrap.Wrap"
-                             class="mt-8">
+                <div class="af-actions-inline">
                     <LinkButton Text="Disable 2FA"
                                 ButtonStyle="ButtonStyle.Danger"
                                 Path="/Account/Manage/Disable2fa" />
@@ -61,16 +65,10 @@
                     <LinkButton Text="Reset recovery codes"
                                 ButtonStyle="ButtonStyle.Warning"
                                 Path="/Account/Manage/GenerateRecoveryCodes" />
-                </RadzenStack>
-            }
-            else
-            {
-                <RadzenAlert AlertStyle="AlertStyle.Warning" Icon="warning" AllowClose="false">
-                    Two-factor authentication is currently <strong>disabled</strong>.
-                </RadzenAlert>
+                </div>
             }
 
-            <RadzenStack Gap="1.5rem" class="mt-8">
+            <RadzenStack Gap="1.5rem">
                 <RadzenText TextStyle="TextStyle.Subtitle1">Authenticator app</RadzenText>
                 <RadzenText TextStyle="TextStyle.Body1">
                     Use a time-based one-time password (TOTP) app such as Google Authenticator,
