@@ -278,6 +278,43 @@ h4:focus-visible, h5:focus-visible, h6:focus-visible {
   table-layout: auto !important;
 }
 
+/* Context menus (grid row overflow "⋯" menus). Radzen's default hover is a
+   near-white block that erases the text in dark mode — make it a dark hover. */
+.rz-menu {
+  background: var(--af-surface);
+  border: 1px solid var(--af-border);
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 4px;
+}
+
+.rz-navigation-item-link {
+  color: var(--af-text2);
+  border-radius: 5px;
+}
+
+.rz-navigation-item-text {
+  color: inherit;
+}
+
+.rz-navigation-item-icon {
+  color: var(--af-muted);
+}
+
+.rz-navigation-item:hover > .rz-navigation-item-wrapper > .rz-navigation-item-link,
+.rz-navigation-item-link:hover {
+  background: var(--af-hover) !important;
+  color: var(--af-text) !important;
+}
+
+/* Destructive item (Delete): the icon carries an inline colour via IconColor,
+   so tint the whole row — icon and text — the danger red, hover included. */
+.rz-navigation-item-link:has(.rz-navigation-item-icon[style*="color"]),
+.rz-navigation-item:hover > .rz-navigation-item-wrapper
+  > .rz-navigation-item-link:has(.rz-navigation-item-icon[style*="color"]) {
+  color: var(--af-danger) !important;
+}
+
 /* Alerts: soften Radzen's filled variant into the design's tinted banners —
    13px body text in --af-text2, and an icon tinted to the status colour. */
 .rz-alert {

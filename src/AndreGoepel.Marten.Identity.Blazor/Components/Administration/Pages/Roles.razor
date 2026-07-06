@@ -186,11 +186,11 @@
         var items = new List<ContextMenuItem>();
         if (role.Deleted)
         {
-            items.Add(new ContextMenuItem { Text = "Restore", Value = "restore" });
+            items.Add(new ContextMenuItem { Text = "Restore", Value = "restore", Icon = "restore" });
         }
         else if (role.Deletable)
         {
-            items.Add(new ContextMenuItem { Text = "Delete", Value = "delete" });
+            items.Add(new ContextMenuItem { Text = "Delete", Value = "delete", Icon = "delete", IconColor = "var(--af-danger)" });
         }
 
         ContextMenuService.Open(args, items, async e =>

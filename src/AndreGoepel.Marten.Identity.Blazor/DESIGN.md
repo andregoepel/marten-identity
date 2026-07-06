@@ -257,8 +257,12 @@ of the heading — not inside it.
 private void OpenRowMenu(MouseEventArgs args, Role role)
 {
     var items = new List<ContextMenuItem>();
-    if (role.Deleted)        items.Add(new() { Text = "Restore", Value = "restore" });
-    else if (role.Deletable) items.Add(new() { Text = "Delete",  Value = "delete"  });
+    if (role.Deleted)
+        items.Add(new() { Text = "Restore", Value = "restore", Icon = "restore" });
+    else if (role.Deletable)
+        // A destructive item: give it the trash icon and the danger colour. The
+        // inline IconColor also lets the stylesheet tint the whole row red.
+        items.Add(new() { Text = "Delete", Value = "delete", Icon = "delete", IconColor = "var(--af-danger)" });
 
     ContextMenuService.Open(args, items, async e =>
     {
