@@ -1,0 +1,42 @@
+@* Presentational login shell: a centred brand, the login card, and an optional
+   footer line. App-neutral — the host layout supplies the brand name and footer.
+   Styling comes from the ag-login-* / ag-brand-* rules in design.css. *@
+
+<div class="ag-login">
+    <div class="ag-login-inner">
+        <div class="ag-login-brand">
+            <div class="ag-brand-mark">@Initial</div>
+            <span class="ag-brand-name">@BrandName</span>
+        </div>
+        <div class="ag-login-card">
+            @ChildContent
+        </div>
+    </div>
+    @if (Footer is not null)
+    {
+        <span class="ag-login-footer">@Footer</span>
+    }
+</div>
+
+@code {
+    /// <summary>Brand name shown next to the mark.</summary>
+    [Parameter, EditorRequired]
+    public string BrandName { get; set; } = "";
+
+    /// <summary>Single-character brand mark. Defaults to the first letter of <see cref="BrandName"/>.</summary>
+    [Parameter]
+    public string? BrandInitial { get; set; }
+
+    /// <summary>The login card contents (heading, form, links).</summary>
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
+    /// <summary>Optional footer line rendered under the card.</summary>
+    [Parameter]
+    public RenderFragment? Footer { get; set; }
+
+    private string Initial =>
+        !string.IsNullOrEmpty(BrandInitial) ? BrandInitial!
+        : string.IsNullOrEmpty(BrandName) ? "?"
+        : BrandName[..1].ToUpperInvariant();
+}
