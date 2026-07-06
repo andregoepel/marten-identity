@@ -309,6 +309,8 @@ A page just provides the heading block + form + a centred footer link:
 | `af-actions-inline` | inline button group that doesn't stretch |
 | `af-form-grid` | two-column field grid (collapses ≤640px) |
 | `af-badge` + `af-badge-success` / `af-badge-danger` | status pills |
+| `af-grid-toolbar`, `af-search`, `af-search-icon`, `af-search-input`, `af-grid-count` | in-card grid toolbar: filter box + row count |
+| `af-info-box`, `af-info-box-label`, `af-info-box-value` | inline soft-tinted info pill (e.g. "Next scheduled run …") |
 | `af-empty`, `af-empty-icon`, `af-empty-title`, `af-empty-text` | dashed empty state |
 | `af-row-actions`, `af-icon-btn` | grid row actions + compact `⋯` button |
 | `af-cell-name`, `af-cell-id` | name/email + truncated mono id in a grid cell |

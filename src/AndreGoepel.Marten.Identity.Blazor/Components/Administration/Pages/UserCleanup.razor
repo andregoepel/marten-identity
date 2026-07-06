@@ -23,13 +23,14 @@
 
                 <RadzenStack Gap="0.4rem">
                     <RadzenLabel Text="Retention period (days)" Component="RetentionDays" />
-                    <RadzenNumeric @bind-Value="@_input.RetentionDays" Name="RetentionDays" Min="1" Max="3650" Style="width: 100%;" />
+                    <RadzenNumeric @bind-Value="@_input.RetentionDays" Name="RetentionDays" Min="1" Max="3650" Style="width: 140px;" />
                 </RadzenStack>
 
                 <RadzenStack Gap="0.4rem">
                     <RadzenLabel Text="Cron schedule" Component="CronSchedule" />
-                    <RadzenTextBox @bind-Value="@_input.CronSchedule" Name="CronSchedule" Style="width: 100%;" />
-                    <RadzenText TextStyle="TextStyle.Caption" Style="color: var(--rz-text-secondary-color);">
+                    <RadzenTextBox @bind-Value="@_input.CronSchedule" Name="CronSchedule"
+                                   Style="width: 240px; max-width: 100%; font-family: 'JetBrains Mono', ui-monospace, monospace;" />
+                    <RadzenText TextStyle="TextStyle.Caption" Style="color: var(--rz-text-secondary-color); line-height: 1.55;">
                         Quartz cron format: seconds minutes hours day-of-month month day-of-week.
                         Example: <code>0 0 3 * * ?</code> runs daily at 03:00 UTC.
                         Changes take effect immediately.
@@ -38,9 +39,10 @@
 
                 @if (_nextFireTime.HasValue)
                 {
-                    <RadzenText TextStyle="TextStyle.Body2">
-                        Next scheduled run: <strong>@_nextFireTime.Value.ToString("f") UTC</strong>
-                    </RadzenText>
+                    <div class="af-info-box">
+                        <span class="af-info-box-label">Next scheduled run</span>
+                        <span class="af-info-box-value">@_nextFireTime.Value.ToString("f") UTC</span>
+                    </div>
                 }
 
                 <div class="af-card-actions">

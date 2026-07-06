@@ -35,8 +35,15 @@
         </RadzenRow>
 
         <RadzenCard Style="padding: 0; overflow: hidden;">
+            <div class="af-grid-toolbar">
+                <div class="af-search">
+                    <span class="af-search-icon">⌕</span>
+                    <input class="af-search-input" placeholder="Filter roles…" value="@_filter" @oninput="OnFilterInput" />
+                </div>
+                <span class="af-grid-count">@FilteredRoles.Count of @(_roles?.Count ?? 0) roles</span>
+            </div>
             <RadzenDataGrid @ref="_rolesGrid"
-                            Data="@_roles"
+                            Data="@FilteredRoles"
                             AllowFiltering="false"
                             AllowColumnResize="false"
                             AllowAlternatingRows="false"
@@ -99,8 +106,25 @@
 @code {
     private IReadOnlyList<Role>? _roles;
     private RadzenDataGrid<Role>? _rolesGrid;
+    private string _filter = "";
 
     private bool ShowDeleted { get; set; }
+
+    private IReadOnlyList<Role> FilteredRoles =>
+        (_roles ?? Array.Empty<Role>())
+            .Where(r => string.IsNullOrWhiteSpace(_filter)
+                        || (r.Name?.Contains(_filter, StringComparison.OrdinalIgnoreCase) ?? false)
+                        || r.Id.ToString().Contains(_filter, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+    private async Task OnFilterInput(ChangeEventArgs e)
+    {
+        _filter = e.Value?.ToString() ?? "";
+        if (_rolesGrid is not null)
+        {
+            await _rolesGrid.Reload();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {

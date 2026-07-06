@@ -28,7 +28,15 @@
         </RadzenRow>
 
         <RadzenCard Style="padding: 0; overflow: hidden;">
-            <RadzenDataGrid Data="@_users"
+            <div class="af-grid-toolbar">
+                <div class="af-search">
+                    <span class="af-search-icon">⌕</span>
+                    <input class="af-search-input" placeholder="Filter users…" value="@_filter" @oninput="OnFilterInput" />
+                </div>
+                <span class="af-grid-count">@FilteredUsers.Count of @(_users?.Count ?? 0) users</span>
+            </div>
+            <RadzenDataGrid @ref="_usersGrid"
+                            Data="@FilteredUsers"
                             AllowFiltering="false"
                             AllowColumnResize="false"
                             AllowAlternatingRows="false"
@@ -105,7 +113,25 @@
 
 @code {
     private IReadOnlyList<User>? _users;
+    private RadzenDataGrid<User>? _usersGrid;
+    private string _filter = "";
     private bool ShowDeleted { get; set; }
+
+    private IReadOnlyList<User> FilteredUsers =>
+        (_users ?? Array.Empty<User>())
+            .Where(u => string.IsNullOrWhiteSpace(_filter)
+                        || (u.Email?.Contains(_filter, StringComparison.OrdinalIgnoreCase) ?? false)
+                        || u.Id.ToString().Contains(_filter, StringComparison.OrdinalIgnoreCase))
+            .ToList();
+
+    private async Task OnFilterInput(ChangeEventArgs e)
+    {
+        _filter = e.Value?.ToString() ?? "";
+        if (_usersGrid is not null)
+        {
+            await _usersGrid.Reload();
+        }
+    }
 
     protected override async Task OnInitializedAsync()
     {
