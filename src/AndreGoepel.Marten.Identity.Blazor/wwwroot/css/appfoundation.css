@@ -103,8 +103,13 @@
   --rz-border-color: var(--af-border);
   --rz-base-300: var(--af-border);
   --rz-input-border-color: var(--af-border2);
+  --rz-input-disabled-background: var(--af-hover);
   --rz-border-radius: 6px;
   --rz-card-border-radius: 10px;
+
+  /* data grid surfaces (Radzen defaults are white — break dark mode row hover) */
+  --rz-grid-background-color: var(--af-surface);
+  --rz-grid-hover-background-color: var(--af-hover);
 
   /* status colours */
   --rz-success: var(--af-accent);
@@ -163,6 +168,16 @@ h4:focus-visible, h5:focus-visible, h6:focus-visible {
   outline: none;
 }
 
+/* Read-only / disabled fields read as greyed out (design's muted look). */
+.rz-textbox[readonly],
+.rz-textbox:disabled,
+.rz-textbox.rz-state-disabled {
+  background: var(--af-hover);
+  color: var(--af-muted);
+  border-color: var(--af-border);
+  cursor: not-allowed;
+}
+
 /* Cards / panels */
 .rz-card,
 .rz-panel {
@@ -211,8 +226,8 @@ h4:focus-visible, h5:focus-visible, h6:focus-visible {
 }
 
 .rz-button.rz-danger {
-  background: var(--af-danger-soft);
-  color: var(--af-danger);
+  background: var(--af-danger-soft) !important;
+  color: var(--af-danger) !important;
   border: 1px solid transparent;
 }
 
@@ -253,6 +268,14 @@ h4:focus-visible, h5:focus-visible, h6:focus-visible {
 .rz-datatable tbody tr:hover,
 .rz-grid-table tbody tr:hover {
   background: var(--af-hover);
+}
+
+/* Let the grid fill the card and fit its columns instead of sizing to the sum
+   of the fixed column widths (which overflowed the card horizontally). */
+.rz-data-grid .rz-grid-table {
+  width: 100% !important;
+  min-width: 0 !important;
+  table-layout: auto !important;
 }
 
 /* Alerts: soften Radzen's filled variant into the design's tinted banners. */
@@ -306,6 +329,36 @@ h4:focus-visible, h5:focus-visible, h6:focus-visible {
 .af-badge-danger {
   background: var(--af-danger-soft);
   color: var(--af-danger);
+}
+
+/* Table row actions: a primary action plus a compact overflow (⋯) button. */
+.af-row-actions {
+  display: flex;
+  gap: 6px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.af-icon-btn.rz-button {
+  width: 30px;
+  min-width: 30px;
+  padding: 0;
+}
+
+/* Name + id stacked cell (id is monospace, muted, truncated). */
+.af-cell-name {
+  font-weight: 700;
+  color: var(--af-text);
+}
+
+.af-cell-id {
+  display: block;
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font: 400 10.5px "JetBrains Mono", monospace;
+  color: var(--af-faint);
 }
 
 /* Two-column field grid (collapses to one column when narrow). */

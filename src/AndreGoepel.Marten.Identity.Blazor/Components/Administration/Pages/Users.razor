@@ -5,6 +5,7 @@
 @inject UserManager<User> UserManager
 @inject UserStore<User> UserStore
 @inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
 
 @attribute [Authorize(Roles = "Administrator")]
 
@@ -36,17 +37,14 @@
                             AllowPaging="true"
                             PagerHorizontalAlign="HorizontalAlign.Left"
                             ShowPagingSummary="true"
-                            LogicalFilterOperator="LogicalFilterOperator.Or"
-                            SelectionMode="DataGridSelectionMode.Single"
-                            @bind-Value="@_selectedUsers"
                             Density="Density.Compact"
                             Style="width: 100%;">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(User.Email)" Title="Email" Width="240px">
                         <Template Context="user">
                             <div style="display:flex; flex-direction:column; gap:2px;">
-                                <span style="font-weight:700; color:var(--af-text);">@user.Email</span>
-                                <span style="font:400 10.5px 'JetBrains Mono', monospace; color:var(--af-faint);">@user.Id</span>
+                                <span class="af-cell-name">@user.Email</span>
+                                <span class="af-cell-id">@user.Id</span>
                             </div>
                         </Template>
                     </RadzenDataGridColumn>
@@ -79,22 +77,23 @@
                     <RadzenDataGridColumn Property="@nameof(User.Deletable)" Title="Deletable" Width="100px">
                         <Template Context="user">@(user.Deletable ? "Yes" : "No")</Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false" Width="200px">
+                    <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false" Width="150px" TextAlign="TextAlign.Right">
                         <Template Context="data">
-                            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
-                                @if (!data.Deleted)
+                            <div class="af-row-actions">
+                                <RadzenButton Text="Roles"
+                                              ButtonStyle="ButtonStyle.Light"
+                                              Size="ButtonSize.Small"
+                                              Disabled="@data.Deleted"
+                                              Click="@(() => SetRolesAsync(data))" />
+                                @if (RowHasMenu(data))
                                 {
-                                    <RadzenButton Text="Roles" ButtonStyle="ButtonStyle.Secondary" Size="ButtonSize.Small" Click="@(() => SetRolesAsync(data))" />
+                                    <RadzenButton Icon="more_horiz"
+                                                  ButtonStyle="ButtonStyle.Light"
+                                                  Size="ButtonSize.Small"
+                                                  class="af-icon-btn"
+                                                  Click="@(args => OpenRowMenu(args, data))" />
                                 }
-                                @if (data.Deletable && !data.Deleted)
-                                {
-                                    <RadzenButton Text="Delete" ButtonStyle="ButtonStyle.Danger" Size="ButtonSize.Small" Click="@(() => DeleteUserAsync(data))" />
-                                }
-                                @if (data.Deleted)
-                                {
-                                    <RadzenButton Text="Restore" ButtonStyle="ButtonStyle.Success" Size="ButtonSize.Small" Click="@(() => RestoreUserAsync(data))" />
-                                }
-                            </RadzenStack>
+                            </div>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -106,7 +105,6 @@
 
 @code {
     private IReadOnlyList<User>? _users;
-    private IList<User> _selectedUsers = new List<User>();
     private bool ShowDeleted { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -162,5 +160,34 @@
     {
         ShowDeleted = value;
         await LoadUsersAsync();
+    }
+
+    private static bool RowHasMenu(User user) => user.Deleted || user.Deletable;
+
+    private void OpenRowMenu(MouseEventArgs args, User user)
+    {
+        var items = new List<ContextMenuItem>();
+        if (user.Deleted)
+        {
+            items.Add(new ContextMenuItem { Text = "Restore", Value = "restore" });
+        }
+        else if (user.Deletable)
+        {
+            items.Add(new ContextMenuItem { Text = "Delete", Value = "delete" });
+        }
+
+        ContextMenuService.Open(args, items, async e =>
+        {
+            ContextMenuService.Close();
+            switch (e.Value as string)
+            {
+                case "restore":
+                    await RestoreUserAsync(user);
+                    break;
+                case "delete":
+                    await DeleteUserAsync(user);
+                    break;
+            }
+        });
     }
 }

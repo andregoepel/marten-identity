@@ -5,6 +5,7 @@
 @inject RoleManager<Role> RoleManager
 @inject RoleStore<Role> RoleStore
 @inject DialogService DialogService
+@inject ContextMenuService ContextMenuService
 
 @attribute [Authorize(Roles = "Administrator")]
 
@@ -44,17 +45,14 @@
                             AllowPaging="true"
                             PagerHorizontalAlign="HorizontalAlign.Left"
                             ShowPagingSummary="true"
-                            LogicalFilterOperator="LogicalFilterOperator.Or"
-                            SelectionMode="DataGridSelectionMode.Single"
-                            @bind-Value="@_selectedRoles"
                             Density="Density.Compact"
                             Style="width: 100%;">
                 <Columns>
                     <RadzenDataGridColumn Property="@nameof(Role.Name)" Title="Role name" Width="260px">
                         <Template Context="role">
                             <div style="display:flex; flex-direction:column; gap:2px;">
-                                <span style="font-weight:700; color:var(--af-text);">@role.Name</span>
-                                <span style="font:400 10.5px 'JetBrains Mono', monospace; color:var(--af-faint);">@role.Id</span>
+                                <span class="af-cell-name">@role.Name</span>
+                                <span class="af-cell-id">@role.Id</span>
                             </div>
                         </Template>
                     </RadzenDataGridColumn>
@@ -72,31 +70,23 @@
                             }
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false" Width="220px">
+                    <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false" Width="150px" TextAlign="TextAlign.Right">
                         <Template Context="data">
-                            <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
-                                @if (!data.Deleted)
+                            <div class="af-row-actions">
+                                <RadzenButton Text="Users"
+                                              ButtonStyle="ButtonStyle.Light"
+                                              Size="ButtonSize.Small"
+                                              Disabled="@data.Deleted"
+                                              Click="@(() => ShowUsersAsync(data))" />
+                                @if (RowHasMenu(data))
                                 {
-                                    <RadzenButton Text="Users"
-                                                  ButtonStyle="ButtonStyle.Secondary"
+                                    <RadzenButton Icon="more_horiz"
+                                                  ButtonStyle="ButtonStyle.Light"
                                                   Size="ButtonSize.Small"
-                                                  Click="@(() => ShowUsersAsync(data))" />
+                                                  class="af-icon-btn"
+                                                  Click="@(args => OpenRowMenu(args, data))" />
                                 }
-                                @if (data.Deletable && !data.Deleted)
-                                {
-                                    <RadzenButton Text="Delete"
-                                                  ButtonStyle="ButtonStyle.Danger"
-                                                  Size="ButtonSize.Small"
-                                                  Click="@(() => DeleteRoleAsync(data))" />
-                                }
-                                @if (data.Deleted)
-                                {
-                                    <RadzenButton Text="Restore"
-                                                  ButtonStyle="ButtonStyle.Success"
-                                                  Size="ButtonSize.Small"
-                                                  Click="@(() => RestoreRoleAsync(data))" />
-                                }
-                            </RadzenStack>
+                            </div>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
@@ -108,7 +98,6 @@
 
 @code {
     private IReadOnlyList<Role>? _roles;
-    private IList<Role> _selectedRoles = new List<Role>();
     private RadzenDataGrid<Role>? _rolesGrid;
 
     private bool ShowDeleted { get; set; }
@@ -188,5 +177,34 @@
     {
         ShowDeleted = value;
         await LoadRolesAsync();
+    }
+
+    private static bool RowHasMenu(Role role) => role.Deleted || role.Deletable;
+
+    private void OpenRowMenu(MouseEventArgs args, Role role)
+    {
+        var items = new List<ContextMenuItem>();
+        if (role.Deleted)
+        {
+            items.Add(new ContextMenuItem { Text = "Restore", Value = "restore" });
+        }
+        else if (role.Deletable)
+        {
+            items.Add(new ContextMenuItem { Text = "Delete", Value = "delete" });
+        }
+
+        ContextMenuService.Open(args, items, async e =>
+        {
+            ContextMenuService.Close();
+            switch (e.Value as string)
+            {
+                case "restore":
+                    await RestoreRoleAsync(role);
+                    break;
+                case "delete":
+                    await DeleteRoleAsync(role);
+                    break;
+            }
+        });
     }
 }
