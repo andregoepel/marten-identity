@@ -64,7 +64,12 @@ these — do not invent new hex values.
 
 ## 3. Typography
 
-Three families, loaded via `<link>` in the host `App.razor`:
+Three families, **self-hosted** by the RCL and loaded via a single
+`<link rel="stylesheet" href="_content/AndreGoepel.Marten.Identity.Blazor/css/fonts.css" />`
+in the host `App.razor`. The `.woff2` files live in `wwwroot/fonts` and are
+vendored from Google Fonts (latin + latin-ext subsets) — the app never calls
+`fonts.googleapis.com` at runtime (GDPR / offline / reliability). Regenerate with
+`scripts/fetch-fonts.py`.
 
 - **Space Grotesk** — headings and the topbar/page titles.
 - **Manrope** — body text, labels, buttons (the default `--rz-text-font-family`).
@@ -316,6 +321,23 @@ A page just provides the heading block + form + a centred footer link:
 | `af-cell-name`, `af-cell-id` | name/email + truncated mono id in a grid cell |
 | `af-login-*` | login-card building blocks (provided by `LoginLayout`) |
 | `af-shell`, `af-sidebar`, `af-topbar`, `af-topbar-left`, `af-nav-item`, `af-theme-toggle`, `af-hamburger`, `af-backdrop`, … | app shell (host layout) |
+
+### Topbar breadcrumb
+
+The topbar crumb is **defined per page, not by the layout**. Each shell page sets
+it through `IdentityPageTitle`'s optional `Breadcrumb` parameter, in sentence case
+with the section prefix:
+
+```razor
+<IdentityPageTitle Title="Profile" Breadcrumb="Account / Profile" />
+```
+
+`IdentityPageTitle` pushes the value into a cascading `BreadcrumbState` that the
+host shell layout owns and renders in `af-topbar-title`; the layout re-renders when
+it changes. Omit `Breadcrumb` and the document `Title` is used as a fallback. A host
+that renders the shell must cascade a `BreadcrumbState` instance over the layout (see
+the Aspire sample's `MainLayout`); pages outside the shell (the `LoginLayout` auth
+pages) simply have no `BreadcrumbState` and ignore the parameter.
 
 ### Responsive
 

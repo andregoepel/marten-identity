@@ -1,7 +1,7 @@
 @inherits LayoutComponentBase
+@implements IDisposable
 
 @inject IConfiguration Configuration
-@inject NavigationManager NavigationManager
 
 @* Radzen overlay hosts. They live in an interactive island so DialogService /
    NotificationService calls from the (also interactive) admin & manage pages work. *@
@@ -10,6 +10,9 @@
 <RadzenTooltip @rendermode="InteractiveServer" />
 <RadzenContextMenu @rendermode="InteractiveServer" />
 
+@* Cascade the breadcrumb state so each page can declare its own topbar crumb.
+   IsFixed: the instance never changes, only its Value (we re-render on Changed). *@
+<CascadingValue Value="_breadcrumb" IsFixed="true">
 <div class="af-shell" data-nav-open="false">
     <div class="af-backdrop" onclick="afNav.close()"></div>
     <nav class="af-sidebar">
@@ -52,7 +55,7 @@
         <div class="af-topbar">
             <div class="af-topbar-left">
                 <button class="af-hamburger" type="button" onclick="afNav.toggle()" aria-label="Toggle navigation">☰</button>
-                <span class="af-topbar-title">@Breadcrumb()</span>
+                <span class="af-topbar-title">@_breadcrumb.Value</span>
             </div>
             <div class="af-topbar-actions">
                 <ThemeToggle />
@@ -84,69 +87,25 @@
         </div>
     </div>
 </div>
+</CascadingValue>
 
 @code {
+    // The current page's topbar breadcrumb, set per-page via IdentityPageTitle's
+    // Breadcrumb parameter (or BreadcrumbState.Set). Re-render the shell on change.
+    private readonly BreadcrumbState _breadcrumb = new();
+
+    protected override void OnInitialized() =>
+        _breadcrumb.Changed += OnBreadcrumbChanged;
+
+    private void OnBreadcrumbChanged() => InvokeAsync(StateHasChanged);
+
+    public void Dispose() =>
+        _breadcrumb.Changed -= OnBreadcrumbChanged;
+
     // Configured application name (falls back to a sensible default).
     private string AppName => Configuration["AppName"] ?? "Marten Identity";
 
     private string AppInitial => string.IsNullOrEmpty(AppName) ? "?" : AppName[..1].ToUpperInvariant();
-
-    // Section / page breadcrumb shown in the topbar, derived from the route.
-    private static readonly Dictionary<string, string> Breadcrumbs = new(StringComparer.OrdinalIgnoreCase)
-    {
-        [""] = "Home",
-        ["account/manage/profile"] = "Account / Profile",
-        ["account/manage/email"] = "Account / Email",
-        ["account/manage/changepassword"] = "Account / Password",
-        ["account/manage/setpassword"] = "Account / Password",
-        ["account/manage/twofactorauthentication"] = "Account / Two-factor authentication",
-        ["account/manage/enableauthenticator"] = "Account / Two-factor authentication",
-        ["account/manage/generaterecoverycodes"] = "Account / Two-factor authentication",
-        ["account/manage/disable2fa"] = "Account / Two-factor authentication",
-        ["account/manage/passkeys"] = "Account / Passkeys",
-        ["account/manage/personaldata"] = "Account / Personal data",
-        ["account/manage/deletepersonaldata"] = "Account / Personal data",
-        ["administration/users"] = "Administration / Users",
-        ["administration/roles"] = "Administration / Roles",
-        ["administration/usercleanup"] = "Administration / User cleanup",
-    };
-
-    private string Breadcrumb()
-    {
-        var path = NavigationManager.ToBaseRelativePath(NavigationManager.Uri);
-        var query = path.IndexOf('?');
-        if (query >= 0)
-        {
-            path = path[..query];
-        }
-        path = path.TrimEnd('/');
-
-        if (Breadcrumbs.TryGetValue(path, out var crumb))
-        {
-            return crumb;
-        }
-
-        var segments = path.Split('/', StringSplitOptions.RemoveEmptyEntries);
-        if (segments.Length == 0)
-        {
-            return "Home";
-        }
-
-        var page = Humanize(segments[^1]);
-        return segments[0].ToLowerInvariant() switch
-        {
-            "account" => $"Account / {page}",
-            "administration" => $"Administration / {page}",
-            _ => page,
-        };
-    }
-
-    // "PersonalData" -> "Personal data" for routes not in the lookup.
-    private static string Humanize(string segment)
-    {
-        var spaced = System.Text.RegularExpressions.Regex.Replace(segment, "(?<=[a-z0-9])(?=[A-Z])", " ");
-        return spaced.Length == 0 ? spaced : char.ToUpperInvariant(spaced[0]) + spaced[1..].ToLowerInvariant();
-    }
 
     // Two-letter avatar initials derived from the account name / email local part.
     private static string Initials(string? name)

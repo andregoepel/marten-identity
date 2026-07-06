@@ -37,3 +37,11 @@
         </NotAuthorized>
     </AuthorizeView>
 </RadzenStack>
+
+@code {
+    // Set the topbar breadcrumb for the landing page (see MainLayout's BreadcrumbState).
+    [CascadingParameter]
+    private BreadcrumbState? Breadcrumb { get; set; }
+
+    protected override void OnParametersSet() => Breadcrumb?.Set("Home");
+}

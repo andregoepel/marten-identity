@@ -56,6 +56,12 @@
     private readonly List<string> errors = new();
     private bool busy;
 
+    // Set the topbar breadcrumb for the first-run setup page.
+    [CascadingParameter]
+    private BreadcrumbState? Breadcrumb { get; set; }
+
+    protected override void OnParametersSet() => Breadcrumb?.Set("Setup");
+
     protected override async Task OnInitializedAsync()
     {
         // Defence in depth: the redirect middleware already blocks /Setup once an

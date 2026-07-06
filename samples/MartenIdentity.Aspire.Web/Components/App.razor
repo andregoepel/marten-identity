@@ -6,11 +6,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <link rel="icon" type="image/png" href="favicon.png" />
-    <!-- AppFoundation fonts (Manrope / Space Grotesk / JetBrains Mono). -->
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" />
+    <!-- AppFoundation fonts (Manrope / Space Grotesk / JetBrains Mono), self-hosted
+         by the RCL so nothing is fetched from Google at runtime (GDPR / offline). -->
+    <link rel="stylesheet" href="_content/AndreGoepel.Marten.Identity.Blazor/css/fonts.css" />
     <!-- Radzen Material theme (base variant works with the components used by the RCL). -->
     <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css" />
     <!-- AppFoundation token layer: remaps Radzen --rz-* variables onto the emerald palette. Must load after material-base. -->
