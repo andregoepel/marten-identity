@@ -123,7 +123,10 @@ public class RoleStore<TRole>(
 
             session.Events.Append(
                 role.StreamId,
-                new RoleDeleted(role.RoleId, await currentUserService.GetCurrentUserIdAsync(cancellationToken))
+                new RoleDeleted(
+                    role.RoleId,
+                    await currentUserService.GetCurrentUserIdAsync(cancellationToken)
+                )
             );
             await session.SaveChangesAsync(cancellationToken);
 
@@ -150,7 +153,10 @@ public class RoleStore<TRole>(
 
             session.Events.Append(
                 role.StreamId,
-                new RoleRestored(role.RoleId, await currentUserService.GetCurrentUserIdAsync(cancellationToken))
+                new RoleRestored(
+                    role.RoleId,
+                    await currentUserService.GetCurrentUserIdAsync(cancellationToken)
+                )
             );
             await session.SaveChangesAsync(cancellationToken);
 
