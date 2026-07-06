@@ -18,11 +18,16 @@
     <link rel="stylesheet" href="app.css" />
     <!-- Resolve + apply the persisted theme before first paint to avoid a flash. -->
     <script src="_content/AndreGoepel.Marten.Identity.Blazor/js/appfoundation-theme.js"></script>
-    <HeadOutlet />
+    <HeadOutlet @rendermode="InteractiveServer" />
 </head>
 
 <body>
-    <Routes />
+    @* Global interactive server render mode. The RCL's Login/LoginForm pages don't
+       self-declare a render mode but require interactivity (the SignInHandoff cookie
+       handoff runs in OnAfterRenderAsync, and Radzen inputs like "Remember me" only
+       bind interactively). Pages in the RCL that redeclare @rendermode InteractiveServer
+       coexist fine with this global mode. *@
+    <Routes @rendermode="InteractiveServer" />
 
     <div id="blazor-error-ui">
         An unhandled error has occurred.
