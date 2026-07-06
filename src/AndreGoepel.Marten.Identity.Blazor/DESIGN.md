@@ -85,6 +85,12 @@ Sizes that matter:
 Labels and headings are styled globally (`.rz-label`, heading rules) — use
 `RadzenLabel` / `RadzenText` and they inherit the right size automatically.
 
+**Body vs. secondary text.** The default body colour is `--af-text2` (bright).
+Descriptive/secondary paragraphs — a subtitle, or the blurb under a card
+sub-heading — should be **muted**: add `Style="color: var(--rz-text-secondary-color);"`
+(which resolves to `--af-muted`). Don't leave a description at the default body
+colour or it reads too bright.
+
 ---
 
 ## 4. Page structure
@@ -195,9 +201,10 @@ stretching.
 ### Alerts / status banners
 
 Use `RadzenAlert`; the stylesheet softens Radzen's filled variants into tinted
-banners (`Info`, `Warning`, `Danger`, `Success`). A page-level status banner
-(e.g. "2FA is disabled") belongs **outside/above** the card, as a sibling of the
-heading — not inside it.
+banners (`Info`, `Warning`, `Danger`, `Success`) — 13px `--af-text2` body text,
+with the icon automatically tinted to the status colour. A page-level status
+banner (e.g. "2FA is disabled") belongs **outside/above** the card, as a sibling
+of the heading — not inside it.
 
 ### Empty state
 

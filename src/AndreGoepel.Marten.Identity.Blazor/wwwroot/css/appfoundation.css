@@ -278,7 +278,17 @@ h4:focus-visible, h5:focus-visible, h6:focus-visible {
   table-layout: auto !important;
 }
 
-/* Alerts: soften Radzen's filled variant into the design's tinted banners. */
+/* Alerts: soften Radzen's filled variant into the design's tinted banners —
+   13px body text in --af-text2, and an icon tinted to the status colour. */
+.rz-alert {
+  font-size: 13px;
+  line-height: 1.55;
+}
+
+.rz-alert .rz-alert-icon {
+  font-size: 18px;
+}
+
 .rz-alert.rz-info {
   background: var(--af-info-soft);
   border: 1px solid var(--af-info);
@@ -301,6 +311,22 @@ h4:focus-visible, h5:focus-visible, h6:focus-visible {
   background: var(--af-accent-soft);
   border: 1px solid var(--af-accent);
   color: var(--af-text2);
+}
+
+.rz-alert.rz-info .rz-alert-icon {
+  color: var(--af-info);
+}
+
+.rz-alert.rz-warning .rz-alert-icon {
+  color: var(--af-warn);
+}
+
+.rz-alert.rz-danger .rz-alert-icon {
+  color: var(--af-danger);
+}
+
+.rz-alert.rz-success .rz-alert-icon {
+  color: var(--af-accent);
 }
 
 /* Inline (non-footer) button group; align-self stops the parent column stack
