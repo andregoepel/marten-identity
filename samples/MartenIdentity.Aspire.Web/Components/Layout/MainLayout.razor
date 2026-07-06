@@ -1,7 +1,5 @@
 @inherits LayoutComponentBase
-@implements IDisposable
-
-@inject IConfiguration Configuration
+@inject IOptions<MartenIdentityBlazorOptions> IdentityOptions
 
 @* Radzen overlay hosts. They live in an interactive island so DialogService /
    NotificationService calls from the (also interactive) admin & manage pages work. *@
@@ -10,17 +8,8 @@
 <RadzenTooltip @rendermode="InteractiveServer" />
 <RadzenContextMenu @rendermode="InteractiveServer" />
 
-@* Cascade the breadcrumb state so each page can declare its own topbar crumb.
-   IsFixed: the instance never changes, only its Value (we re-render on Changed). *@
-<CascadingValue Value="_breadcrumb" IsFixed="true">
-<div class="ag-shell" data-nav-open="false">
-    <div class="ag-backdrop" onclick="agNav.close()"></div>
-    <nav class="ag-sidebar">
-        <div class="ag-brand">
-            <div class="ag-brand-mark">@AppInitial</div>
-            <span class="ag-brand-name">@AppName</span>
-        </div>
-
+<AppShell BrandName="@AppName">
+    <Sidebar>
         <NavLink class="ag-nav-item ag-home" href="" Match="NavLinkMatch.All">⌂&nbsp;&nbsp;Home</NavLink>
 
         <AuthorizeView>
@@ -45,67 +34,49 @@
                 </AuthorizeView>
             </Authorized>
         </AuthorizeView>
+    </Sidebar>
 
-        <div class="ag-sidebar-footer">
-            <span class="ag-sidebar-note">© 2026 @AppName</span>
-        </div>
-    </nav>
+    <SidebarFooter>
+        <span class="ag-sidebar-note">© @DateTime.UtcNow.Year @AppName</span>
+    </SidebarFooter>
 
-    <div class="ag-main">
-        <div class="ag-topbar">
-            <div class="ag-topbar-left">
-                <button class="ag-hamburger" type="button" onclick="agNav.toggle()" aria-label="Toggle navigation">☰</button>
-                <span class="ag-topbar-title">@_breadcrumb.Value</span>
-            </div>
-            <div class="ag-topbar-actions">
-                <ThemeToggle />
-                <AuthorizeView>
-                    <Authorized>
-                        <div class="ag-user-chip">
-                            <span class="ag-avatar">@Initials(context.User.Identity?.Name)</span>
-                            <span class="ag-user-email">@context.User.Identity?.Name</span>
-                        </div>
-                        <form action="Account/Logout" method="post">
-                            <AntiforgeryToken />
-                            <input type="hidden" name="returnUrl" value="/" />
-                            <RadzenButton ButtonType="ButtonType.Submit"
-                                          Text="Log out"
-                                          Size="ButtonSize.Small"
-                                          ButtonStyle="ButtonStyle.Light" />
-                        </form>
-                    </Authorized>
-                    <NotAuthorized>
-                        <RadzenLink Path="Account/Login" Text="Log in" />
-                        <RadzenLink Path="Account/Register" Text="Register" />
-                    </NotAuthorized>
-                </AuthorizeView>
-            </div>
-        </div>
+    <TopbarActions>
+        <ThemeToggle />
+        <AuthorizeView>
+            <Authorized>
+                <div class="ag-user-chip">
+                    <span class="ag-avatar">@Initials(context.User.Identity?.Name)</span>
+                    <span class="ag-user-email">@context.User.Identity?.Name</span>
+                </div>
+                <form action="Account/Logout" method="post">
+                    <AntiforgeryToken />
+                    <input type="hidden" name="returnUrl" value="/" />
+                    <RadzenButton ButtonType="ButtonType.Submit"
+                                  Text="Log out"
+                                  Size="ButtonSize.Small"
+                                  ButtonStyle="ButtonStyle.Light" />
+                </form>
+            </Authorized>
+            <NotAuthorized>
+                <RadzenLink Path="Account/Login" Text="Log in" />
+                <RadzenLink Path="Account/Register" Text="Register" />
+            </NotAuthorized>
+        </AuthorizeView>
+    </TopbarActions>
 
-        <div class="ag-content">
-            @Body
-        </div>
-    </div>
-</div>
-</CascadingValue>
+    <ChildContent>
+        @Body
+    </ChildContent>
+</AppShell>
 
 @code {
-    // The current page's topbar breadcrumb, set per-page via IdentityPageTitle's
-    // Breadcrumb parameter (or BreadcrumbState.Set). Re-render the shell on change.
-    private readonly BreadcrumbState _breadcrumb = new();
-
-    protected override void OnInitialized() =>
-        _breadcrumb.Changed += OnBreadcrumbChanged;
-
-    private void OnBreadcrumbChanged() => InvokeAsync(StateHasChanged);
-
-    public void Dispose() =>
-        _breadcrumb.Changed -= OnBreadcrumbChanged;
-
-    // Configured application name (falls back to a sensible default).
-    private string AppName => Configuration["AppName"] ?? "Marten Identity";
-
-    private string AppInitial => string.IsNullOrEmpty(AppName) ? "?" : AppName[..1].ToUpperInvariant();
+    // Single source of truth for the app/brand name: the same configured value
+    // (MartenIdentityBlazorOptions.ApplicationName) used by page titles and the
+    // login screen, so the shell brand can't drift from them.
+    private string AppName =>
+        string.IsNullOrWhiteSpace(IdentityOptions.Value.ApplicationName)
+            ? "Marten Identity"
+            : IdentityOptions.Value.ApplicationName;
 
     // Two-letter avatar initials derived from the account name / email local part.
     private static string Initials(string? name)

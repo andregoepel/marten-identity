@@ -320,7 +320,26 @@ A page just provides the heading block + form + a centred footer link:
 | `ag-row-actions`, `ag-icon-btn` | grid row actions + compact `⋯` button |
 | `ag-cell-name`, `ag-cell-id` | name/email + truncated mono id in a grid cell |
 | `ag-login-*` | login-card building blocks (provided by `LoginLayout`) |
-| `ag-shell`, `ag-sidebar`, `ag-topbar`, `ag-topbar-left`, `ag-nav-item`, `ag-theme-toggle`, `ag-hamburger`, `ag-backdrop`, … | app shell (host layout) |
+| `ag-shell`, `ag-sidebar`, `ag-topbar`, `ag-topbar-left`, `ag-nav-item`, `ag-theme-toggle`, `ag-hamburger`, `ag-backdrop`, … | app shell (rendered by `AppShell`) |
+
+### App shell
+
+The host layout renders an **`AppShell`** rather than hand-writing the shell markup.
+`AppShell` provides the sidebar / topbar / content structure and the responsive
+off-canvas drawer, and owns the breadcrumb state; the host supplies branding and
+fills the slots:
+
+```razor
+<AppShell BrandName="@AppName">
+    <Sidebar>@* NavLinks + ag-nav-section groups *@</Sidebar>
+    <TopbarActions>@* theme toggle, user chip, sign-in/out *@</TopbarActions>
+    <SidebarFooter>@* optional *@</SidebarFooter>
+    <ChildContent>@Body</ChildContent>
+</AppShell>
+```
+
+The host only needs to load `nav.js` (see the Aspire sample's `App.razor`);
+`AppShell` emits the hamburger, backdrop and `data-nav-open` itself.
 
 ### Topbar breadcrumb
 
@@ -332,12 +351,11 @@ with the section prefix:
 <IdentityPageTitle Title="Profile" Breadcrumb="Account / Profile" />
 ```
 
-`IdentityPageTitle` pushes the value into a cascading `BreadcrumbState` that the
-host shell layout owns and renders in `ag-topbar-title`; the layout re-renders when
-it changes. Omit `Breadcrumb` and the document `Title` is used as a fallback. A host
-that renders the shell must cascade a `BreadcrumbState` instance over the layout (see
-the Aspire sample's `MainLayout`); pages outside the shell (the `LoginLayout` auth
-pages) simply have no `BreadcrumbState` and ignore the parameter.
+`IdentityPageTitle` pushes the value into a cascading `BreadcrumbState` that
+`AppShell` owns and renders in `ag-topbar-title`; the shell re-renders when it
+changes. Omit `Breadcrumb` and the document `Title` is used as a fallback. Pages
+outside the shell (the `LoginLayout` auth pages) have no `BreadcrumbState` cascaded,
+so they simply ignore the parameter.
 
 ### Responsive
 
