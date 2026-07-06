@@ -1,19 +1,30 @@
 @inherits LayoutComponentBase
+@inject IServiceProvider Services
 
 <RadzenDialog />
 <RadzenNotification />
 <RadzenTooltip />
 <RadzenContextMenu />
 
-<div class="ag-login">
-    <div class="ag-login-inner">
-        <div class="ag-login-brand">
-            <div class="ag-brand-mark">A</div>
-            <span class="ag-brand-name">AppFoundation</span>
-        </div>
-        <div class="ag-login-card">
-            @Body
-        </div>
-    </div>
-    <span class="ag-login-footer">andregoepel.dev Members Portal &middot; &copy; 2026</span>
-</div>
+<LoginShell BrandName="@BrandName">
+    <ChildContent>@Body</ChildContent>
+    <Footer>@BrandName &middot; &copy; @DateTime.UtcNow.Year</Footer>
+</LoginShell>
+
+@code {
+    // Brand + footer use the host-configured application name
+    // (MartenIdentityBlazorOptions.ApplicationName) — the same source as page
+    // titles. Resolved optionally so the layout still renders when a host (or a
+    // test) hasn't registered the options; falls back to a neutral default.
+    private string BrandName
+    {
+        get
+        {
+            var name = Services
+                .GetService<IOptions<MartenIdentityBlazorOptions>>()
+                ?.Value.ApplicationName;
+
+            return string.IsNullOrWhiteSpace(name) ? "Identity" : name;
+        }
+    }
+}
