@@ -1,0 +1,52 @@
+@* Light / dark / auto theme switch. Interactive so button clicks reach the
+   browser-side appFoundationTheme helper that owns data-theme + localStorage. *@
+@rendermode InteractiveServer
+@using Microsoft.JSInterop
+@inject IJSRuntime JS
+
+<div class="af-theme-toggle" role="group" aria-label="Theme">
+    @foreach (var mode in Modes)
+    {
+        <button type="button"
+                class="af-theme-btn @(mode.Key == _current ? "af-active" : string.Empty)"
+                title="@mode.Title"
+                aria-pressed="@(mode.Key == _current)"
+                @onclick="() => SetAsync(mode.Key)">
+            @mode.Icon
+        </button>
+    }
+</div>
+
+@code {
+    private string _current = "auto";
+
+    private sealed record Mode(string Key, string Icon, string Title);
+
+    private static readonly Mode[] Modes =
+    [
+        new("auto", "◐", "Match system"),
+        new("light", "☀", "Light"),
+        new("dark", "☾", "Dark"),
+    ];
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (!firstRender)
+        {
+            return;
+        }
+
+        try
+        {
+            _current = await JS.InvokeAsync<string>("appFoundationTheme.get");
+            StateHasChanged();
+        }
+        catch (JSException)
+        {
+            // Script not ready yet (e.g. during prerender) — keep the default.
+        }
+    }
+
+    private async Task SetAsync(string mode) =>
+        _current = await JS.InvokeAsync<string>("appFoundationTheme.set", mode);
+}

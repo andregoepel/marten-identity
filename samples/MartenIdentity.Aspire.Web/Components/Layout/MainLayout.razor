@@ -7,43 +7,95 @@
 <RadzenTooltip @rendermode="InteractiveServer" />
 <RadzenContextMenu @rendermode="InteractiveServer" />
 
-<RadzenLayout>
-    <RadzenHeader>
-        <RadzenStack Orientation="Orientation.Horizontal"
-                     AlignItems="AlignItems.Center"
-                     Gap="1rem"
-                     Class="rz-px-4 rz-py-2">
-            <RadzenLink Path="/" Text="Marten Identity Sample" Class="rz-color-white" />
-            <div style="flex: 1"></div>
-            <AuthorizeView>
-                <Authorized>
-                    <RadzenLink Path="Account/Manage/Profile" Text="My account" Class="rz-color-white" />
-                    <AuthorizeView Roles="@Roles.Administrator" Context="admin">
-                        <RadzenLink Path="Administration/Users" Text="Users" Class="rz-color-white" />
-                        <RadzenLink Path="Administration/Roles" Text="Roles" Class="rz-color-white" />
-                    </AuthorizeView>
-                    <RadzenText TextStyle="TextStyle.Body2" Class="rz-color-white rz-m-0">
-                        @context.User.Identity?.Name
-                    </RadzenText>
-                    <form action="Account/Logout" method="post">
-                        <AntiforgeryToken />
-                        <input type="hidden" name="returnUrl" value="/" />
-                        <RadzenButton ButtonType="ButtonType.Submit"
-                                      Text="Log out"
-                                      Size="ButtonSize.Small"
-                                      ButtonStyle="ButtonStyle.Light" />
-                    </form>
-                </Authorized>
-                <NotAuthorized>
-                    <RadzenLink Path="Account/Login" Text="Log in" Class="rz-color-white" />
-                    <RadzenLink Path="Account/Register" Text="Register" Class="rz-color-white" />
-                </NotAuthorized>
-            </AuthorizeView>
-        </RadzenStack>
-    </RadzenHeader>
-    <RadzenBody>
-        <div class="rz-p-4">
+<div class="af-shell">
+    <nav class="af-sidebar">
+        <div class="af-brand">
+            <div class="af-brand-mark">A</div>
+            <span class="af-brand-name">AppFoundation</span>
+        </div>
+
+        <NavLink class="af-nav-item af-home" href="" Match="NavLinkMatch.All">⌂&nbsp;&nbsp;Home</NavLink>
+
+        <AuthorizeView>
+            <Authorized>
+                <div class="af-nav-section">ACCOUNT</div>
+                <div class="af-nav-group">
+                    <NavLink class="af-nav-item" href="Account/Manage/Profile">Profile</NavLink>
+                    <NavLink class="af-nav-item" href="Account/Manage/Email">Manage Email</NavLink>
+                    <NavLink class="af-nav-item" href="Account/Manage/ChangePassword">Change Password</NavLink>
+                    <NavLink class="af-nav-item" href="Account/Manage/TwoFactorAuthentication">Two-Factor</NavLink>
+                    <NavLink class="af-nav-item" href="Account/Manage/Passkeys">Passkeys</NavLink>
+                    <NavLink class="af-nav-item" href="Account/Manage/PersonalData">Personal Data</NavLink>
+                </div>
+
+                <AuthorizeView Roles="@Roles.Administrator" Context="admin">
+                    <div class="af-nav-section">ADMINISTRATION</div>
+                    <div class="af-nav-group">
+                        <NavLink class="af-nav-item" href="Administration/Users">Users</NavLink>
+                        <NavLink class="af-nav-item" href="Administration/Roles">Roles</NavLink>
+                        <NavLink class="af-nav-item" href="Administration/UserCleanup">User Cleanup</NavLink>
+                    </div>
+                </AuthorizeView>
+            </Authorized>
+        </AuthorizeView>
+
+        <div class="af-sidebar-footer">
+            <span class="af-sidebar-note">© 2026 AppFoundation</span>
+        </div>
+    </nav>
+
+    <div class="af-main">
+        <div class="af-topbar">
+            <span class="af-topbar-title">Marten Identity</span>
+            <div class="af-topbar-actions">
+                <ThemeToggle />
+                <AuthorizeView>
+                    <Authorized>
+                        <div class="af-user-chip">
+                            <span class="af-avatar">@Initials(context.User.Identity?.Name)</span>
+                            <span class="af-user-email">@context.User.Identity?.Name</span>
+                        </div>
+                        <form action="Account/Logout" method="post">
+                            <AntiforgeryToken />
+                            <input type="hidden" name="returnUrl" value="/" />
+                            <RadzenButton ButtonType="ButtonType.Submit"
+                                          Text="Log out"
+                                          Size="ButtonSize.Small"
+                                          ButtonStyle="ButtonStyle.Light" />
+                        </form>
+                    </Authorized>
+                    <NotAuthorized>
+                        <RadzenLink Path="Account/Login" Text="Log in" />
+                        <RadzenLink Path="Account/Register" Text="Register" />
+                    </NotAuthorized>
+                </AuthorizeView>
+            </div>
+        </div>
+
+        <div class="af-content">
             @Body
         </div>
-    </RadzenBody>
-</RadzenLayout>
+    </div>
+</div>
+
+@code {
+    // Two-letter avatar initials derived from the account name / email local part.
+    private static string Initials(string? name)
+    {
+        if (string.IsNullOrWhiteSpace(name))
+        {
+            return "?";
+        }
+
+        var at = name.IndexOf('@');
+        var local = at > 0 ? name[..at] : name;
+        var parts = local.Split(['.', '-', '_', ' '], StringSplitOptions.RemoveEmptyEntries);
+
+        return parts.Length switch
+        {
+            0 => "?",
+            1 => parts[0][..Math.Min(2, parts[0].Length)].ToUpperInvariant(),
+            _ => $"{parts[0][0]}{parts[1][0]}".ToUpperInvariant(),
+        };
+    }
+}
