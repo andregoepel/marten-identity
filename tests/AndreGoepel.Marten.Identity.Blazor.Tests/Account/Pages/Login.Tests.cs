@@ -1,5 +1,5 @@
-using AndreGoepel.Marten.Identity.Blazor;
 using AndreGoepel.Marten.Identity.Blazor.Components.Account.Pages;
+using AndreGoepel.Marten.Identity.Blazor.Features;
 using AndreGoepel.Marten.Identity.Http;
 using AndreGoepel.Marten.Identity.Users;
 using Bunit;

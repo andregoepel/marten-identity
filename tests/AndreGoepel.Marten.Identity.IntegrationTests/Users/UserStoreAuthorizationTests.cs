@@ -3,7 +3,6 @@ using AndreGoepel.Marten.Identity.Roles;
 using AndreGoepel.Marten.Identity.Roles.Events;
 using AndreGoepel.Marten.Identity.Services;
 using AndreGoepel.Marten.Identity.Users;
-using Marten;
 
 namespace AndreGoepel.Marten.Identity.IntegrationTests.Users;
 

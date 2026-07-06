@@ -1,4 +1,4 @@
-namespace AndreGoepel.Marten.Identity.Blazor;
+namespace AndreGoepel.Marten.Identity.Blazor.Features;
 
 /// <summary>
 /// Source of truth for identity feature availability (#66). The library ships an

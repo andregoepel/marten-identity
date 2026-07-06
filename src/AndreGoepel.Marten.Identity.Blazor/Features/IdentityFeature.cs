@@ -1,4 +1,4 @@
-namespace AndreGoepel.Marten.Identity.Blazor;
+namespace AndreGoepel.Marten.Identity.Blazor.Features;
 
 /// <summary>
 /// Identity UI features whose availability a host can toggle at configuration or runtime

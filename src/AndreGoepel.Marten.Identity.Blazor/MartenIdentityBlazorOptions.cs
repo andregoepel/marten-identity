@@ -1,3 +1,5 @@
+using AndreGoepel.Marten.Identity.Blazor.Features;
+
 namespace AndreGoepel.Marten.Identity.Blazor;
 
 public sealed class MartenIdentityBlazorOptions
