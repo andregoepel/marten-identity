@@ -11,9 +11,9 @@
 
 <IdentityPageTitle Title="Log in" />
 
-<div class="af-login-head">
+<div class="ag-login-head">
     <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Welcome back" />
-    <RadzenText TextStyle="TextStyle.Body2" class="af-login-sub" Text="Fill in your login credentials to proceed." />
+    <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub" Text="Fill in your login credentials to proceed." />
 </div>
 
 <LoginForm />
@@ -25,7 +25,7 @@
     </RadzenAlert>
 }
 
-<div class="af-login-actions">
+<div class="ag-login-actions">
     <RadzenButton ButtonType="ButtonType.Submit"
                   Text="Log in"
                   ButtonStyle="ButtonStyle.Primary"
@@ -44,14 +44,14 @@
     }
 </div>
 
-<div class="af-login-footer-links">
+<div class="ag-login-footer-links">
     @if (_flags.UserRegistration)
     {
-        <span class="af-login-resend">
+        <span class="ag-login-resend">
             Don't have an account? <RadzenLink Path="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" Text="Create account" />
         </span>
     }
-    <span class="af-login-resend">
+    <span class="ag-login-resend">
         Didn't get the email? <RadzenLink Path="Account/ResendEmailConfirmation" Text="Resend confirmation" />
     </span>
 </div>
@@ -78,7 +78,7 @@
         if (!firstRender || !_flags.Passkey) return;
 
         _jsModule = await JsRuntime.InvokeAsync<IJSObjectReference>(
-            "import", "./_content/AndreGoepel.Marten.Identity.Blazor/Components/Account/Shared/PasskeySubmit.razor.js");
+            "import", "./_content/AndreGoepel.Design.Blazor/Components/Account/Shared/PasskeySubmit.razor.js");
         _dotNetRef = DotNetObjectReference.Create(this);
 
         await _jsModule.InvokeVoidAsync(

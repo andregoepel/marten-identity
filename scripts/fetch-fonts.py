@@ -34,7 +34,7 @@ SLUG = {"Manrope": "manrope", "Space Grotesk": "space-grotesk", "JetBrains Mono"
 ORDER = ["Manrope", "Space Grotesk", "JetBrains Mono"]
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-WWWROOT = os.path.join(HERE, "..", "src", "AndreGoepel.Marten.Identity.Blazor", "wwwroot")
+WWWROOT = os.path.join(HERE, "..", "src", "AndreGoepel.Design.Blazor", "wwwroot")
 FONTS_DIR = os.path.normpath(os.path.join(WWWROOT, "fonts"))
 CSS_OUT = os.path.normpath(os.path.join(WWWROOT, "css", "fonts.css"))
 

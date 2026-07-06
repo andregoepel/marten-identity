@@ -6,18 +6,18 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <base href="/" />
     <link rel="icon" type="image/png" href="favicon.png" />
-    <!-- AppFoundation fonts (Manrope / Space Grotesk / JetBrains Mono), self-hosted
+    <!-- Design-system fonts (Manrope / Space Grotesk / JetBrains Mono), self-hosted
          by the RCL so nothing is fetched from Google at runtime (GDPR / offline). -->
-    <link rel="stylesheet" href="_content/AndreGoepel.Marten.Identity.Blazor/css/fonts.css" />
+    <link rel="stylesheet" href="_content/AndreGoepel.Design.Blazor/css/fonts.css" />
     <!-- Radzen Material theme (base variant works with the components used by the RCL). -->
     <link rel="stylesheet" href="_content/Radzen.Blazor/css/material-base.css" />
-    <!-- AppFoundation token layer: remaps Radzen --rz-* variables onto the emerald palette. Must load after material-base. -->
-    <link rel="stylesheet" href="_content/AndreGoepel.Marten.Identity.Blazor/css/appfoundation.css" />
+    <!-- Design-system token layer: remaps Radzen --rz-* variables onto the emerald palette. Must load after material-base. -->
+    <link rel="stylesheet" href="_content/AndreGoepel.Design.Blazor/css/design.css" />
     <link rel="stylesheet" href="app.css" />
     <!-- Resolve + apply the persisted theme before first paint to avoid a flash. -->
-    <script src="_content/AndreGoepel.Marten.Identity.Blazor/js/appfoundation-theme.js"></script>
+    <script src="_content/AndreGoepel.Design.Blazor/js/theme.js"></script>
     <!-- Off-canvas sidebar toggle for compact/mobile widths. -->
-    <script src="_content/AndreGoepel.Marten.Identity.Blazor/js/appfoundation-nav.js"></script>
+    <script src="_content/AndreGoepel.Design.Blazor/js/nav.js"></script>
     <HeadOutlet @rendermode="InteractiveServer" />
 </head>
 

@@ -1,13 +1,13 @@
 /*
- * AppFoundation off-canvas sidebar toggle (mobile / compact widths).
+ * Design-system off-canvas sidebar toggle (mobile / compact widths).
  *
  * Pure DOM + CSS: the hamburger and backdrop call these functions, which flip
- * data-nav-open on the .af-shell; the stylesheet's media queries do the rest.
+ * data-nav-open on the .ag-shell; the stylesheet's media queries do the rest.
  * A delegated listener closes the drawer when a sidebar link is followed.
  */
 (function () {
   function shell() {
-    return document.querySelector(".af-shell");
+    return document.querySelector(".ag-shell");
   }
 
   function set(open) {
@@ -17,7 +17,7 @@
     }
   }
 
-  window.afNav = {
+  window.agNav = {
     toggle: function () {
       const s = shell();
       set(!(s && s.getAttribute("data-nav-open") === "true"));
@@ -32,14 +32,14 @@
 
   // Close the drawer after navigating from a sidebar link, and on Escape.
   document.addEventListener("click", function (e) {
-    if (e.target.closest(".af-sidebar a")) {
-      window.afNav.close();
+    if (e.target.closest(".ag-sidebar a")) {
+      window.agNav.close();
     }
   });
 
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape") {
-      window.afNav.close();
+      window.agNav.close();
     }
   });
 })();

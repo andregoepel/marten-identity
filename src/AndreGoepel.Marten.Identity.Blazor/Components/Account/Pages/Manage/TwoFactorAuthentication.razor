@@ -57,7 +57,7 @@
 
             @if (_is2FaEnabled)
             {
-                <div class="af-actions-inline">
+                <div class="ag-actions-inline">
                     <LinkButton Text="Disable 2FA"
                                 ButtonStyle="ButtonStyle.Danger"
                                 Path="/Account/Manage/Disable2fa" />
@@ -77,7 +77,7 @@
 
                 @if (!_hasAuthenticator)
                 {
-                    <div class="af-actions-inline">
+                    <div class="ag-actions-inline">
                         <LinkButton Text="Add authenticator app"
                                     ButtonStyle="ButtonStyle.Primary"
                                     Path="/Account/Manage/EnableAuthenticator" />

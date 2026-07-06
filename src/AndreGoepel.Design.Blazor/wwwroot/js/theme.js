@@ -1,15 +1,15 @@
 /*
- * AppFoundation theme switcher.
+ * Design-system theme switcher.
  *
  * Resolves a user preference of "auto" | "light" | "dark" into a concrete
  * data-theme ("light" | "dark") on <html>, persists the preference in
  * localStorage, and tracks the OS colour scheme while "auto" is selected.
  *
- * Exposed on window.appFoundationTheme so Blazor JS interop and the inline
+ * Exposed on window.agTheme so Blazor JS interop and the inline
  * no-flash bootstrap in App.razor can both use it.
  */
 (function () {
-  const KEY = "af-theme";
+  const KEY = "ag-theme";
   const media = window.matchMedia("(prefers-color-scheme: light)");
 
   function preference() {
@@ -59,7 +59,7 @@
     },
   };
 
-  window.appFoundationTheme = api;
+  window.agTheme = api;
   // Apply immediately so the first paint already matches the preference.
   apply(preference());
 })();

@@ -21,9 +21,9 @@
         </RadzenStack>
 
         <RadzenStack Gap="0.4rem">
-            <div class="af-login-field-head">
+            <div class="ag-login-field-head">
                 <RadzenLabel Text="Password" Component="Password" />
-                <RadzenLink Path="Account/ForgotPassword" Text="Forgot password?" class="af-login-forgot" />
+                <RadzenLink Path="Account/ForgotPassword" Text="Forgot password?" class="ag-login-forgot" />
             </div>
             <RadzenPassword @bind-Value="Input.Password" Name="Password" Style="width:100%" />
             <ValidationMessage For="@(() => Input.Password)" class="rz-message rz-messages-error" />

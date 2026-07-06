@@ -6,6 +6,7 @@
     <File Path="README.md" />
   </Folder>
   <Folder Name="/src/">
+    <Project Path="src/AndreGoepel.Design.Blazor/AndreGoepel.Design.Blazor.csproj" />
     <Project Path="src/AndreGoepel.Marten.Identity.Abstractions/AndreGoepel.Marten.Identity.Abstractions.csproj" />
     <Project Path="src/AndreGoepel.Marten.Identity/AndreGoepel.Marten.Identity.csproj" />
     <Project Path="src/AndreGoepel.Marten.Identity.Blazor/AndreGoepel.Marten.Identity.Blazor.csproj" />
