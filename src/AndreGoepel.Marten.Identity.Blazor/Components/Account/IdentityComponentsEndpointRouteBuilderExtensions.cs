@@ -247,13 +247,20 @@ public static class IdentityComponentsEndpointRouteBuilderExtensions
                     personalData.Add(p.Name, p.GetValue(user)?.ToString() ?? "null");
                 }
 
-                var logins = await userManager.GetLoginsAsync(user);
-                foreach (var l in logins)
+                // Only enumerate external logins when the store supports them. The
+                // Marten-backed UserStore does not implement IUserLoginStore<TUser>
+                // (no external/OAuth providers), so GetLoginsAsync would otherwise
+                // throw NotSupportedException and break the whole data export.
+                if (userManager.SupportsUserLogin)
                 {
-                    personalData.Add(
-                        $"{l.LoginProvider} external login provider key",
-                        l.ProviderKey
-                    );
+                    var logins = await userManager.GetLoginsAsync(user);
+                    foreach (var l in logins)
+                    {
+                        personalData.Add(
+                            $"{l.LoginProvider} external login provider key",
+                            l.ProviderKey
+                        );
+                    }
                 }
 
                 // Never export the authenticator key: it is a live, reusable TOTP
