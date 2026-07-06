@@ -17,7 +17,7 @@ namespace AndreGoepel.Marten.Identity.Blazor.Tests.Account.Pages;
 
 public class LoginTests : BunitContext
 {
-    private const string RegisterLink = "Register as a new user";
+    private const string RegisterLink = "Create account";
     private const string PasskeyButton = "Log in with a passkey";
 
     [Fact]

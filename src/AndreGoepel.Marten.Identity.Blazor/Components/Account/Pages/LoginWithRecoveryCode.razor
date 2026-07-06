@@ -9,37 +9,40 @@
 
 <IdentityPageTitle Title="Recovery code verification" />
 
-<SectionContent SectionName="login-tagline">Use a recovery code to regain access.</SectionContent>
-
-<RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4">Recovery code verification</RadzenText>
+<div class="af-login-head">
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Recovery code verification" />
+    <RadzenText TextStyle="TextStyle.Body2" class="af-login-sub" Text="Use a recovery code to regain access." />
+</div>
 
 <RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@OnSubmitAsync">
     <RadzenStack Gap="1.25rem">
 
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
-            <RadzenLabel Text="Recovery code" Component="RecoveryCode" Style="width: 10rem; flex-shrink: 0;" />
-            <RadzenStack Gap="0.25rem" Style="flex: 1;">
-                <RadzenTextBox @bind-Value="@Input.RecoveryCode"
-                               Name="RecoveryCode"
-                               Placeholder="Enter recovery code"
-                               AutoCompleteType="AutoCompleteType.Off"
-                               Style="width:100%" />
-                <RadzenRequiredValidator Component="RecoveryCode" Text="Recovery code is required" />
-            </RadzenStack>
+        <RadzenStack Gap="0.4rem">
+            <RadzenLabel Text="Recovery code" Component="RecoveryCode" />
+            <RadzenTextBox @bind-Value="@Input.RecoveryCode"
+                           Name="RecoveryCode"
+                           Placeholder="Enter recovery code"
+                           AutoCompleteType="AutoCompleteType.Off"
+                           Style="width:100%" />
+            <RadzenRequiredValidator Component="RecoveryCode" Text="Recovery code is required" />
         </RadzenStack>
 
-        <div class="login-action-row">
+        <div class="af-login-actions">
             <RadzenButton ButtonType="ButtonType.Submit"
                           Text="Log in"
                           ButtonStyle="ButtonStyle.Primary"
                           IsBusy="@_isProcessing"
                           BusyText="Verifying..." />
-
-            <RadzenLink Path="/Account/LoginWith2fa" Text="Use an authenticator code instead" />
         </div>
 
     </RadzenStack>
 </RadzenTemplateForm>
+
+<div class="af-login-footer-links">
+    <span class="af-login-resend">
+        <RadzenLink Path="/Account/LoginWith2fa" Text="Use an authenticator code instead" />
+    </span>
+</div>
 
 <SignInHandoff Action="/loginrecovery" Handle="@_handle" />
 

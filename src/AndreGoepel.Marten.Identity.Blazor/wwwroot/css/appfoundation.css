@@ -530,7 +530,80 @@ a:hover, .rz-link:hover {
 }
 
 /* The auth pages stack their form controls; give them the design's rhythm. */
+.af-login-card .rz-label {
+  font: 600 12.5px "Manrope", sans-serif;
+  color: var(--af-muted);
+}
+
+.af-login-card .rz-textbox,
+.af-login-card .rz-password,
+.af-login-card .rz-password input {
+  width: 100%;
+  box-sizing: border-box;
+  height: 42px;
+}
+
+/* Full-width, stacked, sentence-case (Radzen's Material theme upper-cases). */
 .af-login-card .rz-button {
   height: 44px;
   border-radius: 6px;
+  width: 100%;
+  text-transform: none;
+  justify-content: center;
+}
+
+.af-login-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* Second action ("Log in with a passkey") is an outline button, not filled. */
+.af-login-card .rz-button[data-af="passkey"] {
+  background: transparent;
+  border: 1px solid var(--af-border2);
+  color: var(--af-text);
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+}
+
+.af-login-card .rz-button[data-af="passkey"]:hover {
+  background: var(--af-hover);
+  filter: none;
+}
+
+/* Password label row with the inline "Forgot password?" link. */
+.af-login-field-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+}
+
+.af-login-forgot {
+  font: 600 12px "Manrope", sans-serif;
+  color: var(--af-accent-text);
+}
+
+.af-login-footer-links {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.af-login-resend {
+  font: 600 12.5px "Manrope", sans-serif;
+  color: var(--af-muted);
+}
+
+/* The heading is a plain h1 — never let a theme give it a control border. */
+.af-login-head .rz-text-h4 {
+  border: none;
+  outline: none;
+  background: none;
+  padding: 0;
 }

@@ -11,27 +11,26 @@
 
 <IdentityPageTitle Title="Resend email confirmation" />
 
-<SectionContent SectionName="login-tagline">We'll resend your confirmation email.</SectionContent>
-
-<RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4">Resend email confirmation</RadzenText>
+<div class="af-login-head">
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Resend email confirmation" />
+    <RadzenText TextStyle="TextStyle.Body2" class="af-login-sub" Text="Enter your email and we'll send the confirmation link again." />
+</div>
 
 <RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@OnSubmitAsync">
     <RadzenStack Gap="1.25rem">
 
-        <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="1rem">
-            <RadzenLabel Text="Email" Component="Email" Style="width: 8rem; flex-shrink: 0;" />
-            <RadzenStack Gap="0.25rem" Style="flex: 1;">
-                <RadzenTextBox @bind-Value="@Input.Email"
-                               Name="Email"
-                               Placeholder="name@example.com"
-                               AutoCompleteType="AutoCompleteType.Email"
-                               Style="width:100%" />
-                <RadzenRequiredValidator Component="Email" Text="Email is required" />
-                <RadzenEmailValidator Component="Email" Text="Please enter a valid email address" />
-            </RadzenStack>
+        <RadzenStack Gap="0.4rem">
+            <RadzenLabel Text="Email" Component="Email" />
+            <RadzenTextBox @bind-Value="@Input.Email"
+                           Name="Email"
+                           Placeholder="name@example.com"
+                           AutoCompleteType="AutoCompleteType.Email"
+                           Style="width:100%" />
+            <RadzenRequiredValidator Component="Email" Text="Email is required" />
+            <RadzenEmailValidator Component="Email" Text="Please enter a valid email address" />
         </RadzenStack>
 
-        <div class="login-action-row">
+        <div class="af-login-actions">
             <RadzenButton ButtonType="ButtonType.Submit"
                           Text="Resend"
                           ButtonStyle="ButtonStyle.Primary"
@@ -41,6 +40,12 @@
 
     </RadzenStack>
 </RadzenTemplateForm>
+
+<div class="af-login-footer-links">
+    <span class="af-login-resend">
+        <RadzenLink Path="Account/Login" Text="Back to log in" />
+    </span>
+</div>
 
 @code {
     private InputModel Input { get; set; } = new();
