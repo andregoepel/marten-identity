@@ -213,15 +213,20 @@ h4:focus-visible, h5:focus-visible, h6:focus-visible {
   filter: brightness(1.08);
 }
 
+/* Secondary / light / base share the transparent hairline look. `rz-base` is what
+   Radzen's Confirm/Alert dialogs use for the Cancel button — without this it falls
+   back to Radzen's default white fill and clashes with the design. */
 .rz-button.rz-secondary,
-.rz-button.rz-light {
+.rz-button.rz-light,
+.rz-button.rz-base {
   background: transparent;
   border: 1px solid var(--ag-border2);
   color: var(--ag-text);
 }
 
 .rz-button.rz-secondary:hover,
-.rz-button.rz-light:hover {
+.rz-button.rz-light:hover,
+.rz-button.rz-base:hover {
   background: var(--ag-hover);
 }
 
@@ -233,6 +238,28 @@ h4:focus-visible, h5:focus-visible, h6:focus-visible {
 
 .rz-button.rz-danger:hover {
   border-color: var(--ag-danger);
+}
+
+/* Multi-select list (e.g. the role picker in "Edit user roles"). Force the token
+   palette so items don't fall back to Radzen's default selection colour. */
+.rz-listbox {
+  background: var(--ag-input);
+  border: 1px solid var(--ag-border2);
+  border-radius: 6px;
+}
+
+.rz-listbox .rz-listbox-item {
+  color: var(--ag-text2);
+}
+
+.rz-listbox .rz-listbox-item:hover {
+  background: var(--ag-hover);
+  color: var(--ag-text);
+}
+
+.rz-listbox .rz-listbox-item.rz-state-highlight {
+  background: var(--ag-accent-soft);
+  color: var(--ag-accent-text);
 }
 
 /* Data grid */
