@@ -51,14 +51,13 @@
 
                     </RadzenStack>
 
-                    <!-- Submit Button -->
-                    <RadzenButton ButtonType="ButtonType.Submit"
-                                  Text="Save Changes"
-                                  ButtonStyle="ButtonStyle.Primary"
-                                  Size="ButtonSize.Large"
-                                  IsBusy="@_isSaving"
-                                  BusyText="Saving..."
-                                  Style="width: 100%; max-width: 300px; margin: 0 auto;" />
+                    <div class="af-card-actions">
+                        <RadzenButton ButtonType="ButtonType.Submit"
+                                      Text="Save changes"
+                                      ButtonStyle="ButtonStyle.Primary"
+                                      IsBusy="@_isSaving"
+                                      BusyText="Saving..." />
+                    </div>
 
                 </RadzenStack>
             </RadzenTemplateForm>

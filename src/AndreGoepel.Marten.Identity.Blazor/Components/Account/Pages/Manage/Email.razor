@@ -67,23 +67,17 @@
                         <RadzenCompareValidator Component="NewEmail" Value="@_currentEmail" Text="New email must be different from current email" Operator="CompareOperator.NotEqual" />
                     </RadzenStack>
 
-                    <!-- Action Buttons -->
-                    <RadzenStack Orientation="Orientation.Horizontal"
-                                 Gap="1rem"
-                                 JustifyContent="JustifyContent.Center"
-                                 Wrap="FlexWrap.Wrap">
-                        <RadzenButton ButtonType="ButtonType.Submit"
-                                      Text="Change Email"
-                                      ButtonStyle="ButtonStyle.Primary"
-                                      Size="ButtonSize.Large"
-                                      IsBusy="@_isChangingEmail"
-                                      BusyText="Processing..." />
-
+                    <div class="af-card-actions">
                         <RadzenButton Text="Cancel"
                                       ButtonStyle="ButtonStyle.Light"
-                                      Size="ButtonSize.Large"
                                       Click=@(() => NavigationManager.NavigateTo("/Account/Manage/Profile")) />
-                    </RadzenStack>
+
+                        <RadzenButton ButtonType="ButtonType.Submit"
+                                      Text="Change email"
+                                      ButtonStyle="ButtonStyle.Primary"
+                                      IsBusy="@_isChangingEmail"
+                                      BusyText="Processing..." />
+                    </div>
 
                 </RadzenStack>
             </RadzenTemplateForm>

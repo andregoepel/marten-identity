@@ -134,6 +134,15 @@ code, .af-mono, .rz-text-mono {
   font-family: "JetBrains Mono", ui-monospace, monospace;
 }
 
+/* Blazor's FocusOnNavigate focuses the page heading on navigation; that's for
+   screen readers/keyboard, but the browser paints a focus ring on the (non-
+   interactive) heading. Suppress the visible ring — focus still moves. */
+h1:focus, h2:focus, h3:focus, h4:focus, h5:focus, h6:focus,
+h1:focus-visible, h2:focus-visible, h3:focus-visible,
+h4:focus-visible, h5:focus-visible, h6:focus-visible {
+  outline: none;
+}
+
 /* Inputs picked up by Radzen textboxes / dropdowns */
 .rz-textbox,
 .rz-inputtext,
@@ -161,6 +170,11 @@ code, .af-mono, .rz-text-mono {
   border: 1px solid var(--af-border);
   border-radius: 10px;
   color: var(--af-text2);
+}
+
+/* The design uses sentence case everywhere; Radzen's Material theme upper-cases. */
+.rz-button {
+  text-transform: none;
 }
 
 /* Primary buttons keep the emerald accent with dark on-accent text */
@@ -225,24 +239,38 @@ code, .af-mono, .rz-text-mono {
   background: var(--af-hover);
 }
 
-/* Alerts mapped to the design's soft status banners */
-.rz-notification-item.rz-info,
-.rz-alert-info {
+/* Alerts: soften Radzen's filled variant into the design's tinted banners. */
+.rz-alert.rz-info {
   background: var(--af-info-soft);
   border: 1px solid var(--af-info);
   color: var(--af-text2);
 }
 
-.rz-alert-warning {
+.rz-alert.rz-warning {
   background: var(--af-warn-soft);
   border: 1px solid var(--af-warn);
   color: var(--af-text2);
 }
 
-.rz-alert-danger {
+.rz-alert.rz-danger {
   background: var(--af-danger-soft);
   border: 1px solid var(--af-danger);
   color: var(--af-text2);
+}
+
+.rz-alert.rz-success {
+  background: var(--af-accent-soft);
+  border: 1px solid var(--af-accent);
+  color: var(--af-text2);
+}
+
+/* Inline (non-footer) button group; align-self stops the parent column stack
+   (align-items:stretch) from stretching a lone button to full width. */
+.af-actions-inline {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-self: flex-start;
 }
 
 /* Links */
@@ -252,6 +280,22 @@ a, .rz-link {
 
 a:hover, .rz-link:hover {
   text-decoration: underline;
+}
+
+/* Card footer action row: bordered separator, natural-width buttons, aligned to
+   the end (forms) or start (destructive/data pages), matching the design. */
+.af-card-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 1px solid var(--af-border);
+  padding-top: 18px;
+  margin-top: 2px;
+}
+
+.af-card-actions.af-start {
+  justify-content: flex-start;
 }
 
 /* ===================================================== APP SHELL (host) === */

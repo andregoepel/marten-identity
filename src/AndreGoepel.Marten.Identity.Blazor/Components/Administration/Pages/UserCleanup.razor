@@ -43,10 +43,12 @@
                     </RadzenText>
                 }
 
-                <RadzenButton Text="Save"
-                              ButtonStyle="ButtonStyle.Primary"
-                              Click="@SaveAsync"
-                              IsBusy="@_saving" />
+                <div class="af-card-actions">
+                    <RadzenButton Text="Save changes"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Click="@SaveAsync"
+                                  IsBusy="@_saving" />
+                </div>
 
             </RadzenStack>
         </RadzenCard>

@@ -29,7 +29,7 @@
                         <strong>You have no recovery codes left!</strong><br />
                         Generate a new set before you can use recovery codes to log in.
                         <div class="mt-4">
-                            <RadzenButton Text="Generate New Recovery Codes"
+                            <RadzenButton Text="Generate new recovery codes"
                                           ButtonStyle="ButtonStyle.Danger"
                                           Size="ButtonSize.Large"
                                           Click="@(() => NavigationManager.NavigateTo("/Account/Manage/GenerateRecoveryCodes"))" />
@@ -42,7 +42,7 @@
                         <strong>@_recoveryCodesLeft recovery code@(_recoveryCodesLeft == 1 ? "" : "s") remaining</strong><br />
                         Consider generating a new set soon.
                         <div class="mt-4">
-                            <RadzenButton Text="Generate New Recovery Codes"
+                            <RadzenButton Text="Generate new recovery codes"
                                           ButtonStyle="ButtonStyle.Warning"
                                           Size="ButtonSize.Large"
                                           Click="@(() => NavigationManager.NavigateTo("/Account/Manage/GenerateRecoveryCodes"))" />
@@ -58,14 +58,14 @@
                                 ButtonStyle="ButtonStyle.Danger"
                                 Path="/Account/Manage/Disable2fa" />
 
-                    <LinkButton Text="Reset Recovery Codes"
+                    <LinkButton Text="Reset recovery codes"
                                 ButtonStyle="ButtonStyle.Warning"
                                 Path="/Account/Manage/GenerateRecoveryCodes" />
                 </RadzenStack>
             }
             else
             {
-                <RadzenAlert AlertStyle="AlertStyle.Info" Icon="info" AllowClose="false">
+                <RadzenAlert AlertStyle="AlertStyle.Warning" Icon="warning" AllowClose="false">
                     Two-factor authentication is currently <strong>disabled</strong>.
                 </RadzenAlert>
             }
@@ -79,18 +79,20 @@
 
                 @if (!_hasAuthenticator)
                 {
-                    <LinkButton Text="Add Authenticator App"
-                                ButtonStyle="ButtonStyle.Primary"
-                                Path="/Account/Manage/EnableAuthenticator" />
+                    <div class="af-actions-inline">
+                        <LinkButton Text="Add authenticator app"
+                                    ButtonStyle="ButtonStyle.Primary"
+                                    Path="/Account/Manage/EnableAuthenticator" />
+                    </div>
                 }
                 else
                 {
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap">
-                        <LinkButton Text="Reconfigure Authenticator App"
+                        <LinkButton Text="Reconfigure authenticator app"
                                     ButtonStyle="ButtonStyle.Primary"
                                     Path="/Account/Manage/EnableAuthenticator" />
 
-                        <LinkButton Text="Reset Authenticator App"
+                        <LinkButton Text="Reset authenticator app"
                                     ButtonStyle="ButtonStyle.Danger"
                                     Path="/Account/Manage/ResetAuthenticator" />
                     </RadzenStack>

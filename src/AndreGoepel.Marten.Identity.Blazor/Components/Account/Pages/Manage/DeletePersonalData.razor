@@ -51,24 +51,18 @@
 
                     </RadzenStack>
 
-                    <!-- Action Buttons -->
-                    <RadzenStack Orientation="Orientation.Horizontal"
-                                 Gap="1rem"
-                                 JustifyContent="JustifyContent.Center"
-                                 Wrap="FlexWrap.Wrap">
+                    <div class="af-card-actions">
+                        <RadzenButton Text="Cancel – keep my account"
+                                      ButtonStyle="ButtonStyle.Light"
+                                      Click=@(() => NavigationManager.NavigateTo("/Account/Manage/Profile")) />
+
                         <RadzenButton ButtonType="ButtonType.Submit"
-                                      Text="Permanently Delete My Account"
+                                      Text="Permanently delete my account"
                                       ButtonStyle="ButtonStyle.Danger"
-                                      Size="ButtonSize.Large"
                                       IsBusy="@_isDeleting"
                                       BusyText="Deleting account..."
                                       Disabled="@_isDeleting" />
-
-                        <RadzenButton Text="Cancel – Keep my account"
-                                      ButtonStyle="ButtonStyle.Secondary"
-                                      Size="ButtonSize.Large"
-                                      Click=@(() => NavigationManager.NavigateTo("/Account/Manage/Profile")) />
-                    </RadzenStack>
+                    </div>
 
                 </RadzenStack>
             </RadzenTemplateForm>
