@@ -1,4 +1,4 @@
-namespace AndreGoepel.Marten.Identity.Blazor;
+namespace AndreGoepel.Design.Blazor;
 
 /// <summary>
 /// Holds the topbar breadcrumb for the current page. The host shell layout owns a
