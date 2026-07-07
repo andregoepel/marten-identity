@@ -1,0 +1,33 @@
+@* Sets the document <title> and, for pages inside an AppShell, the topbar
+   breadcrumb (via the cascaded BreadcrumbState). App-neutral: pass an optional
+   Suffix to append a brand, e.g. "Profile – Acme". *@
+
+<PageTitle>@DocumentTitle</PageTitle>
+
+@code {
+    /// <summary>The page-specific title, e.g. "Profile".</summary>
+    [Parameter, EditorRequired]
+    public string Title { get; set; } = default!;
+
+    /// <summary>
+    /// Optional topbar breadcrumb, e.g. "Account / Profile". When omitted the
+    /// <see cref="Title"/> is used. Ignored where no <see cref="BreadcrumbState"/>
+    /// is cascaded (e.g. pages outside the shell).
+    /// </summary>
+    [Parameter]
+    public string? Breadcrumb { get; set; }
+
+    /// <summary>Optional brand appended to the document title as "{Title} – {Suffix}".</summary>
+    [Parameter]
+    public string? Suffix { get; set; }
+
+    // Supplied by AppShell; null under layouts without a topbar.
+    [CascadingParameter]
+    private BreadcrumbState? BreadcrumbState { get; set; }
+
+    private string DocumentTitle =>
+        string.IsNullOrWhiteSpace(Suffix) ? Title : $"{Title} – {Suffix}";
+
+    protected override void OnParametersSet() =>
+        BreadcrumbState?.Set(Breadcrumb ?? Title);
+}

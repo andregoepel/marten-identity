@@ -1,7 +1,10 @@
 @using Microsoft.Extensions.Options
 @inject IServiceProvider Services
 
-<PageTitle>@ComposedTitle</PageTitle>
+@* Identity-flavoured wrapper over the design library's AppPageTitle: adds the
+   configured application name (MartenIdentityBlazorOptions.ApplicationName) as the
+   document-title suffix. AppPageTitle handles the <title> and the breadcrumb. *@
+<AppPageTitle Title="@Title" Breadcrumb="@Breadcrumb" Suffix="@ApplicationName" />
 
 @code {
     /// <summary>The page-specific title, e.g. "Log in".</summary>
@@ -11,29 +14,13 @@
     /// <summary>
     /// Optional topbar breadcrumb for shell pages, e.g. "Account / Profile". When
     /// omitted the document <see cref="Title"/> is used. Ignored on layouts that
-    /// don't provide a <see cref="BreadcrumbState"/> (e.g. the login layout).
+    /// don't cascade a breadcrumb state (e.g. the login layout).
     /// </summary>
     [Parameter]
     public string? Breadcrumb { get; set; }
 
-    // Supplied by the shell layout; null under layouts without a topbar.
-    [CascadingParameter]
-    private BreadcrumbState? BreadcrumbState { get; set; }
-
-    protected override void OnParametersSet() =>
-        BreadcrumbState?.Set(Breadcrumb ?? Title);
-
     // Resolve optionally: the title must still render when the host (or a test) has not
     // registered the options, in which case no brand suffix is appended.
-    private string ComposedTitle
-    {
-        get
-        {
-            var appName = Services
-                .GetService<IOptions<MartenIdentityBlazorOptions>>()
-                ?.Value.ApplicationName;
-
-            return string.IsNullOrWhiteSpace(appName) ? Title : $"{Title} – {appName}";
-        }
-    }
+    private string? ApplicationName =>
+        Services.GetService<IOptions<MartenIdentityBlazorOptions>>()?.Value.ApplicationName;
 }
