@@ -110,16 +110,17 @@ disabled features.
 
 ## Theming & design
 
-The UI is styled by the **[AndreGoepel.Design.Blazor](../AndreGoepel.Design.Blazor/DESIGN.md)**
-design system — an emerald-accented look with matching light and dark modes, built by
-remapping Radzen's variables onto a token system. Reference its stylesheet
-(`_content/AndreGoepel.Design.Blazor/css/design.css`) **after** Radzen's
+The UI is styled by the **[AndreGoepel.Design.Blazor](https://github.com/andregoepel/design-blazor)**
+design system (a separate NuGet package) — an emerald-accented look with matching light
+and dark modes, built by remapping Radzen's variables onto a token system. Reference its
+stylesheet (`_content/AndreGoepel.Design.Blazor/css/design.css`) **after** Radzen's
 `material-base.css` in your host.
 
-To build new pages or controls that fit the existing look, follow
-[`DESIGN.md`](DESIGN.md) — it documents the tokens, typography, component recipes
-(forms, buttons, cards, badges, tables, alerts, empty states), the `ag-*` helper
-classes, and the Radzen overrides to be aware of.
+To build new pages or controls that fit the existing look, follow the design system's
+[`DESIGN.md`](https://github.com/andregoepel/design-blazor/blob/main/src/AndreGoepel.Design.Blazor/DESIGN.md)
+— it documents the tokens, typography, component recipes (forms, buttons, cards, badges,
+tables, alerts, empty states), the `ag-*` helper classes, and the Radzen overrides to be
+aware of.
 
 ## License
 

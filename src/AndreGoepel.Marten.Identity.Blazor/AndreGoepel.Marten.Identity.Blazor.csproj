@@ -23,13 +23,13 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="AndreGoepel.Design.Blazor" />
     <PackageReference Include="Marten" />
     <PackageReference Include="Radzen.Blazor" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AndreGoepel.Marten.Identity\AndreGoepel.Marten.Identity.csproj" />
-    <ProjectReference Include="..\AndreGoepel.Design.Blazor\AndreGoepel.Design.Blazor.csproj" />
   </ItemGroup>
 
   <ItemGroup>
