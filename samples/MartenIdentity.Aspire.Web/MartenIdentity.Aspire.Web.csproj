@@ -1,5 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <ItemGroup>
+    <PackageReference Include="AndreGoepel.Design.Blazor" />
     <PackageReference Include="Marten" />
     <PackageReference Include="Radzen.Blazor" />
   </ItemGroup>
@@ -7,7 +8,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\AndreGoepel.Marten.Identity\AndreGoepel.Marten.Identity.csproj" />
     <ProjectReference Include="..\..\src\AndreGoepel.Marten.Identity.Blazor\AndreGoepel.Marten.Identity.Blazor.csproj" />
-    <ProjectReference Include="..\..\src\AndreGoepel.Design.Blazor\AndreGoepel.Design.Blazor.csproj" />
     <ProjectReference Include="..\MartenIdentity.Aspire.ServiceDefaults\MartenIdentity.Aspire.ServiceDefaults.csproj" />
   </ItemGroup>
 </Project>

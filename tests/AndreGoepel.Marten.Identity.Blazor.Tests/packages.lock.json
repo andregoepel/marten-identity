@@ -369,12 +369,6 @@
           "xunit.v3.runner.common": "[3.2.2]"
         }
       },
-      "andregoepel.design.blazor": {
-        "type": "Project",
-        "dependencies": {
-          "Radzen.Blazor": "[11.1.0, )"
-        }
-      },
       "andregoepel.marten.identity": {
         "type": "Project",
         "dependencies": {
@@ -394,6 +388,15 @@
           "AndreGoepel.Marten.Identity": "[1.0.0, )",
           "Marten": "[9.12.0, )",
           "Radzen.Blazor": "[11.1.0, )"
+        }
+      },
+      "AndreGoepel.Design.Blazor": {
+        "type": "CentralTransitive",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "2Sz0LwsyzW0T2RLqdPPza6l/RfVvHkdUt1rKEiQoJQGXmdng+Lw8ehvtQ99M6zMWuT46HQlusbIB5LOK1cyXcQ==",
+        "dependencies": {
+          "Radzen.Blazor": "11.1.0"
         }
       },
       "Marten": {
