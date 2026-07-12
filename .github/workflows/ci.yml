@@ -35,8 +35,10 @@ jobs:
       - name: Build
         run: dotnet build --no-restore -c Release
 
+      # The E2E suite (Aspire + Playwright) needs Docker and browser binaries, so it runs
+      # in its own workflow (e2e.yml) and is excluded from the fast main pipeline here.
       - name: Test
-        run: dotnet test --no-build -c Release
+        run: dotnet test --no-build -c Release --filter "FullyQualifiedName!~E2ETests"
 
       # Fail the build on any known-vulnerable package (direct or transitive) (#39).
       - name: Vulnerability scan

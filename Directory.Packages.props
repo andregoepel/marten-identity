@@ -17,6 +17,12 @@
     <PackageVersion Include="Radzen.Blazor" Version="11.1.0" />
   </ItemGroup>
 
+  <ItemGroup Label="E2E (browser-driven tests)">
+    <PackageVersion Include="Aspire.Hosting.Testing" Version="13.4.6" />
+    <PackageVersion Include="Microsoft.Playwright" Version="1.49.0" />
+    <PackageVersion Include="Otp.NET" Version="1.4.0" />
+  </ItemGroup>
+
   <ItemGroup Label="Testing">
     <PackageVersion Include="bunit" Version="2.7.2" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />

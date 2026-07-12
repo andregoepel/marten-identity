@@ -45,7 +45,20 @@ builder.Services.AddMartenIdentityCleanup();
 
 // The Identity UI requires an IEmailSender<User>. This sample writes the confirmation and
 // password-reset links to the logs (and the Aspire dashboard) instead of sending real email.
-builder.Services.AddSingleton<IEmailSender<User>, LoggingEmailSender>();
+// Under the E2E harness (E2E=true) a capturing variant also keeps the links in memory so the
+// /e2e/emails endpoint below can hand them to the browser tests; it is inert otherwise.
+var isE2E = string.Equals(builder.Configuration["E2E"], "true", StringComparison.OrdinalIgnoreCase);
+if (isE2E)
+{
+    builder.Services.AddSingleton<CapturingEmailSender>();
+    builder.Services.AddSingleton<IEmailSender<User>>(sp =>
+        sp.GetRequiredService<CapturingEmailSender>()
+    );
+}
+else
+{
+    builder.Services.AddSingleton<IEmailSender<User>, LoggingEmailSender>();
+}
 
 // Marten: connect to the Aspire-provisioned PostgreSQL and register the Identity projections.
 builder
@@ -102,5 +115,16 @@ app.MapRazorComponents<App>()
 
 // Aspire health endpoints (/health, /alive in Development).
 app.MapDefaultEndpoints();
+
+// E2E-only: expose the confirmation/reset links the CapturingEmailSender recorded so the browser
+// tests can follow them (the sample sends no real email). Registered only under E2E=true.
+if (isE2E)
+{
+    app.MapGet(
+            "/e2e/emails",
+            (string email, CapturingEmailSender sender) => Results.Json(sender.LinksFor(email))
+        )
+        .AllowAnonymous();
+}
 
 app.Run();
