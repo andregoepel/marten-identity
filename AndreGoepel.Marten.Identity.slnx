@@ -22,5 +22,6 @@
     <Project Path="tests/AndreGoepel.Marten.Identity.Tests/AndreGoepel.Marten.Identity.Tests.csproj" />
     <Project Path="tests/AndreGoepel.Marten.Identity.IntegrationTests/AndreGoepel.Marten.Identity.IntegrationTests.csproj" />
     <Project Path="tests/AndreGoepel.Marten.Identity.Blazor.Tests/AndreGoepel.Marten.Identity.Blazor.Tests.csproj" />
+    <Project Path="tests/AndreGoepel.Marten.Identity.E2ETests/AndreGoepel.Marten.Identity.E2ETests.csproj" />
   </Folder>
 </Solution>
