@@ -4,8 +4,8 @@
   </PropertyGroup>
 
   <ItemGroup Label="Marten">
-    <PackageVersion Include="Marten" Version="9.14.0" />
-    <PackageVersion Include="Marten.AspNetCore" Version="9.14.0" />
+    <PackageVersion Include="Marten" Version="9.14.1" />
+    <PackageVersion Include="Marten.AspNetCore" Version="9.14.1" />
   </ItemGroup>
 
   <ItemGroup Label="Scheduling">
@@ -14,7 +14,7 @@
 
   <ItemGroup Label="UI">
     <PackageVersion Include="AndreGoepel.Design.Blazor" Version="1.0.1" />
-    <PackageVersion Include="Radzen.Blazor" Version="11.1.2" />
+    <PackageVersion Include="Radzen.Blazor" Version="11.1.3" />
   </ItemGroup>
 
   <ItemGroup Label="E2E (browser-driven tests)">
