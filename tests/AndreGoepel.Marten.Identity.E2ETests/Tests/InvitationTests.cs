@@ -48,8 +48,12 @@ public sealed class InvitationTests(E2EAppFixture fixture) : E2ETestBase(fixture
         await inviteePage.GotoAsync("/Account/Manage/Profile");
         await inviteePage.AssertOnPathAsync("Account/Manage/Profile");
 
-        // And the admin now sees the account as Confirmed in the grid.
+        // And the admin now sees the account as Confirmed in the grid. Filter to the
+        // invitee first: the grid pages at 10 rows, and by the time this runs the shared
+        // suite database holds enough accounts to push a newly-created one onto a later
+        // page, where Radzen would not render its row at all.
         await Page.GotoAsync("/Administration/Users");
+        await Page.Locator(".ag-search-input").FillAsync(invitee);
         var row = Page.Locator(".rz-data-grid tr", new() { HasTextString = invitee });
         await Expect(row.GetByText("Confirmed")).ToBeVisibleAsync();
     }
