@@ -1,0 +1,216 @@
+@page "/Account/AcceptInvitation"
+@attribute [AllowAnonymous]
+@layout LoginLayout
+@rendermode InteractiveServer
+@using Microsoft.AspNetCore.WebUtilities
+
+@inject UserManager<User> UserManager
+@inject NavigationManager NavigationManager
+@inject NotificationService NotificationService
+@inject IOptions<IdentityOptions> IdentityOptions
+@inject LoginTokenProtector LoginTokens
+
+@* Deliberately NOT registered in IdentityFeatureGateMiddleware.MapPathToFeature: this page
+   is the way a host adds people while self-service registration is disabled, so gating it
+   behind the UserRegistration flag would defeat its purpose (#100). *@
+
+<IdentityPageTitle Title="Accept invitation" />
+
+<div class="rz-p-4 rz-p-md-8">
+    <RadzenCard>
+        <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
+
+            <div class="text-center">
+                <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Accept your invitation</RadzenText>
+                @if (!_invalidLink)
+                {
+                    <RadzenText TextStyle="TextStyle.Body1">
+                        Set a password for <strong>@_email</strong> to finish setting up your account.
+                    </RadzenText>
+                }
+            </div>
+
+            @if (_invalidLink)
+            {
+                <RadzenAlert AlertStyle="AlertStyle.Danger" Shade="Shade.Lighter" Variant="Variant.Flat" AllowClose="false">
+                    This invitation link is invalid or has expired. Ask your administrator to send a new one.
+                </RadzenAlert>
+            }
+            else
+            {
+                <RadzenTemplateForm TItem="InputModel" Data=@Input Submit=@OnValidSubmitAsync>
+                    <RadzenStack Gap="1.5rem">
+
+                        <div>
+                            <RadzenLabel Text="New password *" Component="Password" />
+                            <RadzenPassword @bind-Value=@Input.Password
+                                            Name="Password"
+                                            Style="width:100%" />
+                            <RadzenRequiredValidator Component="Password" Text="Password is required" />
+                            <RadzenLengthValidator Component="Password" Min="@MinPasswordLength" Max="100"
+                                                   Text="@($"Password must be between {MinPasswordLength} and 100 characters")" />
+                        </div>
+
+                        <div>
+                            <RadzenLabel Text="Confirm new password *" Component="ConfirmPassword" />
+                            <RadzenPassword @bind-Value=@Input.ConfirmPassword
+                                            Name="ConfirmPassword"
+                                            Style="width:100%" />
+                            <RadzenRequiredValidator Component="ConfirmPassword" Text="Please confirm your password" />
+                            <RadzenCompareValidator Component="ConfirmPassword"
+                                                    Value=@Input.Password
+                                                    Text="The passwords do not match"
+                                                    Operator="CompareOperator.Equal" />
+                        </div>
+
+                        <RadzenStack Orientation="Orientation.Horizontal"
+                                     Gap="1rem"
+                                     JustifyContent="JustifyContent.Center"
+                                     Wrap="FlexWrap.Wrap">
+                            <RadzenButton ButtonType="ButtonType.Submit"
+                                          Text="Set password & sign in"
+                                          ButtonStyle="ButtonStyle.Primary"
+                                          Size="ButtonSize.Large"
+                                          IsBusy=@_isProcessing
+                                          BusyText="Setting up..."
+                                          Style="width: 100%; max-width: 360px;" />
+                        </RadzenStack>
+
+                    </RadzenStack>
+                </RadzenTemplateForm>
+            }
+
+        </RadzenStack>
+    </RadzenCard>
+</div>
+
+<SignInHandoff Action="/login" Handle="@_handle" />
+
+@code {
+    [SupplyParameterFromQuery]
+    private string? UserId { get; set; }
+
+    [SupplyParameterFromQuery]
+    private string? Code { get; set; }
+
+    private InputModel Input { get; set; } = new();
+    private bool _isProcessing;
+    private bool _invalidLink;
+    private string? _email;
+    private string? _decodedCode;
+    private string? _handle;
+
+    private int MinPasswordLength => IdentityOptions.Value.Password.RequiredLength;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (string.IsNullOrEmpty(UserId) || string.IsNullOrEmpty(Code))
+        {
+            _invalidLink = true;
+            return;
+        }
+
+        var user = await UserManager.FindByIdAsync(UserId);
+        if (user is null)
+        {
+            _invalidLink = true;
+            return;
+        }
+
+        _decodedCode = Encoding.UTF8.GetString(WebEncoders.Base64UrlDecode(Code));
+
+        // Verify before rendering the form so an expired or already-redeemed link never
+        // shows a password box. Redeeming rotates the security stamp the token is bound to,
+        // so a second visit to the same link lands here as invalid — single use, for free.
+        var valid = await UserManager.VerifyUserTokenAsync(
+            user,
+            UserInvitationTokenProvider.ProviderName,
+            UserInvitationTokenProvider.Purpose,
+            _decodedCode
+        );
+
+        if (!valid)
+        {
+            _invalidLink = true;
+            return;
+        }
+
+        _email = user.Email;
+    }
+
+    private async Task OnValidSubmitAsync(InputModel model)
+    {
+        if (_invalidLink || _decodedCode is null)
+        {
+            return;
+        }
+
+        _isProcessing = true;
+
+        try
+        {
+            var user = UserId is null ? null : await UserManager.FindByIdAsync(UserId);
+            if (user is null)
+            {
+                _invalidLink = true;
+                return;
+            }
+
+            // Re-verify on submit: the account could have been claimed on another device
+            // between load and submit, and the check is cheap. Fail closed if so.
+            var valid = await UserManager.VerifyUserTokenAsync(
+                user,
+                UserInvitationTokenProvider.ProviderName,
+                UserInvitationTokenProvider.Purpose,
+                _decodedCode
+            );
+            if (!valid)
+            {
+                _invalidLink = true;
+                return;
+            }
+
+            var addPassword = await UserManager.AddPasswordAsync(user, model.Password);
+            if (!addPassword.Succeeded)
+            {
+                NotificationService.Notify(
+                    NotificationSeverity.Error,
+                    "Could not set password",
+                    string.Join(", ", addPassword.Errors.Select(e => e.Description))
+                );
+                return;
+            }
+
+            // Redeeming the invitation proves control of the mailbox it was sent to, so the
+            // email is now confirmed. Generate-then-consume a confirmation token rather than
+            // writing EmailConfirmed directly, to go through the store's normal event path.
+            if (!user.EmailConfirmed)
+            {
+                var confirmToken = await UserManager.GenerateEmailConfirmationTokenAsync(user);
+                await UserManager.ConfirmEmailAsync(user, confirmToken);
+            }
+
+            // Sign in the same way the login page does: hand a single-use handle to the
+            // cookie middleware via SignInHandoff (the circuit cannot set cookies itself).
+            _handle = LoginTokens.Protect(
+                new LoginInfo(user.Email!, model.Password, RememberMe: false, "/")
+            );
+        }
+        finally
+        {
+            _isProcessing = false;
+        }
+    }
+
+    private sealed class InputModel
+    {
+        [Required]
+        [StringLength(100, MinimumLength = 12)]
+        [DataType(DataType.Password)]
+        public string Password { get; set; } = "";
+
+        [DataType(DataType.Password)]
+        [Compare(nameof(Password))]
+        public string ConfirmPassword { get; set; } = "";
+    }
+}

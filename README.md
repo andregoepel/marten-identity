@@ -43,6 +43,30 @@ git tag v1.0.0
 git push origin v1.0.0
 ```
 
+## Inviting users
+
+When self-service registration is disabled (the right default for a staff-only backend),
+an administrator adds people from **Administration → Users → Invite user**. The invitation
+creates a passwordless, unconfirmed account and emails a single-use link; the invitee sets
+their own password and lands signed in. No password ever passes through the admin's hands,
+and registration stays closed.
+
+The invitation email is sent through `IUserInvitationEmailSender`. Registering one is
+optional — without it, invitations reuse your existing `IEmailSender<User>` password-reset
+path, so nothing breaks on upgrade. Register your own to give invitees copy that reads like
+an invitation:
+
+```csharp
+services.AddScoped<IUserInvitationEmailSender, MyInvitationEmailSender>();
+```
+
+Invitation links live for 7 days by default (independent of the shorter password-reset
+lifespan). Override it if needed:
+
+```csharp
+services.Configure<UserInvitationTokenProviderOptions>(o => o.TokenLifespan = TimeSpan.FromDays(3));
+```
+
 ## Security model
 
 The library ships secure defaults but delegates some security-critical concerns to

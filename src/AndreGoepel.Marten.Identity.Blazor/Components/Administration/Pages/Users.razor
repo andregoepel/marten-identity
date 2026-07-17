@@ -1,11 +1,14 @@
 @page "/Administration/Users"
 @rendermode InteractiveServer
 @using AndreGoepel.Marten.Identity.Blazor.Components.Administration.Dialogs
+@using AndreGoepel.Marten.Identity.Blazor.Email
 
 @inject UserManager<User> UserManager
 @inject UserStore<User> UserStore
 @inject DialogService DialogService
 @inject ContextMenuService ContextMenuService
+@inject UserInvitationMailer InvitationMailer
+@inject NotificationService NotificationService
 
 @attribute [Authorize(Roles = "Administrator")]
 
@@ -23,6 +26,11 @@
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem" JustifyContent="JustifyContent.End">
                     <RadzenCheckBox Name="ShowDeleted" @bind-Value="@ShowDeleted" Change="@((bool value) => ShowDeletedChangedAsync(value))" />
                     <RadzenLabel Text="Show deleted" Component="ShowDeleted" />
+                    <RadzenButton Text="Invite user"
+                                  Icon="person_add"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Size="ButtonSize.Small"
+                                  Click="@InviteUserAsync" />
                 </RadzenStack>
             </RadzenColumn>
         </RadzenRow>
@@ -63,6 +71,12 @@
                             @if (user.EmailConfirmed)
                             {
                                 <span class="ag-badge ag-badge-success">Confirmed</span>
+                            }
+                            else if (UserInvitationService.IsPending(user))
+                            {
+                                @* Design package ships only success/danger badges; use its
+                                   warning palette inline for the pending-invite state (#100). *@
+                                <span class="ag-badge" style="background: var(--ag-warn-soft); color: var(--ag-warn);">Invited</span>
                             }
                             else
                             {
@@ -150,6 +164,35 @@
         }
     }
 
+    private async Task InviteUserAsync()
+    {
+        var result = await DialogService.OpenAsync<InviteUser>("Invite user",
+            new Dictionary<string, object?>(),
+            new DialogOptions() { Width = "480px" });
+
+        if (result == true)
+        {
+            NotificationService.Notify(NotificationSeverity.Success, "Invitation sent");
+            await LoadUsersAsync();
+        }
+    }
+
+    private async Task ResendInvitationAsync(User user)
+    {
+        var result = await InvitationMailer.ResendAsync(user);
+        if (result.Succeeded)
+        {
+            NotificationService.Notify(NotificationSeverity.Success, "Invitation resent");
+        }
+        else
+        {
+            await DialogService.Alert(
+                string.Join(", ", result.Errors.Select(e => e.Description)),
+                "Could not resend invitation"
+            );
+        }
+    }
+
     private async Task DeleteUserAsync(User user)
     {
         if (await DialogService.Confirm("Are you sure you want to delete this user?", "Delete User") == true)
@@ -188,7 +231,8 @@
         await LoadUsersAsync();
     }
 
-    private static bool RowHasMenu(User user) => user.Deleted || user.Deletable;
+    private static bool RowHasMenu(User user) =>
+        user.Deleted || user.Deletable || UserInvitationService.IsPending(user);
 
     private void OpenRowMenu(MouseEventArgs args, User user)
     {
@@ -197,9 +241,17 @@
         {
             items.Add(new ContextMenuItem { Text = "Restore", Value = "restore", Icon = "restore" });
         }
-        else if (user.Deletable)
+        else
         {
-            items.Add(new ContextMenuItem { Text = "Delete", Value = "delete", Icon = "delete", IconColor = "var(--ag-danger)" });
+            if (UserInvitationService.IsPending(user))
+            {
+                items.Add(new ContextMenuItem { Text = "Resend invitation", Value = "resend", Icon = "mail" });
+            }
+
+            if (user.Deletable)
+            {
+                items.Add(new ContextMenuItem { Text = "Delete", Value = "delete", Icon = "delete", IconColor = "var(--ag-danger)" });
+            }
         }
 
         ContextMenuService.Open(args, items, async e =>
@@ -209,6 +261,9 @@
             {
                 case "restore":
                     await RestoreUserAsync(user);
+                    break;
+                case "resend":
+                    await ResendInvitationAsync(user);
                     break;
                 case "delete":
                     await DeleteUserAsync(user);

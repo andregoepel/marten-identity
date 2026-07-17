@@ -1,4 +1,5 @@
 using AndreGoepel.Marten.Identity.Blazor.Components.Account;
+using AndreGoepel.Marten.Identity.Blazor.Email;
 using AndreGoepel.Marten.Identity.Blazor.Features;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,6 +29,12 @@ public static class Initialization
         // Default feature-flag provider reads the options baseline (#66). TryAdd lets a host
         // register a persistence-backed provider that takes precedence.
         services.TryAddScoped<IIdentityFeatureProvider, OptionsIdentityFeatureProvider>();
+
+        // Invitation mail falls back to the host's existing password-reset path, so hosts
+        // that register nothing keep working on upgrade. TryAdd lets one that wants proper
+        // invitation copy register its own sender instead (#100).
+        services.TryAddScoped<IUserInvitationEmailSender, DefaultUserInvitationEmailSender>();
+        services.TryAddScoped<UserInvitationMailer>();
 
         return services;
     }

@@ -86,6 +86,19 @@ These are enforced by the library itself — you do not need to wire them up.
   *Not* guarded: `CreateAsync` and `UpdateAsync`, which ASP.NET Identity legitimately
   drives through **anonymous** flows (registration, password reset, email confirmation,
   lockout) — their authorization is the reset/confirmation **token** at the UI layer.
+- **Admin-initiated invitations.** Because `CreateAsync` is intentionally ungated (above),
+  the invitation flow enforces its own check: creating an invited account requires the
+  acting user to hold the `Administrator` role, verified in `UserInvitationService`
+  against the live projection, and failing closed for an unidentified caller (#100). The
+  invitation link carries a purpose-scoped, DataProtection-backed token (default lifespan
+  **7 days**, independent of the shorter password-reset token) that is **single use**:
+  accepting sets a password, which rotates the security stamp the token is bound to, so a
+  forwarded or replayed link no longer validates. An invited account is created
+  passwordless and **unconfirmed**, which also keeps it off the forgot-password path
+  (that path requires a confirmed email) — so a pending invitation cannot be redirected by
+  anyone who merely knows the address. Re-inviting an already-accepted account is refused,
+  so "resend invitation" can never become an unauthenticated password reset for a live
+  account.
 - **PII erasure.** Past the retention period the cleanup job erases personal data
   from the event stream via Marten event-data masking (no raw SQL).
 - **Parameterized data access** throughout — no SQL injection surface in the library.

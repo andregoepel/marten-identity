@@ -94,6 +94,10 @@ public class IdentityFeatureGateMiddlewareTests
     [InlineData("/Account/ForgotPassword")]
     [InlineData("/Account/Manage/Profile")]
     [InlineData("/dashboard")]
+    // AcceptInvitation is the admin-invite counterpart to Register. It must stay reachable
+    // precisely when registration is off, or disabling self-service signup would also
+    // disable the only supported way to add a user (#100).
+    [InlineData("/Account/AcceptInvitation")]
     public async Task UngatedPaths_AlwaysPassThrough(string path)
     {
         var (mw, ctx, called) = Build(path, secFetchDest: "document");
