@@ -69,12 +69,19 @@ public static class Initialization
             .AddRoleManager<RoleManager<Role>>()
             .AddRoleStore<RoleStore<Role>>()
             .AddSignInManager()
-            .AddDefaultTokenProviders();
+            .AddDefaultTokenProviders()
+            // Invitations get their own token provider so their lifespan (7 days by
+            // default) is independent of the 1-day default that password-reset tokens
+            // rely on — a shared provider would force one lifespan onto both (#100).
+            .AddTokenProvider<UserInvitationTokenProvider>(
+                UserInvitationTokenProvider.ProviderName
+            );
 
         services.AddScoped<ICurrentUserService, CurrentUserService>();
         services.AddScoped<IIdentityAuthorizer, IdentityAuthorizer>();
         services.AddScoped<UserStore<User>>();
         services.AddScoped<RoleStore<Role>>();
+        services.AddScoped<UserInvitationService>();
         services.AddSingleton<LoginTokenProtector>();
 
         return services;
