@@ -13,7 +13,7 @@
   </ItemGroup>
 
   <ItemGroup Label="UI">
-    <PackageVersion Include="AndreGoepel.Design.Blazor" Version="1.0.2" />
+    <PackageVersion Include="AndreGoepel.Design.Blazor" Version="1.0.3" />
     <PackageVersion Include="Radzen.Blazor" Version="11.1.5" />
   </ItemGroup>
 
