@@ -1,8 +1,10 @@
 @page "/Setup"
 @rendermode InteractiveServer
 @attribute [AllowAnonymous]
+@layout LoginLayout
 
 @using AndreGoepel.Marten.Identity
+@using AndreGoepel.Marten.Identity.Blazor.Components.Layout
 @using AndreGoepel.Marten.Identity.Services
 @using Marten
 @using Microsoft.AspNetCore.Identity
@@ -15,52 +17,52 @@
 
 <PageTitle>First-run setup</PageTitle>
 
-<RadzenStack Gap="1rem" Style="max-width: 480px; margin: 2rem auto;">
-    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4">Create the first administrator</RadzenText>
-    <RadzenText TextStyle="TextStyle.Body2">
-        No administrator exists yet. The account you create here becomes the un-deletable
-        root administrator, so complete this step on a trusted network before exposing the app.
-    </RadzenText>
+<div class="ag-login-head">
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Create the first administrator" />
+    <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub"
+                Text="No administrator exists yet. The account you create here becomes the un-deletable root administrator, so complete this step on a trusted network before exposing the app." />
+</div>
 
-    @if (errors.Count > 0)
-    {
-        <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false">
-            <ul style="margin: 0; padding-left: 1.2rem;">
-                @foreach (var error in errors)
-                {
-                    <li>@error</li>
-                }
-            </ul>
-        </RadzenAlert>
-    }
+@if (errors.Count > 0)
+{
+    <RadzenAlert AlertStyle="AlertStyle.Danger" Variant="Variant.Flat" Shade="Shade.Lighter" AllowClose="false">
+        <ul style="margin: 0; padding-left: 1.2rem;">
+            @foreach (var error in errors)
+            {
+                <li>@error</li>
+            }
+        </ul>
+    </RadzenAlert>
+}
 
-    <RadzenTemplateForm TItem="Model" Data="@model" Submit="@OnSubmitAsync">
-        <RadzenStack Gap="1rem">
-            <RadzenFormField Text="Email">
-                <RadzenTextBox @bind-Value="model.Email" Name="Email" autocomplete="username" />
-            </RadzenFormField>
-            <RadzenFormField Text="Password (at least 12 characters)">
-                <RadzenPassword @bind-Value="model.Password" Name="Password" autocomplete="new-password" />
-            </RadzenFormField>
-            <RadzenFormField Text="Confirm password">
-                <RadzenPassword @bind-Value="model.ConfirmPassword" Name="ConfirmPassword" autocomplete="new-password" />
-            </RadzenFormField>
-            <RadzenButton ButtonType="ButtonType.Submit" Text="Create administrator"
-                          Disabled="@busy" IsBusy="@busy" BusyText="Creating…" />
+<RadzenTemplateForm TItem="Model" Data="@model" Submit="@OnSubmitAsync">
+    <RadzenStack Gap="1.25rem">
+        <RadzenStack Gap="0.4rem">
+            <RadzenLabel Text="Email" Component="Email" />
+            <RadzenTextBox @bind-Value="model.Email" Name="Email"
+                           Placeholder="name@example.com" autocomplete="username" Style="width:100%" />
         </RadzenStack>
-    </RadzenTemplateForm>
-</RadzenStack>
+        <RadzenStack Gap="0.4rem">
+            <RadzenLabel Text="Password (at least 12 characters)" Component="Password" />
+            <RadzenPassword @bind-Value="model.Password" Name="Password"
+                            autocomplete="new-password" Style="width:100%" />
+        </RadzenStack>
+        <RadzenStack Gap="0.4rem">
+            <RadzenLabel Text="Confirm password" Component="ConfirmPassword" />
+            <RadzenPassword @bind-Value="model.ConfirmPassword" Name="ConfirmPassword"
+                            autocomplete="new-password" Style="width:100%" />
+        </RadzenStack>
+        <div class="ag-login-actions">
+            <RadzenButton ButtonType="ButtonType.Submit" Text="Create administrator"
+                          ButtonStyle="ButtonStyle.Primary" Disabled="@busy" IsBusy="@busy" BusyText="Creating…" />
+        </div>
+    </RadzenStack>
+</RadzenTemplateForm>
 
 @code {
     private readonly Model model = new();
     private readonly List<string> errors = new();
     private bool busy;
-
-    // Set the topbar breadcrumb for the first-run setup page.
-    [CascadingParameter]
-    private BreadcrumbState? Breadcrumb { get; set; }
-
-    protected override void OnParametersSet() => Breadcrumb?.Set("Setup");
 
     protected override async Task OnInitializedAsync()
     {
