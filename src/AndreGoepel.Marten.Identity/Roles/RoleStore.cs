@@ -16,16 +16,41 @@ public class RoleStore<TRole>(
 {
     public IQueryable<TRole> Roles => session.Query<TRole>();
 
+    // Appended when the caller is unidentified rather than merely non-admin, because that
+    // almost always means an unscoped first-run bootstrap. Points at the escape hatch so
+    // the failure is self-diagnosing instead of a silent fail-closed (#101).
+    private const string BootstrapHint =
+        " No user is authenticated; if this is a system or first-run operation, "
+        + "wrap it in IIdentityAuthorizer.BeginSystemScope().";
+
     // Defence in depth (#69/#41): role management is an administrator-only operation,
-    // enforced here independently of any UI [Authorize] guard.
-    private static IdentityResult NotAuthorized() =>
-        IdentityResult.Failed(
-            new IdentityError
-            {
-                Code = "NotAuthorized",
-                Description = "Managing roles requires administrator authority.",
-            }
+    // enforced here independently of any UI [Authorize] guard. The rejection distinguishes
+    // "not an administrator" from "nobody is authenticated" so a bootstrapping consumer is
+    // steered to BeginSystemScope rather than hunting for a missing role assignment (#101).
+    private async Task<IdentityResult> NotAuthorizedAsync(
+        string operation,
+        CancellationToken cancellationToken
+    )
+    {
+        var actor = await currentUserService.GetCurrentUserIdAsync(cancellationToken);
+        var unidentified = actor.Value == Guid.Empty;
+        var description =
+            $"{operation} a role requires administrator authority."
+            + (unidentified ? BootstrapHint : string.Empty);
+
+        // Surface the reason in the host's logs even when the consumer swallows the
+        // IdentityResult — the original trap (app-foundation#89) took a SQL log to diagnose.
+        logger.LogWarning(
+            "Role management rejected: {Operation} requires administrator authority "
+                + "(caller {CallerState}).",
+            operation,
+            unidentified ? "unidentified" : "non-administrator"
         );
+
+        return IdentityResult.Failed(
+            new IdentityError { Code = "NotAuthorized", Description = description }
+        );
+    }
 
     public void Dispose()
     {
@@ -37,7 +62,7 @@ public class RoleStore<TRole>(
         try
         {
             if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
-                return NotAuthorized();
+                return await NotAuthorizedAsync("Creating", cancellationToken);
 
             if (role.Name == null)
                 return IdentityResult.Failed(
@@ -73,7 +98,7 @@ public class RoleStore<TRole>(
         try
         {
             if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
-                return NotAuthorized();
+                return await NotAuthorizedAsync("Updating", cancellationToken);
 
             if (role.Name == null)
             {
@@ -112,7 +137,7 @@ public class RoleStore<TRole>(
         try
         {
             if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
-                return NotAuthorized();
+                return await NotAuthorizedAsync("Deleting", cancellationToken);
 
             if (!role.Deletable)
             {
@@ -149,7 +174,7 @@ public class RoleStore<TRole>(
         try
         {
             if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
-                return NotAuthorized();
+                return await NotAuthorizedAsync("Restoring", cancellationToken);
 
             session.Events.Append(
                 role.StreamId,

@@ -38,10 +38,38 @@ public class UserStore<TUser>(
 {
     private const string UserDataProtectionPurpose = "UserDataProtection";
 
+    // Appended when the caller is unidentified rather than merely non-admin, because that
+    // almost always means an unscoped first-run bootstrap (e.g. assigning the Administrator
+    // role to the first user before signing them in). Points at the escape hatch so the
+    // fail-closed rejection is self-diagnosing (#101).
+    private const string BootstrapHint =
+        " No user is authenticated; if this is a system or first-run operation, "
+        + "wrap it in IIdentityAuthorizer.BeginSystemScope().";
+
     private static IdentityResult NotAuthorized(string description) =>
         IdentityResult.Failed(
             new IdentityError { Code = "NotAuthorized", Description = description }
         );
+
+    // Builds an authorization-failure message that names the bootstrap escape hatch when
+    // the caller is unidentified rather than merely lacking administrator authority (#101).
+    private async Task<string> AdminRequiredMessageAsync(
+        string baseMessage,
+        CancellationToken cancellationToken
+    )
+    {
+        var actor = await currentUserService.GetCurrentUserIdAsync(cancellationToken);
+        var unidentified = actor.Value == Guid.Empty;
+        if (logger.IsEnabled(LogLevel.Warning))
+        {
+            logger.LogWarning(
+                "Identity operation rejected: {BaseMessage} (caller {CallerState}).",
+                baseMessage,
+                unidentified ? "unidentified" : "non-administrator"
+            );
+        }
+        return unidentified ? baseMessage + BootstrapHint : baseMessage;
+    }
 
     private static IdentityResult ConcurrencyFailure() =>
         IdentityResult.Failed(
@@ -333,7 +361,12 @@ public class UserStore<TUser>(
             // Defence in depth (#69/#41): restoring a soft-deleted account is an
             // administrator-only operation.
             if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
-                return NotAuthorized("Restoring a user requires administrator authority.");
+                return NotAuthorized(
+                    await AdminRequiredMessageAsync(
+                        "Restoring a user requires administrator authority.",
+                        cancellationToken
+                    )
+                );
 
             var userId = UserId.Parse(user.Id);
 
@@ -730,7 +763,10 @@ public class UserStore<TUser>(
         // including one reaching the store directly.
         if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
             throw new IdentityAuthorizationException(
-                "Assigning a role requires administrator authority."
+                await AdminRequiredMessageAsync(
+                    "Assigning a role requires administrator authority.",
+                    cancellationToken
+                )
             );
 
         var role =
@@ -769,7 +805,10 @@ public class UserStore<TUser>(
         // independent of any UI [Authorize] guard.
         if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
             throw new IdentityAuthorizationException(
-                "Removing a role requires administrator authority."
+                await AdminRequiredMessageAsync(
+                    "Removing a role requires administrator authority.",
+                    cancellationToken
+                )
             );
 
         // Domain-layer invariant (defence in depth, independent of any UI [Authorize]):
