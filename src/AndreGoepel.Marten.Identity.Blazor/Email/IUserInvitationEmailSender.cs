@@ -17,7 +17,10 @@ public interface IUserInvitationEmailSender
 {
     /// <param name="user">The invited, not-yet-claimed account.</param>
     /// <param name="email">Address to send to.</param>
-    /// <param name="invitationLink">Absolute, already-encoded acceptance URL.</param>
+    /// <param name="invitationLink">
+    /// Absolute acceptance URL, unencoded. HTML-encode it yourself if — and only if — you
+    /// embed it in an HTML body; leave it as-is for plain-text delivery.
+    /// </param>
     Task SendInvitationLinkAsync(
         User user,
         string email,

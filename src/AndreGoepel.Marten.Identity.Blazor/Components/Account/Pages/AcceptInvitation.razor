@@ -16,73 +16,56 @@
 
 <IdentityPageTitle Title="Accept invitation" />
 
-<div class="rz-p-4 rz-p-md-8">
-    <RadzenCard>
-        <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
+<div class="ag-login-head">
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Accept your invitation" />
+    @if (!_invalidLink)
+    {
+        <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub">
+            Set a password for <strong>@_email</strong> to finish setting up your account.
+        </RadzenText>
+    }
+</div>
 
-            <div class="text-center">
-                <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Accept your invitation</RadzenText>
-                @if (!_invalidLink)
-                {
-                    <RadzenText TextStyle="TextStyle.Body1">
-                        Set a password for <strong>@_email</strong> to finish setting up your account.
-                    </RadzenText>
-                }
+@if (_invalidLink)
+{
+    <RadzenAlert AlertStyle="AlertStyle.Danger" Shade="Shade.Lighter" Variant="Variant.Flat" AllowClose="false">
+        This invitation link is invalid or has expired. Ask your administrator to send a new one.
+    </RadzenAlert>
+}
+else
+{
+    <RadzenTemplateForm TItem="InputModel" Data=@Input Submit=@OnValidSubmitAsync>
+        <RadzenStack Gap="1.25rem">
+
+            <RadzenStack Gap="0.4rem">
+                <RadzenLabel Text="New password" Component="Password" />
+                <RadzenPassword @bind-Value=@Input.Password Name="Password" Style="width:100%" />
+                <RadzenRequiredValidator Component="Password" Text="Password is required" />
+                <RadzenLengthValidator Component="Password" Min="@MinPasswordLength" Max="100"
+                                       Text="@($"Password must be between {MinPasswordLength} and 100 characters")" />
+            </RadzenStack>
+
+            <RadzenStack Gap="0.4rem">
+                <RadzenLabel Text="Confirm new password" Component="ConfirmPassword" />
+                <RadzenPassword @bind-Value=@Input.ConfirmPassword Name="ConfirmPassword" Style="width:100%" />
+                <RadzenRequiredValidator Component="ConfirmPassword" Text="Please confirm your password" />
+                <RadzenCompareValidator Component="ConfirmPassword"
+                                        Value=@Input.Password
+                                        Text="The passwords do not match"
+                                        Operator="CompareOperator.Equal" />
+            </RadzenStack>
+
+            <div class="ag-login-actions">
+                <RadzenButton ButtonType="ButtonType.Submit"
+                              Text="Set password & sign in"
+                              ButtonStyle="ButtonStyle.Primary"
+                              IsBusy=@_isProcessing
+                              BusyText="Setting up..." />
             </div>
 
-            @if (_invalidLink)
-            {
-                <RadzenAlert AlertStyle="AlertStyle.Danger" Shade="Shade.Lighter" Variant="Variant.Flat" AllowClose="false">
-                    This invitation link is invalid or has expired. Ask your administrator to send a new one.
-                </RadzenAlert>
-            }
-            else
-            {
-                <RadzenTemplateForm TItem="InputModel" Data=@Input Submit=@OnValidSubmitAsync>
-                    <RadzenStack Gap="1.5rem">
-
-                        <div>
-                            <RadzenLabel Text="New password *" Component="Password" />
-                            <RadzenPassword @bind-Value=@Input.Password
-                                            Name="Password"
-                                            Style="width:100%" />
-                            <RadzenRequiredValidator Component="Password" Text="Password is required" />
-                            <RadzenLengthValidator Component="Password" Min="@MinPasswordLength" Max="100"
-                                                   Text="@($"Password must be between {MinPasswordLength} and 100 characters")" />
-                        </div>
-
-                        <div>
-                            <RadzenLabel Text="Confirm new password *" Component="ConfirmPassword" />
-                            <RadzenPassword @bind-Value=@Input.ConfirmPassword
-                                            Name="ConfirmPassword"
-                                            Style="width:100%" />
-                            <RadzenRequiredValidator Component="ConfirmPassword" Text="Please confirm your password" />
-                            <RadzenCompareValidator Component="ConfirmPassword"
-                                                    Value=@Input.Password
-                                                    Text="The passwords do not match"
-                                                    Operator="CompareOperator.Equal" />
-                        </div>
-
-                        <RadzenStack Orientation="Orientation.Horizontal"
-                                     Gap="1rem"
-                                     JustifyContent="JustifyContent.Center"
-                                     Wrap="FlexWrap.Wrap">
-                            <RadzenButton ButtonType="ButtonType.Submit"
-                                          Text="Set password & sign in"
-                                          ButtonStyle="ButtonStyle.Primary"
-                                          Size="ButtonSize.Large"
-                                          IsBusy=@_isProcessing
-                                          BusyText="Setting up..."
-                                          Style="width: 100%; max-width: 360px;" />
-                        </RadzenStack>
-
-                    </RadzenStack>
-                </RadzenTemplateForm>
-            }
-
         </RadzenStack>
-    </RadzenCard>
-</div>
+    </RadzenTemplateForm>
+}
 
 <SignInHandoff Action="/login" Handle="@_handle" />
 

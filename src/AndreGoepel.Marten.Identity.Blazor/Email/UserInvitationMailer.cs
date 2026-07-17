@@ -1,5 +1,4 @@
 using System.Text;
-using System.Text.Encodings.Web;
 using AndreGoepel.Marten.Identity.Users;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Identity;
@@ -56,19 +55,18 @@ internal sealed class UserInvitationMailer(
         CancellationToken cancellationToken
     )
     {
-        // Same shape as Register.razor's confirmation link: userId identifies the account,
-        // the token rides in the query Base64Url-encoded so it survives the URL intact.
+        // userId identifies the account; the token rides in the query Base64Url-encoded so
+        // it survives the URL intact.
         var encodedCode = WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(result.Token!));
         var link = navigation.GetUriWithQueryParameters(
             navigation.ToAbsoluteUri("Account/AcceptInvitation").AbsoluteUri,
             new Dictionary<string, object?> { ["userId"] = result.User!.Id, ["code"] = encodedCode }
         );
 
-        await emailSender.SendInvitationLinkAsync(
-            result.User,
-            email,
-            HtmlEncoder.Default.Encode(link),
-            cancellationToken
-        );
+        // Pass the raw URL. HTML-encoding is the sender's job, done only if it embeds the
+        // link in HTML — encoding here turns the query separator into "&amp;", which breaks
+        // the link for any sender that emits plain text (e.g. a dev logger writing it to a
+        // console, where "&amp;" is copied verbatim into the browser and splits the query).
+        await emailSender.SendInvitationLinkAsync(result.User, email, link, cancellationToken);
     }
 }
