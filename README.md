@@ -52,6 +52,16 @@ routes, rate limiting, first-run setup protection). See
 library guarantees, an explicit **host-obligations checklist**, and the known
 residual risks. Read it before deploying.
 
+The user, role, and user-role stores fail closed: privileged writes (creating roles,
+assigning roles, restoring accounts) require an authenticated administrator, enforced in
+the domain layer independently of any UI `[Authorize]` guard. This bites during **first-run
+bootstrap**, where there is no administrator yet to authorize seeding the default roles and
+the first admin. Wrap that trusted server-side code in
+`IIdentityAuthorizer.BeginSystemScope()`, which bypasses the check for the duration of the
+scope. See [`samples/MartenIdentity.Aspire.Web/Components/Pages/Setup.razor`](samples/MartenIdentity.Aspire.Web/Components/Pages/Setup.razor)
+for a worked example. If you skip the hatch, the rejection message on an unauthenticated
+caller names it explicitly.
+
 ## Privacy & data protection
 
 The package stores authentication credentials and contact identifiers. See
