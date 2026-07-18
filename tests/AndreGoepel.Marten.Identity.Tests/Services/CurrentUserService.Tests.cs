@@ -87,6 +87,20 @@ public class CurrentUserServiceTests
         Assert.Equal(default, result);
     }
 
+    [Fact]
+    public async Task GetCurrentUserIdAsync_ProviderThrowsOutsideCircuit_ReturnsDefault()
+    {
+        // Arrange — off a Razor circuit the server provider throws instead of returning a
+        // state (e.g. startup seeding under BeginSystemScope); the caller is unidentified.
+        var service = new CurrentUserService(new ThrowingAuthStateProvider());
+
+        // Act
+        var result = await service.GetCurrentUserIdAsync(TestContext.Current.CancellationToken);
+
+        // Assert
+        Assert.Equal(default, result);
+    }
+
     #endregion
 
     #region Test doubles
@@ -96,6 +110,16 @@ public class CurrentUserServiceTests
     {
         public override Task<AuthenticationState> GetAuthenticationStateAsync() =>
             Task.FromResult(state);
+    }
+
+    // Mirrors the server AuthenticationStateProvider's behaviour when called with no Razor
+    // component in scope.
+    private sealed class ThrowingAuthStateProvider : AuthenticationStateProvider
+    {
+        public override Task<AuthenticationState> GetAuthenticationStateAsync() =>
+            throw new InvalidOperationException(
+                "Do not call GetAuthenticationStateAsync outside of the DI scope for a Razor component."
+            );
     }
 
     #endregion

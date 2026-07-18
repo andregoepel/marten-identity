@@ -4,6 +4,8 @@ using AndreGoepel.Marten.Identity.Roles;
 using AndreGoepel.Marten.Identity.Roles.Events;
 using AndreGoepel.Marten.Identity.Services;
 using AndreGoepel.Marten.Identity.Users;
+using Marten;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging.Abstractions;
 
@@ -76,6 +78,35 @@ public class RoleStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
         Assert.True(result.Succeeded);
     }
 
+    [Fact]
+    public async Task CreateAsync_WithinSystemScope_NoRazorCircuit_Succeeds()
+    {
+        // The headless-seeding case (e.g. a consumer creating default roles at startup): with no
+        // Razor circuit the real CurrentUserService cannot resolve a user, so it must not throw.
+        // BeginSystemScope grants authority; the creator is stamped as the empty (system) UserId.
+        var currentUserService = new CurrentUserService(new ThrowingAuthStateProvider());
+        var authorizer = new IdentityAuthorizer(currentUserService, fixture.Store.QuerySession());
+        var store = new RoleStore<Role>(
+            fixture.Store.LightweightSession(),
+            currentUserService,
+            authorizer,
+            NullLogger<RoleStore<Role>>.Instance
+        );
+
+        IdentityResult result;
+        using (authorizer.BeginSystemScope())
+        {
+            result = await store.CreateAsync(new Role { Name = "Member" }, Ct);
+        }
+
+        Assert.True(result.Succeeded);
+        var created = await fixture
+            .Store.QuerySession()
+            .Query<Role>()
+            .FirstOrDefaultAsync(r => r.NormalizedName == "MEMBER", Ct);
+        Assert.NotNull(created);
+    }
+
     private (RoleStore<Role> Store, IIdentityAuthorizer Authorizer) BuildEnforcing(UserId actor)
     {
         var currentUserService = UserStoreTestHelpers.CurrentUserServiceFor(actor);
@@ -98,5 +129,15 @@ public class RoleStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
         root.RootUser = true;
         await store.CreateAsync(root, Ct);
         return root.UserId;
+    }
+
+    // Mirrors the server AuthenticationStateProvider's behaviour when resolved with no Razor
+    // component in scope — as during headless startup seeding.
+    private sealed class ThrowingAuthStateProvider : AuthenticationStateProvider
+    {
+        public override Task<AuthenticationState> GetAuthenticationStateAsync() =>
+            throw new InvalidOperationException(
+                "Do not call GetAuthenticationStateAsync outside of the DI scope for a Razor component."
+            );
     }
 }
