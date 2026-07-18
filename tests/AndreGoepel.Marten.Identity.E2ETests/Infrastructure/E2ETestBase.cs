@@ -14,12 +14,60 @@ public abstract class E2ETestBase(E2EAppFixture fixture) : IAsyncLifetime
     public async ValueTask InitializeAsync()
     {
         Context = await Fixture.NewContextAsync();
+
+        // Record a Playwright trace for the whole test. It is only written to disk when the
+        // test fails (see DisposeAsync) — CI then uploads it as an artifact, which is the
+        // only way to see what the page actually looked like on a headless runner.
+        await Context.Tracing.StartAsync(
+            new TracingStartOptions
+            {
+                Screenshots = true,
+                Snapshots = true,
+                Sources = true,
+            }
+        );
+
         Page = await Context.NewPageAsync();
     }
 
     public async ValueTask DisposeAsync()
     {
+        await StopTracingAsync();
         await Context.DisposeAsync();
+    }
+
+    /// <summary>
+    /// Saves the trace only for a failed test (kept small: passing runs discard theirs). The file
+    /// lands in PLAYWRIGHT_TRACE_DIR — set by CI so the upload step can find it — named after the
+    /// test so a multi-failure run yields one openable trace per failure.
+    /// </summary>
+    private async Task StopTracingAsync()
+    {
+        var failed = TestContext.Current.TestState?.Result == TestResult.Failed;
+        if (!failed)
+        {
+            await Context.Tracing.StopAsync();
+            return;
+        }
+
+        var dir = Environment.GetEnvironmentVariable("PLAYWRIGHT_TRACE_DIR");
+        dir = string.IsNullOrWhiteSpace(dir) ? "playwright-traces" : dir;
+        Directory.CreateDirectory(dir);
+
+        var name = SanitizeFileName(TestContext.Current.Test?.TestDisplayName ?? "e2e-trace");
+        await Context.Tracing.StopAsync(
+            new TracingStopOptions { Path = Path.Combine(dir, $"{name}.zip") }
+        );
+    }
+
+    private static string SanitizeFileName(string name)
+    {
+        foreach (var invalid in Path.GetInvalidFileNameChars())
+        {
+            name = name.Replace(invalid, '_');
+        }
+
+        return name;
     }
 
     #region Account flows
