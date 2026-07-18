@@ -16,6 +16,7 @@ public sealed class InvitationTests(E2EAppFixture fixture) : E2ETestBase(fixture
         // Arrange — signed-in admin on the Users page; a fresh invitee address.
         await LoginAsAdminAsync();
         await Page.GotoAsync("/Administration/Users");
+        await Page.WaitForBlazorAsync();
         var invitee = TestData.NewEmail("invitee");
 
         // Act — open the invite dialog, send the invitation.
@@ -53,7 +54,8 @@ public sealed class InvitationTests(E2EAppFixture fixture) : E2ETestBase(fixture
         // suite database holds enough accounts to push a newly-created one onto a later
         // page, where Radzen would not render its row at all.
         await Page.GotoAsync("/Administration/Users");
-        await Page.Locator(".ag-search-input").FillAsync(invitee);
+        await Page.WaitForBlazorAsync();
+        await Page.FilterUsersGridAsync(invitee);
         var row = Page.Locator(".rz-data-grid tr", new() { HasTextString = invitee });
         await Expect(row.GetByText("Confirmed")).ToBeVisibleAsync();
     }

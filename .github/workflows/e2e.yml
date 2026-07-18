@@ -30,4 +30,17 @@ jobs:
         run: pwsh tests/AndreGoepel.Marten.Identity.E2ETests/bin/Release/net10.0/playwright.ps1 install --with-deps chromium
 
       - name: Run E2E tests
+        env:
+          # Failed tests drop a Playwright trace here (see E2ETestBase); the next step
+          # uploads it so a headless-runner failure can be replayed action by action.
+          PLAYWRIGHT_TRACE_DIR: ${{ github.workspace }}/playwright-traces
         run: dotnet test tests/AndreGoepel.Marten.Identity.E2ETests/AndreGoepel.Marten.Identity.E2ETests.csproj --no-build -c Release
+
+      - name: Upload Playwright traces
+        if: failure()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: playwright-traces
+          path: ${{ github.workspace }}/playwright-traces
+          if-no-files-found: ignore
+          retention-days: 14
