@@ -1,4 +1,5 @@
 ﻿@inject DialogService DialogService
+@inject ConfirmService Confirm
 @inject UserManager<User> UserManager
 @inject RoleManager<Role> RoleManager
 
@@ -46,7 +47,7 @@
         if(string.IsNullOrEmpty(_role.Name))
             return;
 
-        if (await DialogService.Confirm("Are you sure you want to remove this user?", "Remove User") == true)
+        if (await Confirm.ConfirmAsync("Are you sure you want to remove this user?", "Remove User"))
         {
             if (user.RootUser && _role.Name == Roles.Administrator)
             {
