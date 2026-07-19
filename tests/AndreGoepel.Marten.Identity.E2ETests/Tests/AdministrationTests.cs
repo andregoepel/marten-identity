@@ -22,6 +22,26 @@ public sealed class AdministrationTests(E2EAppFixture fixture) : E2ETestBase(fix
     }
 
     [Fact]
+    public async Task Admin_RootAccount_IsNonDeletable()
+    {
+        // #41 / #117: the account created by the first-run /Setup flow is the root admin
+        // and must be non-deletable, so administration can never be orphaned. The Setup
+        // flow drives this via RootUser = true; here we assert it surfaces end-to-end as
+        // Deletable = "No" in the Users grid (ProvisionAdminAsync ran the real /Setup page).
+        // Arrange
+        await LoginAsAdminAsync();
+
+        // Act
+        await Page.GotoAsync("/Administration/Users");
+        await Page.WaitForBlazorAsync();
+
+        // Assert — within the admin's own grid row, the Deletable column reads "No".
+        var adminRow = Page.Locator(".rz-data-grid tr")
+            .Filter(new() { HasText = TestData.AdminEmail });
+        await Expect(adminRow.GetByText("No", new() { Exact = true })).ToBeVisibleAsync();
+    }
+
+    [Fact]
     public async Task Admin_CanCreateRole_AppearsInGrid()
     {
         // Arrange
