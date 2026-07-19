@@ -13,77 +13,54 @@
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <div>
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Manage Email</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Update or verify your email address</RadzenText>
-        </div>
+        <PageHeader Title="Manage Email" Subtitle="Update or verify your email address" />
 
-        <RadzenCard>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
-
-            <RadzenTemplateForm TItem="ChangeEmailModel"
-                                Data="@Model"
-                                Submit="@OnValidSubmit">
-                <RadzenStack Gap="2rem">
-
-                    <RadzenStack Gap="0.4rem">
-                        <RadzenLabel Text="Current email" Component="CurrentEmail" />
-                        <div style="display:flex; align-items:center; gap:12px;">
-                            <RadzenTextBox @bind-Value="@_currentEmail"
-                                           Name="CurrentEmail"
-                                           ReadOnly="true"
-                                           Style="flex:1; background-color: var(--rz-input-disabled-background);" />
-                            @if (_isEmailConfirmed)
-                            {
-                                <span class="ag-badge ag-badge-success">✓ Confirmed</span>
-                            }
-                        </div>
-                        @if (!_isEmailConfirmed)
-                        {
-                            <div>
-                                <RadzenText TextStyle="TextStyle.Body2" class="rz-color-warning">
-                                    Your email is not yet confirmed.
-                                </RadzenText>
-                                <RadzenButton Text="Send verification email"
-                                              ButtonStyle="ButtonStyle.Warning"
-                                              Size="ButtonSize.Medium"
-                                              IsBusy=@_isSendingVerification
-                                              BusyText="Sending..."
-                                              Click=@SendVerificationEmail
-                                              Style="margin-top: 0.75rem;" />
-                            </div>
-                        }
-                    </RadzenStack>
-
-                    <RadzenStack Gap="0.4rem">
-                        <RadzenLabel Text="New email address" Component="NewEmail" />
-                        <RadzenTextBox @bind-Value="@Model.NewEmail"
-                                       Name="NewEmail"
-                                       Placeholder="you@yourdomain.com"
-                                       AutoCompleteType="AutoCompleteType.Email"
-                                       Style="width:100%" />
-                        <RadzenRequiredValidator Component="NewEmail" Text="New email is required" />
-                        <RadzenEmailValidator Component="NewEmail" Text="Please enter a valid email address" />
-                        <RadzenCompareValidator Component="NewEmail" Value="@_currentEmail" Text="New email must be different from current email" Operator="CompareOperator.NotEqual" />
-                    </RadzenStack>
-
-                    <div class="ag-card-actions">
-                        <RadzenButton Text="Cancel"
-                                      ButtonStyle="ButtonStyle.Light"
-                                      Click=@(() => NavigationManager.NavigateTo("/Account/Manage/Profile")) />
-
-                        <RadzenButton ButtonType="ButtonType.Submit"
-                                      Text="Change email"
-                                      ButtonStyle="ButtonStyle.Primary"
-                                      IsBusy="@_isChangingEmail"
-                                      BusyText="Processing..." />
+        <CardForm TItem="ChangeEmailModel"
+                  Data="@Model"
+                  Submit="@OnValidSubmit"
+                  Cancel="@(() => NavigationManager.NavigateTo("/Account/Manage/Profile"))"
+                  SubmitText="Change email"
+                  BusyText="Processing…"
+                  IsBusy="@_isChangingEmail">
+            <FormField Label="Current email" For="CurrentEmail">
+                <div style="display:flex; align-items:center; gap:12px;">
+                    <RadzenTextBox @bind-Value="@_currentEmail"
+                                   Name="CurrentEmail"
+                                   ReadOnly="true"
+                                   Style="flex:1; background-color: var(--rz-input-disabled-background);" />
+                    @if (_isEmailConfirmed)
+                    {
+                        <span class="ag-badge ag-badge-success">✓ Confirmed</span>
+                    }
+                </div>
+                @if (!_isEmailConfirmed)
+                {
+                    <div>
+                        <RadzenText TextStyle="TextStyle.Body2" class="rz-color-warning">
+                            Your email is not yet confirmed.
+                        </RadzenText>
+                        <RadzenButton Text="Send verification email"
+                                      ButtonStyle="ButtonStyle.Warning"
+                                      Size="ButtonSize.Medium"
+                                      IsBusy=@_isSendingVerification
+                                      BusyText="Sending..."
+                                      Click=@SendVerificationEmail
+                                      Style="margin-top: 0.75rem;" />
                     </div>
+                }
+            </FormField>
 
-                </RadzenStack>
-            </RadzenTemplateForm>
-
-            </RadzenStack>
-        </RadzenCard>
+            <FormField Label="New email address" For="NewEmail">
+                <RadzenTextBox @bind-Value="@Model.NewEmail"
+                               Name="NewEmail"
+                               Placeholder="you@yourdomain.com"
+                               AutoCompleteType="AutoCompleteType.Email"
+                               Style="width:100%" />
+                <RadzenRequiredValidator Component="NewEmail" Text="New email is required" />
+                <RadzenEmailValidator Component="NewEmail" Text="Please enter a valid email address" />
+                <RadzenCompareValidator Component="NewEmail" Value="@_currentEmail" Text="New email must be different from current email" Operator="CompareOperator.NotEqual" />
+            </FormField>
+        </CardForm>
 
     </RadzenStack>
 </div>

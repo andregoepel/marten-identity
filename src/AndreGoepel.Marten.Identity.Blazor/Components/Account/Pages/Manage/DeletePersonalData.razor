@@ -13,10 +13,8 @@
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <div>
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Delete Account</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Deactivate your account and schedule your personal data for permanent erasure</RadzenText>
-        </div>
+        <PageHeader Title="Delete Account"
+                    Subtitle="Deactivate your account and schedule your personal data for permanent erasure" />
 
         <RadzenCard>
             <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
@@ -36,14 +34,13 @@
 
                     <RadzenStack Gap="1.5rem">
 
-                        <RadzenStack Gap="0.4rem">
-                            <RadzenLabel Text="Enter your current password to confirm deletion" Component="Password" />
+                        <FormField Label="Enter your current password to confirm deletion" For="Password">
                             <RadzenPassword @bind-Value="@Model.Password"
                                             Name="Password"
                                             Placeholder="Enter your password to confirm"
                                             Style="width:100%" />
                             <RadzenRequiredValidator Component="Password" Text="Password is required to confirm deletion" />
-                        </RadzenStack>
+                        </FormField>
 
                         <RadzenText TextStyle="TextStyle.Body2" class="rz-color-danger">
                             After successful verification your account is deactivated immediately and your personal data is permanently erased once the retention period elapses.
