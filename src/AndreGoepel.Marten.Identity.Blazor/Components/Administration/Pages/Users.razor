@@ -6,6 +6,7 @@
 @inject UserManager<User> UserManager
 @inject UserStore<User> UserStore
 @inject DialogService DialogService
+@inject ConfirmService Confirm
 @inject ContextMenuService ContextMenuService
 @inject UserInvitationMailer InvitationMailer
 @inject NotificationService NotificationService
@@ -17,13 +18,9 @@
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <RadzenRow AlignItems="AlignItems.Center">
-            <RadzenColumn>
-                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Users</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Manage user accounts</RadzenText>
-            </RadzenColumn>
-            <RadzenColumn class="rz-text-align-right">
-                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem" JustifyContent="JustifyContent.End">
+        <PageHeader Title="Users" Subtitle="Manage user accounts">
+            <Actions>
+                <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem">
                     <RadzenCheckBox Name="ShowDeleted" @bind-Value="@ShowDeleted" Change="@((bool value) => ShowDeletedChangedAsync(value))" />
                     <RadzenLabel Text="Show deleted" Component="ShowDeleted" />
                     <RadzenButton Text="Invite user"
@@ -32,17 +29,12 @@
                                   Size="ButtonSize.Small"
                                   Click="@InviteUserAsync" />
                 </RadzenStack>
-            </RadzenColumn>
-        </RadzenRow>
+            </Actions>
+        </PageHeader>
 
-        <RadzenCard Style="padding: 0; overflow: hidden;">
-            <div class="ag-grid-toolbar">
-                <div class="ag-search">
-                    <span class="ag-search-icon">⌕</span>
-                    <input class="ag-search-input" placeholder="Filter users…" value="@_filter" @oninput="OnFilterInput" />
-                </div>
-                <span class="ag-grid-count">@FilteredUsers.Count of @(_users?.Count ?? 0) users</span>
-            </div>
+        <DataCard>
+            <GridToolbar Search="_filter" SearchChanged="OnFilterChangedAsync" SearchPlaceholder="Filter users…"
+                         Count="@($"{FilteredUsers.Count} of {(_users?.Count ?? 0)} users")" />
             <RadzenDataGrid @ref="_usersGrid"
                             Data="@FilteredUsers"
                             AllowFiltering="false"
@@ -70,17 +62,15 @@
                         <Template Context="user">
                             @if (user.EmailConfirmed)
                             {
-                                <span class="ag-badge ag-badge-success">Confirmed</span>
+                                <StatusBadge Text="Confirmed" Variant="BadgeVariant.Success" />
                             }
                             else if (UserInvitationService.IsPending(user))
                             {
-                                @* Design package ships only success/danger badges; use its
-                                   warning palette inline for the pending-invite state (#100). *@
-                                <span class="ag-badge" style="background: var(--ag-warn-soft); color: var(--ag-warn);">Invited</span>
+                                <StatusBadge Text="Invited" Variant="BadgeVariant.Warning" />
                             }
                             else
                             {
-                                <span class="ag-badge ag-badge-danger">Unconfirmed</span>
+                                <StatusBadge Text="Unconfirmed" Variant="BadgeVariant.Danger" />
                             }
                         </Template>
                     </RadzenDataGridColumn>
@@ -88,11 +78,11 @@
                         <Template Context="user">
                             @if (user.Deleted)
                             {
-                                <span class="ag-badge ag-badge-danger">Deleted</span>
+                                <StatusBadge Text="Deleted" Variant="BadgeVariant.Danger" />
                             }
                             else
                             {
-                                <span class="ag-badge ag-badge-success">Active</span>
+                                <StatusBadge Text="Active" Variant="BadgeVariant.Success" />
                             }
                         </Template>
                     </RadzenDataGridColumn>
@@ -101,7 +91,7 @@
                     </RadzenDataGridColumn>
                     <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false" Width="150px" TextAlign="TextAlign.Right">
                         <Template Context="data">
-                            <div class="ag-row-actions">
+                            <RowActions>
                                 <RadzenButton Text="Roles"
                                               ButtonStyle="ButtonStyle.Light"
                                               Size="ButtonSize.Small"
@@ -109,18 +99,14 @@
                                               Click="@(() => SetRolesAsync(data))" />
                                 @if (RowHasMenu(data))
                                 {
-                                    <RadzenButton Icon="more_horiz"
-                                                  ButtonStyle="ButtonStyle.Light"
-                                                  Size="ButtonSize.Small"
-                                                  class="ag-icon-btn"
-                                                  Click="@(args => OpenRowMenu(args, data))" />
+                                    <IconButton Icon="more_horiz" Title="More actions" Click="@(args => OpenRowMenu(args, data))" />
                                 }
-                            </div>
+                            </RowActions>
                         </Template>
                     </RadzenDataGridColumn>
                 </Columns>
             </RadzenDataGrid>
-        </RadzenCard>
+        </DataCard>
 
     </RadzenStack>
 </div>
@@ -138,9 +124,9 @@
                         || u.Id.ToString().Contains(_filter, StringComparison.OrdinalIgnoreCase))
             .ToList();
 
-    private async Task OnFilterInput(ChangeEventArgs e)
+    private async Task OnFilterChangedAsync(string value)
     {
-        _filter = e.Value?.ToString() ?? "";
+        _filter = value;
         if (_usersGrid is not null)
         {
             await _usersGrid.Reload();
@@ -195,7 +181,7 @@
 
     private async Task DeleteUserAsync(User user)
     {
-        if (await DialogService.Confirm("Are you sure you want to delete this user?", "Delete User") == true)
+        if (await Confirm.ConfirmDeleteAsync(user.Email ?? "this user", title: "Delete user"))
         {
             var deleteResult = await UserManager.DeleteAsync(user);
             if (deleteResult.Succeeded)
@@ -211,7 +197,7 @@
 
     private async Task RestoreUserAsync(User user)
     {
-        if (await DialogService.Confirm("Are you sure you want to restore this user?", "Restore User") == true)
+        if (await Confirm.ConfirmAsync($"Restore {user.Email}?", "Restore user", okText: "Restore"))
         {
             var result = await UserStore.RestoreAsync(user);
             if (result.Succeeded)

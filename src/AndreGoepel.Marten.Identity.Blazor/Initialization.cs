@@ -1,3 +1,4 @@
+using AndreGoepel.Design.Blazor;
 using AndreGoepel.Marten.Identity.Blazor.Components.Account;
 using AndreGoepel.Marten.Identity.Blazor.Email;
 using AndreGoepel.Marten.Identity.Blazor.Features;
@@ -19,6 +20,12 @@ public static class Initialization
             AuthenticationStateProvider,
             IdentityRevalidatingAuthenticationStateProvider
         >();
+
+        // The Blazor UI here builds on AndreGoepel.Design.Blazor components; some
+        // (e.g. ConfirmService, injected by the admin pages) need its DI services.
+        // Register them so hosts don't have to call AddDesignBlazor() themselves.
+        // Idempotent (TryAdd) — a host that also calls it directly is fine.
+        services.AddDesignBlazor();
 
         var options = services.AddOptions<MartenIdentityBlazorOptions>();
         if (configureOptions is not null)
