@@ -6,9 +6,9 @@
 @inject ILogger<DeletePersonalData> Logger
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
-@inject DialogService DialogService
+@inject ConfirmService Confirm
 
-<IdentityPageTitle Title="Delete Account" Breadcrumb="Account / Personal data" />
+<AppPageTitle Title="Delete Account" Breadcrumb="Account / Personal data" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
@@ -96,12 +96,13 @@
         }
 
         // Zweifache Absicherung über Dialog
-        var confirm = await DialogService.Confirm(
+        var confirm = await Confirm.ConfirmAsync(
             "Your account will be deactivated now and your personal data permanently erased after the retention period. Continue?",
             "Final Confirmation",
-            new ConfirmOptions { OkButtonText = "Yes, Delete My Account", CancelButtonText = "No, Cancel" });
+            okText: "Yes, Delete My Account",
+            cancelText: "No, Cancel");
 
-        if (confirm != true)
+        if (!confirm)
         {
             NotificationService.Notify(NotificationSeverity.Info, "Cancelled", "Account deletion cancelled.");
             return;
