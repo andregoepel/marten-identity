@@ -11,49 +11,24 @@
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <div>
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">User Cleanup</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">
-                Configure automatic permanent deletion of soft-deleted users.
-            </RadzenText>
-        </div>
+        <PageHeader Title="User Cleanup" Subtitle="Configure automatic permanent deletion of soft-deleted users." />
 
-        <RadzenCard>
-            <RadzenStack Gap="1.25rem">
+        <CardForm TItem="InputModel" Data="_input" Submit="SaveAsync" IsBusy="_saving">
+            <FormField Label="Retention period (days)" For="RetentionDays">
+                <RadzenNumeric @bind-Value="@_input.RetentionDays" Name="RetentionDays" Min="1" Max="3650" Style="width: 140px;" />
+            </FormField>
 
-                <RadzenStack Gap="0.4rem">
-                    <RadzenLabel Text="Retention period (days)" Component="RetentionDays" />
-                    <RadzenNumeric @bind-Value="@_input.RetentionDays" Name="RetentionDays" Min="1" Max="3650" Style="width: 140px;" />
-                </RadzenStack>
+            <FormField Label="Cron schedule" For="CronSchedule"
+                       Hint="Quartz cron format: seconds minutes hours day-of-month month day-of-week. Example: 0 0 3 * * ? runs daily at 03:00 UTC. Changes take effect immediately.">
+                <RadzenTextBox @bind-Value="@_input.CronSchedule" Name="CronSchedule"
+                               Style="width: 240px; max-width: 100%; font-family: 'JetBrains Mono', ui-monospace, monospace;" />
+            </FormField>
 
-                <RadzenStack Gap="0.4rem">
-                    <RadzenLabel Text="Cron schedule" Component="CronSchedule" />
-                    <RadzenTextBox @bind-Value="@_input.CronSchedule" Name="CronSchedule"
-                                   Style="width: 240px; max-width: 100%; font-family: 'JetBrains Mono', ui-monospace, monospace;" />
-                    <RadzenText TextStyle="TextStyle.Caption" Style="color: var(--rz-text-secondary-color); line-height: 1.55;">
-                        Quartz cron format: seconds minutes hours day-of-month month day-of-week.
-                        Example: <code>0 0 3 * * ?</code> runs daily at 03:00 UTC.
-                        Changes take effect immediately.
-                    </RadzenText>
-                </RadzenStack>
-
-                @if (_nextFireTime.HasValue)
-                {
-                    <div class="ag-info-box">
-                        <span class="ag-info-box-label">Next scheduled run</span>
-                        <span class="ag-info-box-value">@_nextFireTime.Value.ToString("f") UTC</span>
-                    </div>
-                }
-
-                <div class="ag-card-actions">
-                    <RadzenButton Text="Save changes"
-                                  ButtonStyle="ButtonStyle.Primary"
-                                  Click="@SaveAsync"
-                                  IsBusy="@_saving" />
-                </div>
-
-            </RadzenStack>
-        </RadzenCard>
+            @if (_nextFireTime.HasValue)
+            {
+                <InfoBox Label="Next scheduled run" Value="@($"{_nextFireTime.Value:f} UTC")" />
+            }
+        </CardForm>
 
     </RadzenStack>
 </div>
