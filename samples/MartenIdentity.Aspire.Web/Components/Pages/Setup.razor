@@ -10,7 +10,6 @@
 @using Microsoft.AspNetCore.Identity
 
 @inject UserManager<User> UserManager
-@inject RoleManager<Role> RoleManager
 @inject IIdentityAuthorizer Authorizer
 @inject IQuerySession QuerySession
 @inject NavigationManager Nav
@@ -90,22 +89,18 @@
         busy = true;
         try
         {
-            // Trusted first-run bootstrap: BeginSystemScope lets the store operations that
-            // normally require an administrator (creating and assigning the role) run while
-            // no administrator exists yet. The scope is ambient across the awaits below.
+            // Trusted first-run bootstrap: BeginSystemScope lets the privileged store
+            // operations run while no administrator exists yet. The scope is ambient across
+            // the awaits below.
             using (Authorizer.BeginSystemScope())
             {
-                if (!await RoleManager.RoleExistsAsync(Roles.Administrator))
-                {
-                    var roleResult = await RoleManager.CreateAsync(new Role { Name = Roles.Administrator });
-                    if (!roleResult.Succeeded)
-                    {
-                        AddIdentityErrors(roleResult);
-                        return;
-                    }
-                }
-
-                var user = new User { UserName = model.Email, Email = model.Email };
+                // Mark this account as the root user. The library then owns the whole
+                // "un-deletable root administrator" guarantee in one transaction: it forces
+                // the account non-deletable, creates the Administrator role as a protected,
+                // non-deletable role, and assigns it — so the first admin and the role that
+                // anchors it can never be deleted (#41). Do NOT create the role or assign it
+                // manually here; that historically left both deletable.
+                var user = new User { UserName = model.Email, Email = model.Email, RootUser = true };
                 var createResult = await UserManager.CreateAsync(user, model.Password);
                 if (!createResult.Succeeded)
                 {
@@ -119,13 +114,6 @@
                 if (!confirmResult.Succeeded)
                 {
                     AddIdentityErrors(confirmResult);
-                    return;
-                }
-
-                var roleAssign = await UserManager.AddToRoleAsync(user, Roles.Administrator);
-                if (!roleAssign.Succeeded)
-                {
-                    AddIdentityErrors(roleAssign);
                     return;
                 }
             }

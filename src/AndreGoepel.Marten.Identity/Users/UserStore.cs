@@ -146,6 +146,14 @@ public class UserStore<TUser>(
             user.LockoutEnabled =
                 !user.RootUser && identityOptions.Value.Lockout.AllowedForNewUsers;
 
+            // Domain-layer invariant (#41): the root user must be non-deletable so it can
+            // never be removed (which would orphan administration). User.Deletable defaults
+            // to true, so a host that sets RootUser but leaves Deletable at its default
+            // would otherwise mint a *deletable* root. Force it here, mirroring the same
+            // guard on the UpdateAsync path — the guarantee must not depend on host code.
+            if (user.RootUser)
+                user.Deletable = false;
+
             using var session = documentStore.LightweightSession();
 
             session.Events.Append(
@@ -194,7 +202,10 @@ public class UserStore<TUser>(
     /// <summary>
     /// Returns the id of the (non-deleted) Administrator role, creating it as a
     /// protected, non-deletable role in the supplied session if it does not yet
-    /// exist. Used to guarantee the root user is always an administrator.
+    /// exist. If it already exists but is (incorrectly) deletable — e.g. a host
+    /// setup flow created it manually before assigning the root user — it is
+    /// hardened to non-deletable. Used to guarantee the root user is always an
+    /// administrator anchored by a role that can never be removed.
     /// </summary>
     private async Task<RoleId> EnsureAdministratorRoleAsync(
         IDocumentSession session,
@@ -210,7 +221,24 @@ public class UserStore<TUser>(
                 cancellationToken
             );
         if (existing is not null)
+        {
+            // The Administrator role that anchors the root user must be non-deletable.
+            // A host that created it manually (as the sample setup flow historically did)
+            // leaves it at the default Deletable = true; upgrade it here so the guarantee
+            // holds regardless of how the role first came to exist (#41).
+            if (existing.Deletable)
+            {
+                session.Events.Append(
+                    existing.RoleId.Value,
+                    new RoleChanged(existing.RoleId, existing.Name!, createdBy)
+                    {
+                        Deletable = false,
+                    }
+                );
+            }
+
             return existing.RoleId;
+        }
 
         var roleId = RoleId.New();
         session.Events.Append(

@@ -188,6 +188,52 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
+    public async Task CreateAsync_RootUser_IsNonDeletable()
+    {
+        // #41 domain-layer invariant: the root user must be created non-deletable so the
+        // admin anchor can never be removed. User.Deletable defaults to true, so a host
+        // that sets RootUser but leaves Deletable at its default must NOT mint a deletable
+        // root — CreateAsync forces it, mirroring the UpdateAsync guard.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        user.RootUser = true; // Deletable intentionally left at its default (true)
+
+        // Act
+        var result = await store.CreateAsync(user, Ct);
+
+        // Assert
+        Assert.True(result.Succeeded);
+        Assert.False(user.Deletable);
+        await using var session = fixture.Store.QuerySession();
+        var persisted = await session.LoadAsync<User>(user.UserId.Value, Ct);
+        Assert.False(persisted!.Deletable);
+    }
+
+    [Fact]
+    public async Task CreateAsync_RootUser_HardensExistingDeletableAdministratorRole()
+    {
+        // If a host created the Administrator role manually first, it is deletable by
+        // default. Assigning the root user must harden it to non-deletable so the role
+        // that anchors administration can never be removed (#41).
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        await SeedRoleAsync(RoleNames.Administrator); // RoleCreated defaults Deletable = true
+        var user = UserStoreTestHelpers.NewUser();
+        user.RootUser = true;
+
+        // Act
+        await store.CreateAsync(user, Ct);
+
+        // Assert
+        await using var session = fixture.Store.QuerySession();
+        var role = await session
+            .Query<Role>()
+            .SingleAsync(r => r.NormalizedName == RoleNames.Administrator.ToUpperInvariant(), Ct);
+        Assert.False(role.Deletable);
+    }
+
+    [Fact]
     public async Task CreateAsync_SecondRootUser_IsRejected()
     {
         // Safeguard: only one root user may ever exist.
