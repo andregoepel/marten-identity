@@ -17,8 +17,7 @@
 <RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@OnSubmitAsync">
     <RadzenStack Gap="1.25rem">
 
-        <RadzenStack Gap="0.4rem">
-            <RadzenLabel Text="Authenticator code" Component="TwoFactorCode" />
+        <FormField Label="Authenticator code" For="TwoFactorCode">
             <RadzenTextBox @bind-Value="@Input.TwoFactorCode"
                            Name="TwoFactorCode"
                            Placeholder="6-digit code"
@@ -27,7 +26,7 @@
             <RadzenRequiredValidator Component="TwoFactorCode" Text="Authenticator code is required" />
             <RadzenLengthValidator Component="TwoFactorCode" Min="6" Max="7"
                                    Text="Code must be 6 or 7 characters" />
-        </RadzenStack>
+        </FormField>
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
             <RadzenCheckBox @bind-Value="@Input.RememberMachine" Name="RememberMachine" />

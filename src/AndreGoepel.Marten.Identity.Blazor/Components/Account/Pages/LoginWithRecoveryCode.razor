@@ -17,15 +17,14 @@
 <RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@OnSubmitAsync">
     <RadzenStack Gap="1.25rem">
 
-        <RadzenStack Gap="0.4rem">
-            <RadzenLabel Text="Recovery code" Component="RecoveryCode" />
+        <FormField Label="Recovery code" For="RecoveryCode">
             <RadzenTextBox @bind-Value="@Input.RecoveryCode"
                            Name="RecoveryCode"
                            Placeholder="Enter recovery code"
                            AutoCompleteType="AutoCompleteType.Off"
                            Style="width:100%" />
             <RadzenRequiredValidator Component="RecoveryCode" Text="Recovery code is required" />
-        </RadzenStack>
+        </FormField>
 
         <div class="ag-login-actions">
             <RadzenButton ButtonType="ButtonType.Submit"
