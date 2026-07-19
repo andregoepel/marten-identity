@@ -6,7 +6,7 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
-@inject DialogService DialogService
+@inject ConfirmService Confirm
 @inject NotificationService NotificationService
 
 <IdentityPageTitle Title="Manage Passkeys" Breadcrumb="Account / Passkeys" />
@@ -14,20 +14,19 @@
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <div class="ag-page-head">
-            <div>
-                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Manage Passkeys</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Add, rename or remove your security keys (WebAuthn / passkeys)</RadzenText>
-            </div>
-            @if (!_isLoading && (_currentPasskeys?.Count ?? 0) < MaxPasskeyCount)
-            {
-                <RadzenButton Text="Register passkey"
-                              ButtonStyle="ButtonStyle.Primary"
-                              Icon="add"
-                              Disabled="@_isLoading"
-                              Click="@AddNewPasskey" />
-            }
-        </div>
+        <PageHeader Title="Manage Passkeys"
+                    Subtitle="Add, rename or remove your security keys (WebAuthn / passkeys)">
+            <Actions>
+                @if (!_isLoading && (_currentPasskeys?.Count ?? 0) < MaxPasskeyCount)
+                {
+                    <RadzenButton Text="Register passkey"
+                                  ButtonStyle="ButtonStyle.Primary"
+                                  Icon="add"
+                                  Disabled="@_isLoading"
+                                  Click="@AddNewPasskey" />
+                }
+            </Actions>
+        </PageHeader>
 
         @if (_currentPasskeys?.Count >= MaxPasskeyCount)
         {
@@ -45,7 +44,7 @@
         }
         else if (_currentPasskeys?.Count > 0)
         {
-            <RadzenCard Style="padding: 0; overflow: hidden;">
+            <DataCard>
                 <RadzenDataGrid Data="@_currentPasskeys"
                                 AllowPaging="true"
                                 PageSize="8"
@@ -66,9 +65,10 @@
                         <RadzenDataGridColumn Title="Actions"
                                               Sortable="false"
                                               Filterable="false"
-                                              Width="220px">
+                                              Width="220px"
+                                              TextAlign="TextAlign.Right">
                             <Template Context="data">
-                                <RadzenStack Orientation="Orientation.Horizontal" Gap="0.5rem">
+                                <RowActions>
                                     <RadzenButton Text="Rename"
                                                   ButtonStyle="ButtonStyle.Light"
                                                   Size="ButtonSize.Small"
@@ -78,20 +78,18 @@
                                                   ButtonStyle="ButtonStyle.Danger"
                                                   Size="ButtonSize.Small"
                                                   Click="@(() => DeletePasskey(data))" />
-                                </RadzenStack>
+                                </RowActions>
                             </Template>
                         </RadzenDataGridColumn>
                     </Columns>
                 </RadzenDataGrid>
-            </RadzenCard>
+            </DataCard>
         }
         else
         {
-            <div class="ag-empty">
-                <span class="ag-empty-icon">🔑&#xFE0E;</span>
-                <span class="ag-empty-title">No passkeys registered yet</span>
-                <span class="ag-empty-text">Passkeys let you sign in without a password, using your device.</span>
-            </div>
+            <EmptyState Icon="@("\U0001F511︎")"
+                        Title="No passkeys registered yet"
+                        Text="Passkeys let you sign in without a password, using your device." />
         }
 
     </RadzenStack>
@@ -151,16 +149,10 @@
     {
         if (_currentUser == null || passkey?.CredentialId == null) return;
 
-        var confirmed = await DialogService.Confirm(
-            $"Delete passkey **{passkey.Name}**?\n\nThis cannot be undone.",
-            "Delete Passkey",
-            new ConfirmOptions
-            {
-                OkButtonText = "Delete",
-                CancelButtonText = "Cancel"
-            });
+        var confirmed = await Confirm.ConfirmDeleteAsync(
+            $"passkey **{passkey.Name}**", title: "Delete passkey");
 
-        if (confirmed != true) return;
+        if (!confirmed) return;
 
         try
         {
