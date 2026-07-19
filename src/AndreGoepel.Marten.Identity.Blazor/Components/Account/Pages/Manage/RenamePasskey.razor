@@ -13,65 +13,44 @@
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <div>
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">@(_passkey?.Name?.Length > 0 ? "Rename Passkey" : "Name Your New Passkey")</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Choose a recognizable name for this security key</RadzenText>
-        </div>
+        <PageHeader Title="@(_passkey?.Name?.Length > 0 ? "Rename Passkey" : "Name Your New Passkey")"
+                    Subtitle="Choose a recognizable name for this security key" />
 
-        <RadzenCard>
-            <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
-
-            @if (_isLoading)
-            {
+        @if (_isLoading)
+        {
+            <RadzenCard>
                 <div class="text-center my-8">
                     <RadzenProgressBar Mode="ProgressBarMode.Indeterminate" Style="width: 240px;" />
                     <RadzenText TextStyle="TextStyle.Body2" class="rz-color-muted mt-4">
                         Loading passkey information...
                     </RadzenText>
                 </div>
-            }
-            else if (_hasError || _passkey is null)
-            {
-                <RadzenAlert AlertStyle="AlertStyle.Danger" AllowClose="false" Icon="error">
-                    @(_errorMessage ?? "Passkey not found or session expired.")
-                </RadzenAlert>
-            }
-            else
-            {
-                <RadzenTemplateForm TItem="RenamePasskeyModel"
-                                    Data=@_model
-                                    Submit=@OnValidSubmit>
-                    <RadzenStack Gap="2rem">
-
-                        <RadzenStack Gap="0.4rem">
-                            <RadzenLabel Text="Passkey name" Component="NameField" />
-                            <RadzenTextBox @bind-Value="_model.Name"
-                                           Name="NameField"
-                                           Placeholder="e.g. My iPhone 15, Work Laptop Key, Blue YubiKey"
-                                           Style="width: 100%;" />
-                            <RadzenRequiredValidator Component="NameField" Text="Name is required" />
-                            <RadzenLengthValidator Component="NameField" Min="3" Max="100" Text="Name must be 3–100 characters long" />
-                        </RadzenStack>
-
-                        <div class="ag-card-actions">
-                            <RadzenButton Text="Cancel"
-                                          ButtonStyle="ButtonStyle.Light"
-                                          Disabled="@_isSaving"
-                                          Click=@(() => NavigationManager.NavigateTo("/Account/Manage/Passkeys")) />
-
-                            <RadzenButton ButtonType="ButtonType.Submit"
-                                          Text="Save name"
-                                          ButtonStyle="ButtonStyle.Primary"
-                                          IsBusy="@_isSaving"
-                                          BusyText="Saving..." />
-                        </div>
-
-                    </RadzenStack>
-                </RadzenTemplateForm>
-            }
-
-            </RadzenStack>
-        </RadzenCard>
+            </RadzenCard>
+        }
+        else if (_hasError || _passkey is null)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Danger" AllowClose="false" Icon="error">
+                @(_errorMessage ?? "Passkey not found or session expired.")
+            </RadzenAlert>
+        }
+        else
+        {
+            <CardForm TItem="RenamePasskeyModel"
+                      Data="@_model"
+                      Submit="@OnValidSubmit"
+                      Cancel="@(() => NavigationManager.NavigateTo("/Account/Manage/Passkeys"))"
+                      SubmitText="Save name"
+                      IsBusy="@_isSaving">
+                <FormField Label="Passkey name" For="NameField">
+                    <RadzenTextBox @bind-Value="_model.Name"
+                                   Name="NameField"
+                                   Placeholder="e.g. My iPhone 15, Work Laptop Key, Blue YubiKey"
+                                   Style="width: 100%;" />
+                    <RadzenRequiredValidator Component="NameField" Text="Name is required" />
+                    <RadzenLengthValidator Component="NameField" Min="3" Max="100" Text="Name must be 3–100 characters long" />
+                </FormField>
+            </CardForm>
+        }
 
     </RadzenStack>
 </div>
