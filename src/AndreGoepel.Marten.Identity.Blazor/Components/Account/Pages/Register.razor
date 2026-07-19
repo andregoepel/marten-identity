@@ -23,27 +23,24 @@
     <DataAnnotationsValidator />
     <RadzenStack Gap="1.25rem">
 
-        <RadzenStack Gap="0.4rem">
-            <RadzenLabel Text="Email" Component="Email" />
+        <FormField Label="Email" For="Email">
             <RadzenTextBox @bind-Value="@Input.Email"
                            Name="Email"
                            AutoCompleteType="AutoCompleteType.Email"
                            Placeholder="name@example.com"
                            Style="width:100%" />
             <ValidationMessage For="@(() => Input.Email)" class="rz-message rz-messages-error" />
-        </RadzenStack>
+        </FormField>
 
-        <RadzenStack Gap="0.4rem">
-            <RadzenLabel Text="Password" Component="NewPassword" />
+        <FormField Label="Password" For="NewPassword">
             <RadzenPassword @bind-Value="Input.Password" Name="NewPassword" Style="width:100%" />
             <ValidationMessage For="@(() => Input.Password)" class="rz-message rz-messages-error" />
-        </RadzenStack>
+        </FormField>
 
-        <RadzenStack Gap="0.4rem">
-            <RadzenLabel Text="Confirm password" Component="ConfirmPassword" />
+        <FormField Label="Confirm password" For="ConfirmPassword">
             <RadzenPassword @bind-Value="Input.ConfirmPassword" Name="ConfirmPassword" Style="width:100%" />
             <ValidationMessage For="@(() => Input.ConfirmPassword)" class="rz-message rz-messages-error" />
-        </RadzenStack>
+        </FormField>
 
         <div class="ag-login-actions">
             <RadzenButton ButtonType="ButtonType.Submit"
