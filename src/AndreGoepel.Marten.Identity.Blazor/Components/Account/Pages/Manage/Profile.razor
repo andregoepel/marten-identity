@@ -122,12 +122,15 @@
         }
     }
 
+    // Validation lives in the markup as Radzen validator components. RadzenTemplateForm
+    // (wrapped by CardForm) does not evaluate DataAnnotations and no DataAnnotationsValidator
+    // is present, so attributes here would never run — they were removed rather than
+    // translated into a second, silently-dead set of messages (#114).
     private sealed class ProfileModel
     {
-        [Required(ErrorMessage = "Username is required")]
+        // UserName is rendered read-only, so it cannot be emptied from the UI.
         public string? UserName { get; set; }
 
-        [Phone(ErrorMessage = "Please enter a valid phone number")]
         public string? PhoneNumber { get; set; }
     }
 }

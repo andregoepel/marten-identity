@@ -198,10 +198,12 @@
         }
     }
 
+    // Validation lives in the markup as Radzen validator components. RadzenTemplateForm
+    // (wrapped by CardForm) does not evaluate DataAnnotations and no DataAnnotationsValidator
+    // is present, so attributes here would never run — they were removed rather than
+    // translated into a second, silently-dead set of messages (#114).
     private sealed class ChangeEmailModel
     {
-        [Required(ErrorMessage = "New email is required")]
-        [EmailAddress(ErrorMessage = "Invalid email format")]
         public string? NewEmail { get; set; }
     }
 }
