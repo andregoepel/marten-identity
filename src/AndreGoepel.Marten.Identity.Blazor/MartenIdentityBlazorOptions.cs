@@ -24,4 +24,18 @@ public sealed class MartenIdentityBlazorOptions
 
     /// <inheritdoc cref="EnableUserRegistration" />
     public bool EnablePasskey { get; set; } = true;
+
+    /// <summary>
+    /// Culture used until a visitor picks one, as a two-letter code (#114). Should also appear
+    /// in <see cref="SupportedCultures"/>. Flows into the design system's
+    /// <c>DesignBlazorOptions</c>, which owns the request-localization configuration.
+    /// </summary>
+    public string DefaultCulture { get; set; } = "en";
+
+    /// <summary>
+    /// Cultures this app offers, in the order the language switcher renders them. The identity
+    /// UI ships English and German resources; listing a culture without resources falls back to
+    /// English rather than failing.
+    /// </summary>
+    public IList<string> SupportedCultures { get; set; } = ["en", "de"];
 }

@@ -8,12 +8,13 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 @inject IIdentityFeatureProvider Features
+@inject IServiceProvider Services
 
-<AppPageTitle Title="Log in" />
+<AppPageTitle Title="@T("Login.PageTitle")" />
 
 <div class="ag-login-head">
-    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Welcome back" />
-    <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub" Text="Fill in your login credentials to proceed." />
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="@T("Login.Heading")" />
+    <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub" Text="@T("Login.Subheading")" />
 </div>
 
 <LoginForm />
@@ -27,7 +28,7 @@
 
 <div class="ag-login-actions">
     <RadzenButton ButtonType="ButtonType.Submit"
-                  Text="Log in"
+                  Text="@T("Login.Submit")"
                   ButtonStyle="ButtonStyle.Primary"
                   form="login-form" />
 
@@ -39,7 +40,7 @@
                        OnSuccess="HandlePasskeySuccess"
                        OnError="HandlePasskeyError"
                        data-af="passkey">
-            <span style="font-size:15px">🔑&#xFE0E;</span> Log in with a passkey
+            <span style="font-size:15px">🔑&#xFE0E;</span> @T("Login.WithPasskey")
         </PasskeySubmit>
     }
 </div>
@@ -48,11 +49,11 @@
     @if (_flags.UserRegistration)
     {
         <span class="ag-login-resend">
-            Don't have an account? <RadzenLink Path="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" Text="Create account" />
+            @T("Login.NoAccountPrompt") <RadzenLink Path="@(NavigationManager.GetUriWithQueryParameters("Account/Register", new Dictionary<string, object?> { ["ReturnUrl"] = ReturnUrl }))" Text="@T("Login.CreateAccount")" />
         </span>
     }
     <span class="ag-login-resend">
-        Didn't get the email? <RadzenLink Path="Account/ResendEmailConfirmation" Text="Resend confirmation" />
+        @T("Login.NoEmailPrompt") <RadzenLink Path="Account/ResendEmailConfirmation" Text="@T("Login.ResendConfirmation")" />
     </span>
 </div>
 
@@ -115,4 +116,8 @@
             }
         }
     }
+
+    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
+    // still renders on a host (or bUnit test) without localization registered.
+    private string T(string key) => Services.IdentityText(key);
 }

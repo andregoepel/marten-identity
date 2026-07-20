@@ -36,13 +36,25 @@ public static class Initialization
 
         // Feed the identity ApplicationName into the design system's brand name so
         // AppPageTitle renders "{page title} – {ApplicationName}" without every page
-        // passing a Suffix (this replaces the old IdentityPageTitle wrapper). Bound
-        // lazily off IOptions so it picks up the host's configureOptions value.
+        // passing a Suffix (this replaces the old IdentityPageTitle wrapper). The
+        // culture settings ride along the same binding: DesignBlazorOptions owns the
+        // request-localization configuration, so hosts configure language once, here.
+        // Bound lazily off IOptions so it picks up the host's configureOptions value.
         services
             .AddOptions<DesignBlazorOptions>()
             .Configure<IOptions<MartenIdentityBlazorOptions>>(
-                (design, identity) => design.BrandName = identity.Value.ApplicationName
+                (design, identity) =>
+                {
+                    design.BrandName = identity.Value.ApplicationName;
+                    design.DefaultCulture = identity.Value.DefaultCulture;
+                    design.SupportedCultures = identity.Value.SupportedCultures;
+                }
             );
+
+        // Backs IStringLocalizer for this library's own resources (#114). AddDesignBlazor
+        // already calls this, but registering explicitly keeps the dependency honest — the
+        // identity UI needs localization whether or not the design system happens to.
+        services.AddLocalization();
 
         // Default feature-flag provider reads the options baseline (#66). TryAdd lets a host
         // register a persistence-backed provider that takes precedence.
