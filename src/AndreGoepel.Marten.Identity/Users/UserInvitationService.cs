@@ -1,4 +1,4 @@
-using AndreGoepel.Marten.Identity.Services;
+﻿using AndreGoepel.Marten.Identity.Services;
 using Microsoft.AspNetCore.Identity;
 
 namespace AndreGoepel.Marten.Identity.Users;
@@ -30,7 +30,7 @@ public sealed class UserInvitationService(
         IdentityResult.Failed(
             new IdentityError
             {
-                Code = "NotAuthorized",
+                Code = IdentityErrorCodes.NotAuthorized,
                 Description = "Inviting a user requires administrator authority.",
             }
         );
@@ -53,7 +53,10 @@ public sealed class UserInvitationService(
 
         if (await userManager.FindByEmailAsync(email) is not null)
             return UserInvitationResult.Failed(
-                Failure("DuplicateEmail", $"An account already exists for {email}.")
+                Failure(
+                    IdentityErrorCodes.DuplicateEmail,
+                    $"An account already exists for {email}."
+                )
             );
 
         // No password argument: the account is created with a null password hash, so it
@@ -82,7 +85,9 @@ public sealed class UserInvitationService(
                 // throwing rather than returning a result (#69/#41). Reaching this after
                 // the check above would mean authority was lost mid-operation; surface it
                 // as a normal failure rather than letting it escape as an exception.
-                return UserInvitationResult.Failed(Failure("NotAuthorized", ex.Message));
+                return UserInvitationResult.Failed(
+                    Failure(IdentityErrorCodes.NotAuthorized, ex.Message)
+                );
             }
         }
 
@@ -107,7 +112,7 @@ public sealed class UserInvitationService(
         if (!IsPending(user))
             return UserInvitationResult.Failed(
                 Failure(
-                    "InvitationAlreadyAccepted",
+                    IdentityErrorCodes.InvitationAlreadyAccepted,
                     "This account has already been set up; send a password reset instead."
                 )
             );

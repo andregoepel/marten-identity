@@ -48,7 +48,7 @@ public class UserStore<TUser>(
 
     private static IdentityResult NotAuthorized(string description) =>
         IdentityResult.Failed(
-            new IdentityError { Code = "NotAuthorized", Description = description }
+            new IdentityError { Code = IdentityErrorCodes.NotAuthorized, Description = description }
         );
 
     // Builds an authorization-failure message that names the bootstrap escape hatch when
@@ -75,7 +75,7 @@ public class UserStore<TUser>(
         IdentityResult.Failed(
             new IdentityError
             {
-                Code = "ConcurrencyFailure",
+                Code = IdentityErrorCodes.ConcurrencyFailure,
                 Description = "The user was modified concurrently; reload and try again.",
             }
         );
@@ -131,7 +131,7 @@ public class UserStore<TUser>(
                     return IdentityResult.Failed(
                         new IdentityError
                         {
-                            Code = "RootUserAlreadyExists",
+                            Code = IdentityErrorCodes.RootUserAlreadyExists,
                             Description = "A root user already exists; only one is permitted.",
                         }
                     );
@@ -194,7 +194,11 @@ public class UserStore<TUser>(
         {
             logger.LogError(ex, "Failed to create the user in Marten.");
             return IdentityResult.Failed(
-                new IdentityError() { Description = "Something went wrong saving the user." }
+                new IdentityError
+                {
+                    Code = IdentityErrorCodes.UserSaveFailed,
+                    Description = "Something went wrong saving the user.",
+                }
             );
         }
     }
@@ -334,7 +338,11 @@ public class UserStore<TUser>(
         {
             logger.LogError(ex, "Failed to update the user in Marten.");
             return IdentityResult.Failed(
-                new IdentityError() { Description = "Something went wrong saving the user." }
+                new IdentityError
+                {
+                    Code = IdentityErrorCodes.UserSaveFailed,
+                    Description = "Something went wrong saving the user.",
+                }
             );
         }
     }
@@ -355,7 +363,11 @@ public class UserStore<TUser>(
             if (!user.Deletable)
             {
                 return IdentityResult.Failed(
-                    new IdentityError() { Description = "This user cannot be deleted." }
+                    new IdentityError
+                    {
+                        Code = IdentityErrorCodes.UserNotDeletable,
+                        Description = "This user cannot be deleted.",
+                    }
                 );
             }
 
@@ -374,7 +386,11 @@ public class UserStore<TUser>(
                 logger.LogError(ex, "Failed to delete the user in Marten.");
             }
             return IdentityResult.Failed(
-                new IdentityError() { Description = "Something went wrong deleting the user." }
+                new IdentityError
+                {
+                    Code = IdentityErrorCodes.UserDeleteFailed,
+                    Description = "Something went wrong deleting the user.",
+                }
             );
         }
     }
@@ -446,7 +462,11 @@ public class UserStore<TUser>(
                 logger.LogError(ex, "Failed to restore the user in Marten.");
             }
             return IdentityResult.Failed(
-                new IdentityError() { Description = "Something went wrong restoring the user." }
+                new IdentityError
+                {
+                    Code = IdentityErrorCodes.UserRestoreFailed,
+                    Description = "Something went wrong restoring the user.",
+                }
             );
         }
     }

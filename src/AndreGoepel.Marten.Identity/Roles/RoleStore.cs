@@ -48,7 +48,7 @@ public class RoleStore<TRole>(
         );
 
         return IdentityResult.Failed(
-            new IdentityError { Code = "NotAuthorized", Description = description }
+            new IdentityError { Code = IdentityErrorCodes.NotAuthorized, Description = description }
         );
     }
 
@@ -66,7 +66,11 @@ public class RoleStore<TRole>(
 
             if (role.Name == null)
                 return IdentityResult.Failed(
-                    new IdentityError() { Description = "Role name cannot be null." }
+                    new IdentityError
+                    {
+                        Code = IdentityErrorCodes.RoleNameRequired,
+                        Description = "Role name cannot be null.",
+                    }
                 );
 
             session.Events.Append(
@@ -88,7 +92,11 @@ public class RoleStore<TRole>(
         {
             logger.LogError(ex, "Failed to create the role in Marten.");
             return IdentityResult.Failed(
-                new IdentityError() { Description = "Something went wrong saving the role." }
+                new IdentityError
+                {
+                    Code = IdentityErrorCodes.RoleSaveFailed,
+                    Description = "Something went wrong saving the role.",
+                }
             );
         }
     }
@@ -103,7 +111,11 @@ public class RoleStore<TRole>(
             if (role.Name == null)
             {
                 return IdentityResult.Failed(
-                    new IdentityError() { Description = "Role name cannot be null." }
+                    new IdentityError
+                    {
+                        Code = IdentityErrorCodes.RoleNameRequired,
+                        Description = "Role name cannot be null.",
+                    }
                 );
             }
 
@@ -127,7 +139,11 @@ public class RoleStore<TRole>(
         {
             logger.LogError(ex, "Failed to update the role in Marten.");
             return IdentityResult.Failed(
-                new IdentityError() { Description = "Something went wrong saving the role." }
+                new IdentityError
+                {
+                    Code = IdentityErrorCodes.RoleSaveFailed,
+                    Description = "Something went wrong saving the role.",
+                }
             );
         }
     }
@@ -142,7 +158,11 @@ public class RoleStore<TRole>(
             if (!role.Deletable)
             {
                 return IdentityResult.Failed(
-                    new IdentityError() { Description = "This role cannot be deleted." }
+                    new IdentityError
+                    {
+                        Code = IdentityErrorCodes.RoleNotDeletable,
+                        Description = "This role cannot be deleted.",
+                    }
                 );
             }
 
@@ -161,7 +181,11 @@ public class RoleStore<TRole>(
         {
             logger.LogError(ex, "Failed to delete the role in Marten.");
             return IdentityResult.Failed(
-                new IdentityError() { Description = "Something went wrong deleting the role." }
+                new IdentityError
+                {
+                    Code = IdentityErrorCodes.RoleDeleteFailed,
+                    Description = "Something went wrong deleting the role.",
+                }
             );
         }
     }
@@ -191,7 +215,11 @@ public class RoleStore<TRole>(
         {
             logger.LogError(ex, "Failed to restore the role in Marten.");
             return IdentityResult.Failed(
-                new IdentityError() { Description = "Something went wrong restoring the role." }
+                new IdentityError
+                {
+                    Code = IdentityErrorCodes.RoleRestoreFailed,
+                    Description = "Something went wrong restoring the role.",
+                }
             );
         }
     }
