@@ -84,4 +84,42 @@
     <comment>Followed by the Login.ResendConfirmation link.</comment>
   </data>
   <data name="Login.ResendConfirmation" xml:space="preserve"><value><![CDATA[Resend confirmation]]></value></data>
+
+  <!-- LoginForm.razor -->
+  <data name="LoginForm.Email" xml:space="preserve"><value><![CDATA[Email]]></value></data>
+  <data name="LoginForm.Password" xml:space="preserve"><value><![CDATA[Password]]></value></data>
+  <data name="LoginForm.ForgotPassword" xml:space="preserve"><value><![CDATA[Forgot password?]]></value></data>
+  <data name="LoginForm.RememberMe" xml:space="preserve"><value><![CDATA[Remember me]]></value></data>
+  <data name="LoginForm.EmailRequired" xml:space="preserve"><value><![CDATA[Email is required]]></value></data>
+  <data name="LoginForm.PasswordRequired" xml:space="preserve"><value><![CDATA[Password is required]]></value></data>
+  <data name="LoginForm.LoginErrorTitle" xml:space="preserve"><value><![CDATA[Login error]]></value></data>
+  <data name="LoginForm.InvalidLoginAttempt" xml:space="preserve">
+    <value><![CDATA[Invalid login attempt.]]></value>
+    <comment>Deliberately identical whether the email is unknown, the account can't sign in, it's locked out, or the password is wrong — user enumeration (CWE-208) requires one message for all of them. Used at three call sites in LoginForm.razor via this single key; do not give any of them a more specific translation.</comment>
+  </data>
+
+  <!-- Register.razor -->
+  <data name="Register.PageTitle" xml:space="preserve"><value><![CDATA[Register]]></value></data>
+  <data name="Register.Heading" xml:space="preserve"><value><![CDATA[Register]]></value></data>
+  <data name="Register.Subheading" xml:space="preserve"><value><![CDATA[Create your account to get started.]]></value></data>
+  <data name="Register.Email" xml:space="preserve"><value><![CDATA[Email]]></value></data>
+  <data name="Register.EmailRequired" xml:space="preserve"><value><![CDATA[Email is required]]></value></data>
+  <data name="Register.EmailInvalid" xml:space="preserve"><value><![CDATA[Please enter a valid email address]]></value></data>
+  <data name="Register.Password" xml:space="preserve"><value><![CDATA[Password]]></value></data>
+  <data name="Register.PasswordRequired" xml:space="preserve"><value><![CDATA[Password is required]]></value></data>
+  <data name="Register.PasswordLength" xml:space="preserve"><value><![CDATA[Password must be between 12 and 100 characters]]></value></data>
+  <data name="Register.ConfirmPassword" xml:space="preserve"><value><![CDATA[Confirm password]]></value></data>
+  <data name="Register.ConfirmPasswordRequired" xml:space="preserve"><value><![CDATA[Please confirm your password]]></value></data>
+  <data name="Register.PasswordMismatch" xml:space="preserve"><value><![CDATA[The passwords do not match]]></value></data>
+  <data name="Register.Submit" xml:space="preserve"><value><![CDATA[Register]]></value></data>
+  <data name="Register.HaveAccountPrompt" xml:space="preserve">
+    <value><![CDATA[Already have an account?]]></value>
+    <comment>Followed by the Register.LogIn link.</comment>
+  </data>
+  <data name="Register.LogIn" xml:space="preserve"><value><![CDATA[Log in]]></value></data>
+  <data name="Register.CreationFailedTitle" xml:space="preserve"><value><![CDATA[Error]]></value></data>
+  <data name="Register.CreationFailedDetail" xml:space="preserve">
+    <value><![CDATA[Error on creating a new account: {0}]]></value>
+    <comment>{0} is the joined IdentityResult error descriptions (e.g. "Email 'x' is already taken.").</comment>
+  </data>
 </root>

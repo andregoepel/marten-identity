@@ -72,4 +72,33 @@
   <data name="Login.CreateAccount" xml:space="preserve"><value><![CDATA[Konto erstellen]]></value></data>
   <data name="Login.NoEmailPrompt" xml:space="preserve"><value><![CDATA[Keine E-Mail erhalten?]]></value></data>
   <data name="Login.ResendConfirmation" xml:space="preserve"><value><![CDATA[Bestätigung erneut senden]]></value></data>
+
+  <!-- LoginForm.razor -->
+  <data name="LoginForm.Email" xml:space="preserve"><value><![CDATA[E-Mail]]></value></data>
+  <data name="LoginForm.Password" xml:space="preserve"><value><![CDATA[Passwort]]></value></data>
+  <data name="LoginForm.ForgotPassword" xml:space="preserve"><value><![CDATA[Passwort vergessen?]]></value></data>
+  <data name="LoginForm.RememberMe" xml:space="preserve"><value><![CDATA[Angemeldet bleiben]]></value></data>
+  <data name="LoginForm.EmailRequired" xml:space="preserve"><value><![CDATA[E-Mail ist erforderlich]]></value></data>
+  <data name="LoginForm.PasswordRequired" xml:space="preserve"><value><![CDATA[Passwort ist erforderlich]]></value></data>
+  <data name="LoginForm.LoginErrorTitle" xml:space="preserve"><value><![CDATA[Anmeldefehler]]></value></data>
+  <data name="LoginForm.InvalidLoginAttempt" xml:space="preserve"><value><![CDATA[Ungültiger Anmeldeversuch.]]></value></data>
+
+  <!-- Register.razor -->
+  <data name="Register.PageTitle" xml:space="preserve"><value><![CDATA[Registrieren]]></value></data>
+  <data name="Register.Heading" xml:space="preserve"><value><![CDATA[Registrieren]]></value></data>
+  <data name="Register.Subheading" xml:space="preserve"><value><![CDATA[Erstellen Sie Ihr Konto, um loszulegen.]]></value></data>
+  <data name="Register.Email" xml:space="preserve"><value><![CDATA[E-Mail]]></value></data>
+  <data name="Register.EmailRequired" xml:space="preserve"><value><![CDATA[E-Mail ist erforderlich]]></value></data>
+  <data name="Register.EmailInvalid" xml:space="preserve"><value><![CDATA[Bitte geben Sie eine gültige E-Mail-Adresse ein]]></value></data>
+  <data name="Register.Password" xml:space="preserve"><value><![CDATA[Passwort]]></value></data>
+  <data name="Register.PasswordRequired" xml:space="preserve"><value><![CDATA[Passwort ist erforderlich]]></value></data>
+  <data name="Register.PasswordLength" xml:space="preserve"><value><![CDATA[Das Passwort muss zwischen 12 und 100 Zeichen lang sein]]></value></data>
+  <data name="Register.ConfirmPassword" xml:space="preserve"><value><![CDATA[Passwort bestätigen]]></value></data>
+  <data name="Register.ConfirmPasswordRequired" xml:space="preserve"><value><![CDATA[Bitte bestätigen Sie Ihr Passwort]]></value></data>
+  <data name="Register.PasswordMismatch" xml:space="preserve"><value><![CDATA[Die Passwörter stimmen nicht überein]]></value></data>
+  <data name="Register.Submit" xml:space="preserve"><value><![CDATA[Registrieren]]></value></data>
+  <data name="Register.HaveAccountPrompt" xml:space="preserve"><value><![CDATA[Sie haben bereits ein Konto?]]></value></data>
+  <data name="Register.LogIn" xml:space="preserve"><value><![CDATA[Anmelden]]></value></data>
+  <data name="Register.CreationFailedTitle" xml:space="preserve"><value><![CDATA[Fehler]]></value></data>
+  <data name="Register.CreationFailedDetail" xml:space="preserve"><value><![CDATA[Fehler beim Erstellen des Kontos: {0}]]></value></data>
 </root>

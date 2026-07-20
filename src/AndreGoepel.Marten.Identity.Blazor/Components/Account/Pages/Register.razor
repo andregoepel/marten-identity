@@ -11,40 +11,43 @@
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
 @inject LoginTokenProtector LoginTokens
+@inject IServiceProvider Services
 
-<AppPageTitle Title="Register" />
+<AppPageTitle Title="@T("Register.PageTitle")" />
 
 <div class="ag-login-head">
-    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Register" />
-    <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub" Text="Create your account to get started." />
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="@T("Register.Heading")" />
+    <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub" Text="@T("Register.Subheading")" />
 </div>
 
 <RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@RegisterUser">
-    <DataAnnotationsValidator />
     <RadzenStack Gap="1.25rem">
 
-        <FormField Label="Email" For="Email">
+        <FormField Label="@T("Register.Email")" For="Email">
             <RadzenTextBox @bind-Value="@Input.Email"
                            Name="Email"
                            AutoCompleteType="AutoCompleteType.Email"
                            Placeholder="name@example.com"
                            Style="width:100%" />
-            <ValidationMessage For="@(() => Input.Email)" class="rz-message rz-messages-error" />
+            <RadzenRequiredValidator Component="Email" Text="@T("Register.EmailRequired")" />
+            <RadzenEmailValidator Component="Email" Text="@T("Register.EmailInvalid")" />
         </FormField>
 
-        <FormField Label="Password" For="NewPassword">
+        <FormField Label="@T("Register.Password")" For="NewPassword">
             <RadzenPassword @bind-Value="Input.Password" Name="NewPassword" Style="width:100%" />
-            <ValidationMessage For="@(() => Input.Password)" class="rz-message rz-messages-error" />
+            <RadzenRequiredValidator Component="NewPassword" Text="@T("Register.PasswordRequired")" />
+            <RadzenLengthValidator Component="NewPassword" Min="12" Max="100" Text="@T("Register.PasswordLength")" />
         </FormField>
 
-        <FormField Label="Confirm password" For="ConfirmPassword">
+        <FormField Label="@T("Register.ConfirmPassword")" For="ConfirmPassword">
             <RadzenPassword @bind-Value="Input.ConfirmPassword" Name="ConfirmPassword" Style="width:100%" />
-            <ValidationMessage For="@(() => Input.ConfirmPassword)" class="rz-message rz-messages-error" />
+            <RadzenRequiredValidator Component="ConfirmPassword" Text="@T("Register.ConfirmPasswordRequired")" />
+            <RadzenCompareValidator Component="ConfirmPassword" Value="@Input.Password" Text="@T("Register.PasswordMismatch")" Operator="CompareOperator.Equal" />
         </FormField>
 
         <div class="ag-login-actions">
             <RadzenButton ButtonType="ButtonType.Submit"
-                          Text="Register"
+                          Text="@T("Register.Submit")"
                           ButtonStyle="ButtonStyle.Primary" />
         </div>
 
@@ -53,7 +56,7 @@
 
 <div class="ag-login-footer-links">
     <span class="ag-login-resend">
-        Already have an account? <RadzenLink Path="Account/Login" Text="Log in" />
+        @T("Register.HaveAccountPrompt") <RadzenLink Path="Account/Login" Text="@T("Register.LogIn")" />
     </span>
 </div>
 
@@ -84,7 +87,16 @@
 
         if (!result.Succeeded)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error", $"Error on creating a new account: {string.Join('\r', result.Errors)}");
+            // Pre-existing bug fixed in passing: this joined the IdentityError objects
+            // themselves, not their Description — IdentityError doesn't override ToString(),
+            // so the notification showed the bare type name instead of the actual reason.
+            // No test covered the text, only that a notification fired, so it went unnoticed.
+            var reasons = string.Join(' ', result.Errors.Select(e => e.Description));
+            NotificationService.Notify(
+                NotificationSeverity.Error,
+                T("Register.CreationFailedTitle"),
+                T("Register.CreationFailedDetail", reasons)
+            );
             return;
         }
 
@@ -125,18 +137,22 @@
         return (IUserEmailStore<User>)UserStore;
     }
 
+    // Validation lives in the markup as Radzen validator components — the same reasoning as
+    // LoginForm.razor: a DataAnnotation's error text must be a compile-time constant, so it
+    // cannot call into IStringLocalizer (#114).
     private sealed class InputModel
     {
-        [Required(ErrorMessage = "Email is required")]
-        [EmailAddress(ErrorMessage = "Please enter a valid email address")]
         public string Email { get; set; } = "";
 
-        [Required(ErrorMessage = "Password is required")]
-        [StringLength(100, MinimumLength = 12, ErrorMessage = "Password must be between 12 and 100 characters")]
         public string Password { get; set; } = "";
 
-        [Required(ErrorMessage = "Please confirm your password")]
-        [Compare(nameof(Password), ErrorMessage = "The passwords do not match")]
         public string ConfirmPassword { get; set; } = "";
     }
+
+    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
+    // still renders on a host (or bUnit test) without localization registered.
+    private string T(string key) => Services.IdentityText(key);
+
+    private string T(string key, params object[] arguments) =>
+        Services.IdentityText(key, arguments);
 }

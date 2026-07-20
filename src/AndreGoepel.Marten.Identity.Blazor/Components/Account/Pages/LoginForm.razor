@@ -5,33 +5,33 @@
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
 @inject LoginTokenProtector LoginTokens
+@inject IServiceProvider Services
 
 <RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@LoginUser" id="login-form">
-    <DataAnnotationsValidator />
     <RadzenStack Gap="1.25rem">
 
         <RadzenStack Gap="0.4rem">
-            <RadzenLabel Text="Email" Component="Email" />
+            <RadzenLabel Text="@T("LoginForm.Email")" Component="Email" />
             <RadzenTextBox @bind-Value="@Input.Email"
                            Name="Email"
                            AutoCompleteType="AutoCompleteType.Username"
                            Placeholder="name@example.com"
                            Style="width:100%" />
-            <ValidationMessage For="@(() => Input.Email)" class="rz-message rz-messages-error" />
+            <RadzenRequiredValidator Component="Email" Text="@T("LoginForm.EmailRequired")" />
         </RadzenStack>
 
         <RadzenStack Gap="0.4rem">
             <div class="ag-login-field-head">
-                <RadzenLabel Text="Password" Component="Password" />
-                <RadzenLink Path="Account/ForgotPassword" Text="Forgot password?" class="ag-login-forgot" />
+                <RadzenLabel Text="@T("LoginForm.Password")" Component="Password" />
+                <RadzenLink Path="Account/ForgotPassword" Text="@T("LoginForm.ForgotPassword")" class="ag-login-forgot" />
             </div>
             <RadzenPassword @bind-Value="Input.Password" Name="Password" Style="width:100%" />
-            <ValidationMessage For="@(() => Input.Password)" class="rz-message rz-messages-error" />
+            <RadzenRequiredValidator Component="Password" Text="@T("LoginForm.PasswordRequired")" />
         </RadzenStack>
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
             <RadzenCheckBox @bind-Value="@Input.RememberMe" Name="RememberMe" />
-            <RadzenLabel Text="Remember me" Component="RememberMe" />
+            <RadzenLabel Text="@T("LoginForm.RememberMe")" Component="RememberMe" />
         </RadzenStack>
 
     </RadzenStack>
@@ -64,13 +64,13 @@
             // (user enumeration, CWE-208). The uniform message already hides it in the
             // response body; this closes the timing side channel.
             _ = PasswordHasher.HashPassword(new User(), model.Password);
-            NotificationService.Notify(NotificationSeverity.Error, "LoginError", "Invalid login attempt.");
+            NotificationService.Notify(NotificationSeverity.Error, T("LoginForm.LoginErrorTitle"), T("LoginForm.InvalidLoginAttempt"));
             return;
         }
 
         if (!await SignInManager.CanSignInAsync(user))
         {
-            NotificationService.Notify(NotificationSeverity.Error, "LoginError", "Invalid login attempt.");
+            NotificationService.Notify(NotificationSeverity.Error, T("LoginForm.LoginErrorTitle"), T("LoginForm.InvalidLoginAttempt"));
             return;
         }
 
@@ -84,7 +84,7 @@
         if (!await UserManager.CheckPasswordAsync(user, model.Password))
         {
             await UserManager.AccessFailedAsync(user);
-            NotificationService.Notify(NotificationSeverity.Error, "LoginError", "Invalid login attempt.");
+            NotificationService.Notify(NotificationSeverity.Error, T("LoginForm.LoginErrorTitle"), T("LoginForm.InvalidLoginAttempt"));
             return;
         }
 
@@ -94,14 +94,21 @@
         );
     }
 
+    // Validation lives in the markup as RadzenRequiredValidator components. Removing
+    // DataAnnotationsValidator (and the Required attributes with it) unifies this form onto
+    // the same mechanism every other form in the app uses, and — the reason it matters here —
+    // lets the required messages be localized like everything else; a DataAnnotation's error
+    // text must be a compile-time constant, so it cannot call into IStringLocalizer (#114).
     private sealed class InputModel
     {
-        [Required(ErrorMessage = "Email is required")]
         public string Email { get; set; } = "";
 
-        [Required(ErrorMessage = "Password is required")]
         public string Password { get; set; } = "";
 
         public bool RememberMe { get; set; }
     }
+
+    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the
+    // component still renders on a host (or bUnit test) without localization registered.
+    private string T(string key) => Services.IdentityText(key);
 }
