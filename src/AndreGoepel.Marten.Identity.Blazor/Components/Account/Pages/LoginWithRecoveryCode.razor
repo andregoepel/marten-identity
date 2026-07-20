@@ -6,32 +6,33 @@
 
 @inject NotificationService NotificationService
 @inject LoginTokenProtector LoginTokens
+@inject IServiceProvider Services
 
-<AppPageTitle Title="Recovery code verification" />
+<AppPageTitle Title="@T("LoginWithRecoveryCode.PageTitle")" />
 
 <div class="ag-login-head">
-    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Recovery code verification" />
-    <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub" Text="Use a recovery code to regain access." />
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="@T("LoginWithRecoveryCode.Heading")" />
+    <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub" Text="@T("LoginWithRecoveryCode.Subheading")" />
 </div>
 
 <RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@OnSubmitAsync">
     <RadzenStack Gap="1.25rem">
 
-        <FormField Label="Recovery code" For="RecoveryCode">
+        <FormField Label="@T("LoginWithRecoveryCode.CodeLabel")" For="RecoveryCode">
             <RadzenTextBox @bind-Value="@Input.RecoveryCode"
                            Name="RecoveryCode"
-                           Placeholder="Enter recovery code"
+                           Placeholder="@T("LoginWithRecoveryCode.CodePlaceholder")"
                            AutoCompleteType="AutoCompleteType.Off"
                            Style="width:100%" />
-            <RadzenRequiredValidator Component="RecoveryCode" Text="Recovery code is required" />
+            <RadzenRequiredValidator Component="RecoveryCode" Text="@T("LoginWithRecoveryCode.CodeRequired")" />
         </FormField>
 
         <div class="ag-login-actions">
             <RadzenButton ButtonType="ButtonType.Submit"
-                          Text="Log in"
+                          Text="@T("LoginWithRecoveryCode.Submit")"
                           ButtonStyle="ButtonStyle.Primary"
                           IsBusy="@_isProcessing"
-                          BusyText="Verifying..." />
+                          BusyText="@T("LoginWithRecoveryCode.Verifying")" />
         </div>
 
     </RadzenStack>
@@ -39,7 +40,7 @@
 
 <div class="ag-login-footer-links">
     <span class="ag-login-resend">
-        <RadzenLink Path="/Account/LoginWith2fa" Text="Use an authenticator code instead" />
+        <RadzenLink Path="/Account/LoginWith2fa" Text="@T("LoginWithRecoveryCode.UseAuthenticatorCode")" />
     </span>
 </div>
 
@@ -60,7 +61,7 @@
     {
         if (Error == "invalid")
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Recovery Code Error", "Invalid recovery code entered.");
+            NotificationService.Notify(NotificationSeverity.Error, T("LoginWithRecoveryCode.ErrorTitle"), T("LoginWithRecoveryCode.InvalidCode"));
         }
     }
 
@@ -78,4 +79,8 @@
         [Required]
         public string RecoveryCode { get; set; } = "";
     }
+
+    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
+    // still renders on a host (or bUnit test) without localization registered.
+    private string T(string key) => Services.IdentityText(key);
 }

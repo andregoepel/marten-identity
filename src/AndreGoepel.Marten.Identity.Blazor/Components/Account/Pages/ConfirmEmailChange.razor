@@ -6,21 +6,22 @@
 @inject UserManager<User> UserManager
 @inject SignInManager<User> SignInManager
 @inject NavigationManager NavigationManager
+@inject IServiceProvider Services
 
-<AppPageTitle Title="Confirm email change" />
+<AppPageTitle Title="@T("ConfirmEmailChange.PageTitle")" />
 
 <div class="rz-p-4 rz-p-md-8">
     <RadzenCard>
         <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Center">
 
-            <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Email change confirmation</RadzenText>
+            <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">@T("ConfirmEmailChange.Heading")</RadzenText>
 
             @if (_succeeded)
             {
                 <RadzenAlert AlertStyle="AlertStyle.Success" Shade="Shade.Lighter" Variant="Variant.Flat" AllowClose="false">
-                    Thank you for confirming your email change. Your email has been updated.
+                    @T("ConfirmEmailChange.Success")
                 </RadzenAlert>
-                <RadzenButton Text="Go to profile"
+                <RadzenButton Text="@T("ConfirmEmailChange.GoToProfile")"
                               ButtonStyle="ButtonStyle.Primary"
                               Click=@(() => NavigationManager.NavigateTo("/Account/Manage/Profile")) />
             }
@@ -29,7 +30,7 @@
                 <RadzenAlert AlertStyle="AlertStyle.Danger" Shade="Shade.Lighter" Variant="Variant.Flat" AllowClose="false">
                     @_error
                 </RadzenAlert>
-                <RadzenButton Text="Go to home"
+                <RadzenButton Text="@T("ConfirmEmailChange.GoHome")"
                               ButtonStyle="ButtonStyle.Primary"
                               Click=@(() => NavigationManager.NavigateTo("/")) />
             }
@@ -40,7 +41,7 @@
 
 @code {
     private bool _succeeded;
-    private string _error = "An error occurred confirming your email change.";
+    private string? _error;
 
     [SupplyParameterFromQuery]
     private string? UserId { get; set; }
@@ -53,9 +54,11 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _error = T("ConfirmEmailChange.GenericError");
+
         if (UserId is null || Email is null || Code is null)
         {
-            _error = "Invalid email change confirmation link.";
+            _error = T("ConfirmEmailChange.InvalidLink");
             return;
         }
 
@@ -63,7 +66,7 @@
         if (user is null)
         {
             // Do not reflect the supplied UserId back to the client (#13, CWE-204).
-            _error = "Invalid email change confirmation link.";
+            _error = T("ConfirmEmailChange.InvalidLink");
             return;
         }
 
@@ -71,7 +74,7 @@
         var result = await UserManager.ChangeEmailAsync(user, Email, code);
         if (!result.Succeeded)
         {
-            _error = "Error changing email. The link may have expired.";
+            _error = T("ConfirmEmailChange.ChangeFailedError");
             return;
         }
 
@@ -79,11 +82,15 @@
         var setUserNameResult = await UserManager.SetUserNameAsync(user, Email);
         if (!setUserNameResult.Succeeded)
         {
-            _error = "Error updating user name.";
+            _error = T("ConfirmEmailChange.UsernameUpdateError");
             return;
         }
 
         await SignInManager.RefreshSignInAsync(user);
         _succeeded = true;
     }
+
+    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
+    // still renders on a host (or bUnit test) without localization registered.
+    private string T(string key) => Services.IdentityText(key);
 }

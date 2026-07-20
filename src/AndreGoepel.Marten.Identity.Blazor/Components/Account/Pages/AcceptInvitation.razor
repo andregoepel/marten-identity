@@ -9,19 +9,20 @@
 @inject NotificationService NotificationService
 @inject IOptions<IdentityOptions> IdentityOptions
 @inject LoginTokenProtector LoginTokens
+@inject IServiceProvider Services
 
 @* Deliberately NOT registered in IdentityFeatureGateMiddleware.MapPathToFeature: this page
    is the way a host adds people while self-service registration is disabled, so gating it
    behind the UserRegistration flag would defeat its purpose (#100). *@
 
-<AppPageTitle Title="Accept invitation" />
+<AppPageTitle Title="@T("AcceptInvitation.PageTitle")" />
 
 <div class="ag-login-head">
-    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Accept your invitation" />
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="@T("AcceptInvitation.Heading")" />
     @if (!_invalidLink)
     {
         <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub">
-            Set a password for <strong>@_email</strong> to finish setting up your account.
+            @T("AcceptInvitation.SubheadingPrefix") <strong>@_email</strong> @T("AcceptInvitation.SubheadingSuffix")
         </RadzenText>
     }
 </div>
@@ -29,7 +30,7 @@
 @if (_invalidLink)
 {
     <RadzenAlert AlertStyle="AlertStyle.Danger" Shade="Shade.Lighter" Variant="Variant.Flat" AllowClose="false">
-        This invitation link is invalid or has expired. Ask your administrator to send a new one.
+        @T("AcceptInvitation.InvalidLink")
     </RadzenAlert>
 }
 else
@@ -37,28 +38,28 @@ else
     <RadzenTemplateForm TItem="InputModel" Data=@Input Submit=@OnValidSubmitAsync>
         <RadzenStack Gap="1.25rem">
 
-            <FormField Label="New password" For="Password">
+            <FormField Label="@T("AcceptInvitation.NewPassword")" For="Password">
                 <RadzenPassword @bind-Value=@Input.Password Name="Password" Style="width:100%" />
-                <RadzenRequiredValidator Component="Password" Text="Password is required" />
+                <RadzenRequiredValidator Component="Password" Text="@T("AcceptInvitation.PasswordRequired")" />
                 <RadzenLengthValidator Component="Password" Min="@MinPasswordLength" Max="100"
-                                       Text="@($"Password must be between {MinPasswordLength} and 100 characters")" />
+                                       Text="@T("AcceptInvitation.PasswordLength", MinPasswordLength)" />
             </FormField>
 
-            <FormField Label="Confirm new password" For="ConfirmPassword">
+            <FormField Label="@T("AcceptInvitation.ConfirmPassword")" For="ConfirmPassword">
                 <RadzenPassword @bind-Value=@Input.ConfirmPassword Name="ConfirmPassword" Style="width:100%" />
-                <RadzenRequiredValidator Component="ConfirmPassword" Text="Please confirm your password" />
+                <RadzenRequiredValidator Component="ConfirmPassword" Text="@T("AcceptInvitation.ConfirmPasswordRequired")" />
                 <RadzenCompareValidator Component="ConfirmPassword"
                                         Value=@Input.Password
-                                        Text="The passwords do not match"
+                                        Text="@T("AcceptInvitation.PasswordMismatch")"
                                         Operator="CompareOperator.Equal" />
             </FormField>
 
             <div class="ag-login-actions">
                 <RadzenButton ButtonType="ButtonType.Submit"
-                              Text="Set password & sign in"
+                              Text="@T("AcceptInvitation.Submit")"
                               ButtonStyle="ButtonStyle.Primary"
                               IsBusy=@_isProcessing
-                              BusyText="Setting up..." />
+                              BusyText="@T("AcceptInvitation.SettingUp")" />
             </div>
 
         </RadzenStack>
@@ -156,7 +157,7 @@ else
             {
                 NotificationService.Notify(
                     NotificationSeverity.Error,
-                    "Could not set password",
+                    T("AcceptInvitation.SetPasswordFailedTitle"),
                     string.Join(", ", addPassword.Errors.Select(e => e.Description))
                 );
                 return;
@@ -194,4 +195,11 @@ else
         [Compare(nameof(Password))]
         public string ConfirmPassword { get; set; } = "";
     }
+
+    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
+    // still renders on a host (or bUnit test) without localization registered.
+    private string T(string key) => Services.IdentityText(key);
+
+    private string T(string key, params object[] arguments) =>
+        Services.IdentityText(key, arguments);
 }

@@ -6,39 +6,40 @@
 
 @inject NotificationService NotificationService
 @inject LoginTokenProtector LoginTokens
+@inject IServiceProvider Services
 
-<AppPageTitle Title="Two-factor authentication" />
+<AppPageTitle Title="@T("LoginWith2fa.PageTitle")" />
 
 <div class="ag-login-head">
-    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Two-factor authentication" />
-    <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub" Text="Enter the code from your authenticator app." />
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="@T("LoginWith2fa.Heading")" />
+    <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub" Text="@T("LoginWith2fa.Subheading")" />
 </div>
 
 <RadzenTemplateForm TItem="InputModel" Data="@Input" Submit="@OnSubmitAsync">
     <RadzenStack Gap="1.25rem">
 
-        <FormField Label="Authenticator code" For="TwoFactorCode">
+        <FormField Label="@T("LoginWith2fa.CodeLabel")" For="TwoFactorCode">
             <RadzenTextBox @bind-Value="@Input.TwoFactorCode"
                            Name="TwoFactorCode"
-                           Placeholder="6-digit code"
+                           Placeholder="@T("LoginWith2fa.CodePlaceholder")"
                            AutoCompleteType="AutoCompleteType.Off"
                            Style="width:100%" />
-            <RadzenRequiredValidator Component="TwoFactorCode" Text="Authenticator code is required" />
+            <RadzenRequiredValidator Component="TwoFactorCode" Text="@T("LoginWith2fa.CodeRequired")" />
             <RadzenLengthValidator Component="TwoFactorCode" Min="6" Max="7"
-                                   Text="Code must be 6 or 7 characters" />
+                                   Text="@T("LoginWith2fa.CodeLength")" />
         </FormField>
 
         <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.5rem">
             <RadzenCheckBox @bind-Value="@Input.RememberMachine" Name="RememberMachine" />
-            <RadzenLabel Text="Remember this machine" Component="RememberMachine" />
+            <RadzenLabel Text="@T("LoginWith2fa.RememberMachine")" Component="RememberMachine" />
         </RadzenStack>
 
         <div class="ag-login-actions">
             <RadzenButton ButtonType="ButtonType.Submit"
-                          Text="Log in"
+                          Text="@T("LoginWith2fa.Submit")"
                           ButtonStyle="ButtonStyle.Primary"
                           IsBusy="@_isProcessing"
-                          BusyText="Verifying..." />
+                          BusyText="@T("LoginWith2fa.Verifying")" />
         </div>
 
     </RadzenStack>
@@ -47,7 +48,7 @@
 <div class="ag-login-footer-links">
     <span class="ag-login-resend">
         <RadzenLink Path="@($"/Account/LoginWithRecoveryCode?returnUrl={ReturnUrl}")"
-                    Text="Use a recovery code instead" />
+                    Text="@T("LoginWith2fa.UseRecoveryCode")" />
     </span>
 </div>
 
@@ -71,7 +72,7 @@
     {
         if (Error == "invalid")
         {
-            NotificationService.Notify(NotificationSeverity.Error, "2FA Error", "Invalid authenticator code.");
+            NotificationService.Notify(NotificationSeverity.Error, T("LoginWith2fa.ErrorTitle"), T("LoginWith2fa.InvalidCode"));
         }
     }
 
@@ -97,4 +98,8 @@
 
         public bool RememberMachine { get; set; }
     }
+
+    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
+    // still renders on a host (or bUnit test) without localization registered.
+    private string T(string key) => Services.IdentityText(key);
 }
