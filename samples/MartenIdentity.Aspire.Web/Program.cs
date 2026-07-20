@@ -1,3 +1,4 @@
+using AndreGoepel.Design.Blazor;
 using AndreGoepel.Marten.Identity;
 using AndreGoepel.Marten.Identity.Blazor;
 using AndreGoepel.Marten.Identity.Blazor.Components.Account;
@@ -93,6 +94,13 @@ if (!app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
+
+// Resolves the request culture (cookie → Accept-Language → default) and maps the
+// culture-switch endpoint LanguageSwitcher links to. Must run before anything that
+// renders user-facing text — that includes the identity middlewares below, which
+// redirect to localized pages, and MapRazorComponents, because a Blazor Server
+// circuit takes its culture from the request that establishes it.
+app.UseDesignBlazorLocalization();
 
 app.UseAuthentication();
 app.UseAuthorization();

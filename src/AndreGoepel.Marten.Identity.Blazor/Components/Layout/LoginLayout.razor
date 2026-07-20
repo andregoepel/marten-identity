@@ -6,6 +6,18 @@
 <RadzenTooltip />
 <RadzenContextMenu />
 
+@* The auth pages have no topbar to host the switcher, so it floats top-right over
+   the centred LoginShell card. LanguageSwitcher renders plain anchors, which is what
+   makes it work here at all — Login.razor is statically rendered, so an interactive
+   toggle would be inert.
+
+   Positioned inline rather than via an ag-* class: this library ships no stylesheet
+   of its own, and design.css has no login-page switcher recipe yet. Worth promoting
+   to design.css if a second consumer needs the same placement. *@
+<div style="position: fixed; top: 1rem; right: 1rem; z-index: 10;">
+    <LanguageSwitcher />
+</div>
+
 <LoginShell BrandName="@BrandName">
     <ChildContent>@Body</ChildContent>
     <Footer>@BrandName &middot; &copy; @DateTime.UtcNow.Year</Footer>

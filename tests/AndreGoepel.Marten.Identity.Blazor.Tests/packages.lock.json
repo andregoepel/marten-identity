@@ -382,19 +382,19 @@
       "andregoepel.marten.identity.blazor": {
         "type": "Project",
         "dependencies": {
-          "AndreGoepel.Design.Blazor": "[1.1.0, )",
+          "AndreGoepel.Design.Blazor": "[1.2.1, )",
           "AndreGoepel.Marten.Identity": "[1.0.0, )",
           "Marten": "[9.16.0, )",
-          "Radzen.Blazor": "[11.1.5, )"
+          "Radzen.Blazor": "[11.1.6, )"
         }
       },
       "AndreGoepel.Design.Blazor": {
         "type": "CentralTransitive",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "hv/9YPUyf5pjxx2ASmN9Gdnc0l1EoBs0rmEFnHdnbqajGBLtGcoJlz0MjMvS8JCyllU52uv3heHcbdHeaipYDQ==",
+        "requested": "[1.2.1, )",
+        "resolved": "1.2.1",
+        "contentHash": "Ai5Ym4mHwo5BIcZTGpYXnSc3VQn73ZqcLtbcqtKNqKeVaCuMrcboj4+rbuAbAc7IEG9hLRH87VsNaq+6L+JNHQ==",
         "dependencies": {
-          "Radzen.Blazor": "11.1.5"
+          "Radzen.Blazor": "11.1.6"
         }
       },
       "AngleSharp": {
@@ -436,9 +436,9 @@
       },
       "Radzen.Blazor": {
         "type": "CentralTransitive",
-        "requested": "[11.1.5, )",
-        "resolved": "11.1.5",
-        "contentHash": "BIInbCL6KILYx9jkXeCX/gnblMVMI84kGTtgb4dY6sxFpRlClVakcPC8UrckuXg40TD7U4n+/WOSiwwoZV2Bpg=="
+        "requested": "[11.1.6, )",
+        "resolved": "11.1.6",
+        "contentHash": "Lue6gBxVcSN2SBs8R/ixMXv1iyLImONTzDTdPHzCpFzASaHLccoy6yXXPWU3EKe+mDBJjde9CS/e8juYBkxIOQ=="
       }
     }
   }
