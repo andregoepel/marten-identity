@@ -3,14 +3,15 @@
 
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
+@inject IServiceProvider Services
 
-<AppPageTitle Title="Register confirmation" />
+<AppPageTitle Title="@T("RegisterConfirmation.PageTitle")" />
 
 <div class="rz-p-4 rz-p-md-8">
     <RadzenCard>
         <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Center">
 
-            <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">Check your email</RadzenText>
+            <RadzenText TextStyle="TextStyle.H3" TagName="TagName.H1">@T("RegisterConfirmation.Heading")</RadzenText>
 
             @if (_error is not null)
             {
@@ -21,11 +22,11 @@
             else
             {
                 <RadzenAlert AlertStyle="AlertStyle.Info" Shade="Shade.Lighter" Variant="Variant.Flat" AllowClose="false">
-                    Please check your email to confirm your account.
+                    @T("RegisterConfirmation.Detail")
                 </RadzenAlert>
             }
 
-            <RadzenButton Text="Back to login"
+            <RadzenButton Text="@T("RegisterConfirmation.BackToLogin")"
                           ButtonStyle="ButtonStyle.Primary"
                           Click=@(() => NavigationManager.NavigateTo("/Account/Login")) />
 
@@ -54,7 +55,11 @@
         if (user is null)
         {
             HttpContext.Response.StatusCode = StatusCodes.Status404NotFound;
-            _error = "Error finding user for the specified email.";
+            _error = T("RegisterConfirmation.UserNotFoundError");
         }
     }
+
+    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
+    // still renders on a host (or bUnit test) without localization registered.
+    private string T(string key) => Services.IdentityText(key);
 }

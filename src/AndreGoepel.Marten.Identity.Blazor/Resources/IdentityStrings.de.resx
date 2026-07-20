@@ -101,4 +101,149 @@
   <data name="Register.LogIn" xml:space="preserve"><value><![CDATA[Anmelden]]></value></data>
   <data name="Register.CreationFailedTitle" xml:space="preserve"><value><![CDATA[Fehler]]></value></data>
   <data name="Register.CreationFailedDetail" xml:space="preserve"><value><![CDATA[Fehler beim Erstellen des Kontos: {0}]]></value></data>
+
+  <!-- AcceptInvitation.razor -->
+  <data name="AcceptInvitation.PageTitle" xml:space="preserve"><value><![CDATA[Einladung annehmen]]></value></data>
+  <data name="AcceptInvitation.Heading" xml:space="preserve"><value><![CDATA[Nehmen Sie Ihre Einladung an]]></value></data>
+  <data name="AcceptInvitation.SubheadingPrefix" xml:space="preserve"><value><![CDATA[Legen Sie ein Passwort für]]></value></data>
+  <data name="AcceptInvitation.SubheadingSuffix" xml:space="preserve"><value><![CDATA[fest, um die Einrichtung Ihres Kontos abzuschließen.]]></value></data>
+  <data name="AcceptInvitation.InvalidLink" xml:space="preserve"><value><![CDATA[Dieser Einladungslink ist ungültig oder abgelaufen. Bitten Sie Ihren Administrator, einen neuen zu senden.]]></value></data>
+  <data name="AcceptInvitation.NewPassword" xml:space="preserve"><value><![CDATA[Neues Passwort]]></value></data>
+  <data name="AcceptInvitation.PasswordRequired" xml:space="preserve"><value><![CDATA[Passwort ist erforderlich]]></value></data>
+  <data name="AcceptInvitation.PasswordLength" xml:space="preserve"><value><![CDATA[Das Passwort muss zwischen {0} und 100 Zeichen lang sein]]></value></data>
+  <data name="AcceptInvitation.ConfirmPassword" xml:space="preserve"><value><![CDATA[Neues Passwort bestätigen]]></value></data>
+  <data name="AcceptInvitation.ConfirmPasswordRequired" xml:space="preserve"><value><![CDATA[Bitte bestätigen Sie Ihr Passwort]]></value></data>
+  <data name="AcceptInvitation.PasswordMismatch" xml:space="preserve"><value><![CDATA[Die Passwörter stimmen nicht überein]]></value></data>
+  <data name="AcceptInvitation.Submit" xml:space="preserve"><value><![CDATA[Passwort festlegen & anmelden]]></value></data>
+  <data name="AcceptInvitation.SettingUp" xml:space="preserve"><value><![CDATA[Wird eingerichtet...]]></value></data>
+  <data name="AcceptInvitation.SetPasswordFailedTitle" xml:space="preserve"><value><![CDATA[Passwort konnte nicht festgelegt werden]]></value></data>
+
+  <!-- ConfirmEmail.razor -->
+  <data name="ConfirmEmail.PageTitle" xml:space="preserve"><value><![CDATA[E-Mail bestätigen]]></value></data>
+  <data name="ConfirmEmail.Heading" xml:space="preserve"><value><![CDATA[E-Mail-Bestätigung]]></value></data>
+  <data name="ConfirmEmail.Success" xml:space="preserve"><value><![CDATA[Vielen Dank für die Bestätigung Ihrer E-Mail-Adresse. Sie können sich jetzt anmelden.]]></value></data>
+  <data name="ConfirmEmail.LogIn" xml:space="preserve"><value><![CDATA[Anmelden]]></value></data>
+  <data name="ConfirmEmail.GoHome" xml:space="preserve"><value><![CDATA[Zur Startseite]]></value></data>
+  <data name="ConfirmEmail.GenericError" xml:space="preserve"><value><![CDATA[Bei der Bestätigung Ihrer E-Mail-Adresse ist ein Fehler aufgetreten.]]></value></data>
+  <data name="ConfirmEmail.UserNotFoundError" xml:space="preserve"><value><![CDATA[Fehler beim Bestätigen Ihrer E-Mail-Adresse. Der Link ist möglicherweise ungültig oder abgelaufen.]]></value></data>
+  <data name="ConfirmEmail.ConfirmFailedError" xml:space="preserve"><value><![CDATA[Fehler beim Bestätigen Ihrer E-Mail-Adresse. Der Link ist möglicherweise abgelaufen.]]></value></data>
+
+  <!-- ConfirmEmailChange.razor -->
+  <data name="ConfirmEmailChange.PageTitle" xml:space="preserve"><value><![CDATA[E-Mail-Änderung bestätigen]]></value></data>
+  <data name="ConfirmEmailChange.Heading" xml:space="preserve"><value><![CDATA[Bestätigung der E-Mail-Änderung]]></value></data>
+  <data name="ConfirmEmailChange.Success" xml:space="preserve"><value><![CDATA[Vielen Dank für die Bestätigung Ihrer E-Mail-Änderung. Ihre E-Mail-Adresse wurde aktualisiert.]]></value></data>
+  <data name="ConfirmEmailChange.GoToProfile" xml:space="preserve"><value><![CDATA[Zum Profil]]></value></data>
+  <data name="ConfirmEmailChange.GoHome" xml:space="preserve"><value><![CDATA[Zur Startseite]]></value></data>
+  <data name="ConfirmEmailChange.GenericError" xml:space="preserve"><value><![CDATA[Bei der Bestätigung Ihrer E-Mail-Änderung ist ein Fehler aufgetreten.]]></value></data>
+  <data name="ConfirmEmailChange.InvalidLink" xml:space="preserve"><value><![CDATA[Ungültiger Bestätigungslink für die E-Mail-Änderung.]]></value></data>
+  <data name="ConfirmEmailChange.ChangeFailedError" xml:space="preserve"><value><![CDATA[Fehler beim Ändern der E-Mail-Adresse. Der Link ist möglicherweise abgelaufen.]]></value></data>
+  <data name="ConfirmEmailChange.UsernameUpdateError" xml:space="preserve"><value><![CDATA[Fehler beim Aktualisieren des Benutzernamens.]]></value></data>
+
+  <!-- ForgotPassword.razor -->
+  <data name="ForgotPassword.PageTitle" xml:space="preserve"><value><![CDATA[Passwort vergessen?]]></value></data>
+  <data name="ForgotPassword.Heading" xml:space="preserve"><value><![CDATA[Passwort vergessen?]]></value></data>
+  <data name="ForgotPassword.Subheading" xml:space="preserve"><value><![CDATA[Wir senden Ihnen einen Link zum Zurücksetzen des Passworts.]]></value></data>
+  <data name="ForgotPassword.Email" xml:space="preserve"><value><![CDATA[E-Mail]]></value></data>
+  <data name="ForgotPassword.EmailRequired" xml:space="preserve"><value><![CDATA[E-Mail ist erforderlich]]></value></data>
+  <data name="ForgotPassword.EmailInvalid" xml:space="preserve"><value><![CDATA[Bitte geben Sie eine gültige E-Mail-Adresse ein]]></value></data>
+  <data name="ForgotPassword.Submit" xml:space="preserve"><value><![CDATA[Passwort zurücksetzen]]></value></data>
+  <data name="ForgotPassword.Sending" xml:space="preserve"><value><![CDATA[Wird gesendet...]]></value></data>
+  <data name="ForgotPassword.BackToLogin" xml:space="preserve"><value><![CDATA[Zurück zur Anmeldung]]></value></data>
+
+  <!-- ForgotPasswordConfirmation.razor -->
+  <data name="ForgotPasswordConfirmation.PageTitle" xml:space="preserve"><value><![CDATA[Prüfen Sie Ihre E-Mails]]></value></data>
+  <data name="ForgotPasswordConfirmation.Heading" xml:space="preserve"><value><![CDATA[Prüfen Sie Ihre E-Mails]]></value></data>
+  <data name="ForgotPasswordConfirmation.Detail" xml:space="preserve"><value><![CDATA[Falls ein Konto mit dieser E-Mail-Adresse existiert, wurde ein Link zum Zurücksetzen des Passworts gesendet. Bitte prüfen Sie Ihren Posteingang.]]></value></data>
+  <data name="ForgotPasswordConfirmation.BackToLogin" xml:space="preserve"><value><![CDATA[Zurück zur Anmeldung]]></value></data>
+
+  <!-- InvalidPasswordReset.razor -->
+  <data name="InvalidPasswordReset.PageTitle" xml:space="preserve"><value><![CDATA[Ungültiges Zurücksetzen des Passworts]]></value></data>
+  <data name="InvalidPasswordReset.Heading" xml:space="preserve"><value><![CDATA[Ungültiges Zurücksetzen des Passworts]]></value></data>
+  <data name="InvalidPasswordReset.Detail" xml:space="preserve"><value><![CDATA[Der Link zum Zurücksetzen des Passworts ist ungültig.]]></value></data>
+  <data name="InvalidPasswordReset.RequestNewLink" xml:space="preserve"><value><![CDATA[Neuen Link anfordern]]></value></data>
+
+  <!-- InvalidUser.razor -->
+  <data name="InvalidUser.PageTitle" xml:space="preserve"><value><![CDATA[Ungültiger Benutzer]]></value></data>
+  <data name="InvalidUser.Heading" xml:space="preserve"><value><![CDATA[Ungültiger Benutzer]]></value></data>
+  <data name="InvalidUser.Detail" xml:space="preserve"><value><![CDATA[Der Benutzer konnte nicht geladen werden.]]></value></data>
+  <data name="InvalidUser.GoHome" xml:space="preserve"><value><![CDATA[Zur Startseite]]></value></data>
+
+  <!-- Lockout.razor -->
+  <data name="Lockout.PageTitle" xml:space="preserve"><value><![CDATA[Gesperrt]]></value></data>
+  <data name="Lockout.Heading" xml:space="preserve"><value><![CDATA[Konto gesperrt]]></value></data>
+  <data name="Lockout.Detail" xml:space="preserve"><value><![CDATA[Dieses Konto wurde gesperrt. Bitte versuchen Sie es später erneut.]]></value></data>
+  <data name="Lockout.BackToLogin" xml:space="preserve"><value><![CDATA[Zurück zur Anmeldung]]></value></data>
+
+  <!-- LoginWith2fa.razor -->
+  <data name="LoginWith2fa.PageTitle" xml:space="preserve"><value><![CDATA[Zwei-Faktor-Authentifizierung]]></value></data>
+  <data name="LoginWith2fa.Heading" xml:space="preserve"><value><![CDATA[Zwei-Faktor-Authentifizierung]]></value></data>
+  <data name="LoginWith2fa.Subheading" xml:space="preserve"><value><![CDATA[Geben Sie den Code aus Ihrer Authenticator-App ein.]]></value></data>
+  <data name="LoginWith2fa.CodeLabel" xml:space="preserve"><value><![CDATA[Authenticator-Code]]></value></data>
+  <data name="LoginWith2fa.CodePlaceholder" xml:space="preserve"><value><![CDATA[6-stelliger Code]]></value></data>
+  <data name="LoginWith2fa.CodeRequired" xml:space="preserve"><value><![CDATA[Authenticator-Code ist erforderlich]]></value></data>
+  <data name="LoginWith2fa.CodeLength" xml:space="preserve"><value><![CDATA[Der Code muss 6 oder 7 Zeichen lang sein]]></value></data>
+  <data name="LoginWith2fa.RememberMachine" xml:space="preserve"><value><![CDATA[Dieses Gerät merken]]></value></data>
+  <data name="LoginWith2fa.Submit" xml:space="preserve"><value><![CDATA[Anmelden]]></value></data>
+  <data name="LoginWith2fa.Verifying" xml:space="preserve"><value><![CDATA[Wird überprüft...]]></value></data>
+  <data name="LoginWith2fa.UseRecoveryCode" xml:space="preserve"><value><![CDATA[Stattdessen einen Wiederherstellungscode verwenden]]></value></data>
+  <data name="LoginWith2fa.ErrorTitle" xml:space="preserve"><value><![CDATA[2FA-Fehler]]></value></data>
+  <data name="LoginWith2fa.InvalidCode" xml:space="preserve"><value><![CDATA[Ungültiger Authenticator-Code.]]></value></data>
+
+  <!-- LoginWithRecoveryCode.razor -->
+  <data name="LoginWithRecoveryCode.PageTitle" xml:space="preserve"><value><![CDATA[Überprüfung des Wiederherstellungscodes]]></value></data>
+  <data name="LoginWithRecoveryCode.Heading" xml:space="preserve"><value><![CDATA[Überprüfung des Wiederherstellungscodes]]></value></data>
+  <data name="LoginWithRecoveryCode.Subheading" xml:space="preserve"><value><![CDATA[Verwenden Sie einen Wiederherstellungscode, um wieder Zugriff zu erhalten.]]></value></data>
+  <data name="LoginWithRecoveryCode.CodeLabel" xml:space="preserve"><value><![CDATA[Wiederherstellungscode]]></value></data>
+  <data name="LoginWithRecoveryCode.CodePlaceholder" xml:space="preserve"><value><![CDATA[Wiederherstellungscode eingeben]]></value></data>
+  <data name="LoginWithRecoveryCode.CodeRequired" xml:space="preserve"><value><![CDATA[Wiederherstellungscode ist erforderlich]]></value></data>
+  <data name="LoginWithRecoveryCode.Submit" xml:space="preserve"><value><![CDATA[Anmelden]]></value></data>
+  <data name="LoginWithRecoveryCode.Verifying" xml:space="preserve"><value><![CDATA[Wird überprüft...]]></value></data>
+  <data name="LoginWithRecoveryCode.UseAuthenticatorCode" xml:space="preserve"><value><![CDATA[Stattdessen einen Authenticator-Code verwenden]]></value></data>
+  <data name="LoginWithRecoveryCode.ErrorTitle" xml:space="preserve"><value><![CDATA[Fehler beim Wiederherstellungscode]]></value></data>
+  <data name="LoginWithRecoveryCode.InvalidCode" xml:space="preserve"><value><![CDATA[Ungültiger Wiederherstellungscode eingegeben.]]></value></data>
+
+  <!-- RegisterConfirmation.razor -->
+  <data name="RegisterConfirmation.PageTitle" xml:space="preserve"><value><![CDATA[Registrierungsbestätigung]]></value></data>
+  <data name="RegisterConfirmation.Heading" xml:space="preserve"><value><![CDATA[Prüfen Sie Ihre E-Mails]]></value></data>
+  <data name="RegisterConfirmation.Detail" xml:space="preserve"><value><![CDATA[Bitte prüfen Sie Ihre E-Mails, um Ihr Konto zu bestätigen.]]></value></data>
+  <data name="RegisterConfirmation.BackToLogin" xml:space="preserve"><value><![CDATA[Zurück zur Anmeldung]]></value></data>
+  <data name="RegisterConfirmation.UserNotFoundError" xml:space="preserve"><value><![CDATA[Fehler beim Suchen des Benutzers für die angegebene E-Mail-Adresse.]]></value></data>
+
+  <!-- ResendEmailConfirmation.razor -->
+  <data name="ResendEmailConfirmation.PageTitle" xml:space="preserve"><value><![CDATA[Bestätigungs-E-Mail erneut senden]]></value></data>
+  <data name="ResendEmailConfirmation.Heading" xml:space="preserve"><value><![CDATA[Bestätigungs-E-Mail erneut senden]]></value></data>
+  <data name="ResendEmailConfirmation.Subheading" xml:space="preserve"><value><![CDATA[Geben Sie Ihre E-Mail-Adresse ein, und wir senden Ihnen den Bestätigungslink erneut.]]></value></data>
+  <data name="ResendEmailConfirmation.Email" xml:space="preserve"><value><![CDATA[E-Mail]]></value></data>
+  <data name="ResendEmailConfirmation.EmailRequired" xml:space="preserve"><value><![CDATA[E-Mail ist erforderlich]]></value></data>
+  <data name="ResendEmailConfirmation.EmailInvalid" xml:space="preserve"><value><![CDATA[Bitte geben Sie eine gültige E-Mail-Adresse ein]]></value></data>
+  <data name="ResendEmailConfirmation.Submit" xml:space="preserve"><value><![CDATA[Erneut senden]]></value></data>
+  <data name="ResendEmailConfirmation.Sending" xml:space="preserve"><value><![CDATA[Wird gesendet...]]></value></data>
+  <data name="ResendEmailConfirmation.BackToLogin" xml:space="preserve"><value><![CDATA[Zurück zur Anmeldung]]></value></data>
+  <data name="ResendEmailConfirmation.EmailSentTitle" xml:space="preserve"><value><![CDATA[E-Mail gesendet]]></value></data>
+  <data name="ResendEmailConfirmation.EmailSentDetail" xml:space="preserve"><value><![CDATA[Bestätigungs-E-Mail gesendet. Bitte prüfen Sie Ihre E-Mails.]]></value></data>
+
+  <!-- ResetPassword.razor -->
+  <data name="ResetPassword.PageTitle" xml:space="preserve"><value><![CDATA[Passwort zurücksetzen]]></value></data>
+  <data name="ResetPassword.Heading" xml:space="preserve"><value><![CDATA[Setzen Sie Ihr Passwort zurück]]></value></data>
+  <data name="ResetPassword.Subheading" xml:space="preserve"><value><![CDATA[Wählen Sie ein neues Passwort für Ihr Konto.]]></value></data>
+  <data name="ResetPassword.InvalidLink" xml:space="preserve"><value><![CDATA[Dieser Link zum Zurücksetzen des Passworts ist ungültig. Bitte fordern Sie einen neuen an.]]></value></data>
+  <data name="ResetPassword.RequestNewLink" xml:space="preserve"><value><![CDATA[Neuen Link anfordern]]></value></data>
+  <data name="ResetPassword.Email" xml:space="preserve"><value><![CDATA[E-Mail]]></value></data>
+  <data name="ResetPassword.EmailRequired" xml:space="preserve"><value><![CDATA[E-Mail ist erforderlich]]></value></data>
+  <data name="ResetPassword.EmailInvalid" xml:space="preserve"><value><![CDATA[Bitte geben Sie eine gültige E-Mail-Adresse ein]]></value></data>
+  <data name="ResetPassword.NewPassword" xml:space="preserve"><value><![CDATA[Neues Passwort]]></value></data>
+  <data name="ResetPassword.PasswordRequired" xml:space="preserve"><value><![CDATA[Passwort ist erforderlich]]></value></data>
+  <data name="ResetPassword.PasswordLength" xml:space="preserve"><value><![CDATA[Das Passwort muss zwischen {0} und 100 Zeichen lang sein]]></value></data>
+  <data name="ResetPassword.ConfirmPassword" xml:space="preserve"><value><![CDATA[Neues Passwort bestätigen]]></value></data>
+  <data name="ResetPassword.ConfirmPasswordRequired" xml:space="preserve"><value><![CDATA[Bitte bestätigen Sie Ihr Passwort]]></value></data>
+  <data name="ResetPassword.PasswordMismatch" xml:space="preserve"><value><![CDATA[Die Passwörter stimmen nicht überein]]></value></data>
+  <data name="ResetPassword.Submit" xml:space="preserve"><value><![CDATA[Passwort zurücksetzen]]></value></data>
+  <data name="ResetPassword.Resetting" xml:space="preserve"><value><![CDATA[Wird zurückgesetzt...]]></value></data>
+  <data name="ResetPassword.ResetFailedTitle" xml:space="preserve"><value><![CDATA[Zurücksetzen fehlgeschlagen]]></value></data>
+
+  <!-- ResetPasswordConfirmation.razor -->
+  <data name="ResetPasswordConfirmation.PageTitle" xml:space="preserve"><value><![CDATA[Passwort zurückgesetzt]]></value></data>
+  <data name="ResetPasswordConfirmation.Heading" xml:space="preserve"><value><![CDATA[Passwort zurückgesetzt]]></value></data>
+  <data name="ResetPasswordConfirmation.Detail" xml:space="preserve"><value><![CDATA[Ihr Passwort wurde erfolgreich zurückgesetzt.]]></value></data>
+  <data name="ResetPasswordConfirmation.LogIn" xml:space="preserve"><value><![CDATA[Anmelden]]></value></data>
 </root>
