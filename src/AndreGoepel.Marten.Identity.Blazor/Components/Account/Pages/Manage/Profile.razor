@@ -1,34 +1,35 @@
-﻿@page "/Account/Manage/Profile"
+@page "/Account/Manage/Profile"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<User> UserManager
 @inject NotificationService NotificationService
 
-<AppPageTitle Title="Profile" Breadcrumb="Account / Profile" />
+<AppPageTitle Title="@T("Profile.PageTitle")" Breadcrumb="@T("Profile.Breadcrumb")" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <PageHeader Title="Your Profile" Subtitle="Update your personal information" />
+        <PageHeader Title="@T("Profile.Heading")" Subtitle="@T("Profile.Subtitle")" />
 
         <CardForm TItem="ProfileModel" Data="@Model" Submit="@OnValidSubmit" IsBusy="@_isSaving">
-            <FormField Label="Username" For="Username" Hint="Your unique identifier (cannot be changed)">
+            <FormField Label="@T("Profile.UsernameLabel")" For="Username" Hint="@T("Profile.UsernameHint")">
                 <RadzenTextBox @bind-Value="@Model.UserName"
                                Name="Username"
                                ReadOnly="true"
                                Style="width:100%; background-color: var(--rz-input-disabled-background);" />
             </FormField>
 
-            <FormField Label="Phone number" For="PhoneNumber">
+            <FormField Label="@T("Profile.PhoneLabel")" For="PhoneNumber">
                 <RadzenTextBox @bind-Value="@Model.PhoneNumber"
                                Name="PhoneNumber"
                                Placeholder="+49 123 4567890"
                                Style="width:100%" />
                 <RadzenRequiredValidator Component="PhoneNumber"
-                                         Text="Phone number is required" />
+                                         Text="@T("Profile.PhoneRequired")" />
                 <RadzenRegexValidator Component="PhoneNumber"
-                                      Text="Please enter a valid phone number"
+                                      Text="@T("Profile.PhoneInvalid")"
                                       Pattern="^\s*(?:\+?(\d{1,3}))?[-. (]*(\d{3})[-. )]*(\d{3})[-. ]*(\d{4})(?: *x(\d+))?\s*$" />
             </FormField>
         </CardForm>
@@ -50,8 +51,8 @@
         {
             NotificationService.Notify(
                 NotificationSeverity.Error,
-                "Error",
-                "Could not load your profile. Please try again."
+                T("Profile.ErrorTitle"),
+                T("Profile.UserNotFoundDetail")
             );
             return;
         }
@@ -64,7 +65,7 @@
     {
         if (_currentUser == null)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error", "No user loaded.");
+            NotificationService.Notify(NotificationSeverity.Error, T("Profile.ErrorTitle"), T("Profile.UserNotLoadedDetail"));
             return;
         }
 
@@ -83,7 +84,7 @@
                 {
                     foreach (var error in result.Errors)
                     {
-                        NotificationService.Notify(NotificationSeverity.Error, "Error", error.Description);
+                        NotificationService.Notify(NotificationSeverity.Error, T("Profile.ErrorTitle"), error.Description);
                     }
                     return;
                 }
@@ -94,16 +95,16 @@
             {
                 NotificationService.Notify(
                     NotificationSeverity.Success,
-                    "Success",
-                    "Your profile has been updated."
+                    T("Profile.SuccessTitle"),
+                    T("Profile.SuccessDetail")
                 );
             }
             else
             {
                 NotificationService.Notify(
                     NotificationSeverity.Info,
-                    "Info",
-                    "No changes were made."
+                    T("Profile.InfoTitle"),
+                    T("Profile.NoChangesDetail")
                 );
             }
         }
@@ -111,8 +112,8 @@
         {
             NotificationService.Notify(
                 NotificationSeverity.Error,
-                "Error",
-                "An unexpected error occurred while saving."
+                T("Profile.ErrorTitle"),
+                T("Profile.UnexpectedErrorDetail")
             );
         }
         finally
@@ -133,4 +134,5 @@
 
         public string? PhoneNumber { get; set; }
     }
+
 }

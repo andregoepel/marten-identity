@@ -1,5 +1,6 @@
-﻿@page "/Account/Manage/Passkeys"
+@page "/Account/Manage/Passkeys"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 @using System.Buffers.Text
 
@@ -9,17 +10,17 @@
 @inject ConfirmService Confirm
 @inject NotificationService NotificationService
 
-<AppPageTitle Title="Manage Passkeys" Breadcrumb="Account / Passkeys" />
+<AppPageTitle Title="@T("Passkeys.PageTitle")" Breadcrumb="@T("Passkeys.Breadcrumb")" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <PageHeader Title="Manage Passkeys"
-                    Subtitle="Add, rename or remove your security keys (WebAuthn / passkeys)">
+        <PageHeader Title="@T("Passkeys.Heading")"
+                    Subtitle="@T("Passkeys.Subtitle")">
             <Actions>
                 @if (!_isLoading && (_currentPasskeys?.Count ?? 0) < MaxPasskeyCount)
                 {
-                    <RadzenButton Text="Register passkey"
+                    <RadzenButton Text="@T("Passkeys.RegisterButton")"
                                   ButtonStyle="ButtonStyle.Primary"
                                   Icon="add"
                                   Disabled="@_isLoading"
@@ -31,8 +32,7 @@
         @if (_currentPasskeys?.Count >= MaxPasskeyCount)
         {
             <RadzenAlert AlertStyle="AlertStyle.Danger" AllowClose="false" Icon="block">
-                You have reached the maximum number of passkeys (@MaxPasskeyCount).
-                Delete one before adding a new one.
+                @T("Passkeys.MaxReachedAlert", MaxPasskeyCount)
             </RadzenAlert>
         }
 
@@ -54,27 +54,27 @@
                                 Style="width: 100%;">
                     <Columns>
                         <RadzenDataGridColumn Property="@nameof(UserPasskeyInfo.Name)"
-                                              Title="Passkey name"
+                                              Title="@T("Passkeys.ColumnPasskeyName")"
                                               Width="280px" />
 
                         <RadzenDataGridColumn Property="@nameof(UserPasskeyInfo.CreatedAt)"
-                                              Title="Registered"
+                                              Title="@T("Passkeys.ColumnRegistered")"
                                               FormatString="{0:MMM dd, yyyy}"
                                               Width="140px" />
 
-                        <RadzenDataGridColumn Title="Actions"
+                        <RadzenDataGridColumn Title="@T("Passkeys.ColumnActions")"
                                               Sortable="false"
                                               Filterable="false"
                                               Width="220px"
                                               TextAlign="TextAlign.Right">
                             <Template Context="data">
                                 <RowActions>
-                                    <RadzenButton Text="Rename"
+                                    <RadzenButton Text="@T("Passkeys.RenameButton")"
                                                   ButtonStyle="ButtonStyle.Light"
                                                   Size="ButtonSize.Small"
                                                   Click="@(() => RenamePasskey(data))" />
 
-                                    <RadzenButton Text="Delete"
+                                    <RadzenButton Text="@T("Passkeys.DeleteButton")"
                                                   ButtonStyle="ButtonStyle.Danger"
                                                   Size="ButtonSize.Small"
                                                   Click="@(() => DeletePasskey(data))" />
@@ -88,8 +88,8 @@
         else
         {
             <EmptyState Icon="@("\U0001F511︎")"
-                        Title="No passkeys registered yet"
-                        Text="Passkeys let you sign in without a password, using your device." />
+                        Title="@T("Passkeys.EmptyTitle")"
+                        Text="@T("Passkeys.EmptyText")" />
         }
 
     </RadzenStack>
@@ -114,7 +114,7 @@
 
             if (_currentUser == null)
             {
-                NotificationService.Notify(NotificationSeverity.Error, "Error", "Could not load user profile.");
+                NotificationService.Notify(NotificationSeverity.Error, T("Passkeys.ErrorTitle"), T("Passkeys.UserNotFoundDetail"));
                 NavigationManager.NavigateTo("/Account/Login", forceLoad: true);
                 return;
             }
@@ -123,7 +123,7 @@
         }
         catch (Exception)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error", "Failed to load passkeys.");
+            NotificationService.Notify(NotificationSeverity.Error, T("Passkeys.ErrorTitle"), T("Passkeys.LoadFailedDetail"));
         }
         finally
         {
@@ -150,7 +150,7 @@
         if (_currentUser == null || passkey?.CredentialId == null) return;
 
         var confirmed = await Confirm.ConfirmDeleteAsync(
-            $"passkey **{passkey.Name}**", title: "Delete passkey");
+            T("Passkeys.DeleteConfirmItem", passkey.Name!), title: T("Passkeys.DeleteConfirmTitle"));
 
         if (!confirmed) return;
 
@@ -160,18 +160,19 @@
 
             if (result.Succeeded)
             {
-                NotificationService.Notify(NotificationSeverity.Success, "Success", "Passkey deleted.");
+                NotificationService.Notify(NotificationSeverity.Success, T("Passkeys.SuccessTitle"), T("Passkeys.DeletedDetail"));
                 _currentPasskeys = await UserManager.GetPasskeysAsync(_currentUser);
             }
             else
             {
-                NotificationService.Notify(NotificationSeverity.Error, "Error",
-                    result.Errors.FirstOrDefault()?.Description ?? "Could not delete passkey.");
+                NotificationService.Notify(NotificationSeverity.Error, T("Passkeys.ErrorTitle"),
+                    result.Errors.FirstOrDefault()?.Description ?? T("Passkeys.DeleteFailedDefaultDetail"));
             }
         }
         catch (Exception)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error", "An unexpected error occurred.");
+            NotificationService.Notify(NotificationSeverity.Error, T("Passkeys.ErrorTitle"), T("Passkeys.UnexpectedErrorDetail"));
         }
     }
+
 }

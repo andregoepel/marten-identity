@@ -1,18 +1,19 @@
-﻿@page "/Account/Manage/PersonalData"
+@page "/Account/Manage/PersonalData"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
 
-<AppPageTitle Title="Personal Data" Breadcrumb="Account / Personal data" />
+<AppPageTitle Title="@T("PersonalData.PageTitle")" Breadcrumb="@T("PersonalData.Breadcrumb")" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
         <div>
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Personal Data</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Download or delete the personal information associated with your account</RadzenText>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">@T("PersonalData.Heading")</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">@T("PersonalData.Subheading")</RadzenText>
         </div>
 
         <RadzenCard>
@@ -20,18 +21,17 @@
 
             <!-- Erklärungstext -->
             <RadzenText TextStyle="TextStyle.Body1">
-                This page lets you download a copy of all personal data we store about you
-                (profile information, activity logs, etc.) or permanently delete your account
-                and all related data.
+                @T("PersonalData.IntroText")
             </RadzenText>
 
             <!-- Warnhinweis -->
             <RadzenAlert AlertStyle="AlertStyle.Danger"
                          AllowClose="false"
                          Icon="warning">
-                <strong>Warning:</strong> Deleting your account deactivates it immediately and
-                <strong>permanently erases your personal data once the retention period elapses</strong>
-                — including all content, settings and history. After erasure this <strong>cannot be undone</strong>.
+                <strong>@T("PersonalData.WarningLabel")</strong> @T("PersonalData.WarningPart1")
+                <strong>@T("PersonalData.WarningPart2Strong")</strong>
+                @T("PersonalData.WarningPart3")
+                <strong>@T("PersonalData.WarningPart4Strong")</strong>@T("PersonalData.WarningSuffix")
             </RadzenAlert>
 
             <div class="ag-card-actions ag-start">
@@ -39,19 +39,19 @@
                 <form action="/Account/Manage/DownloadPersonalData" method="post">
                     <AntiforgeryToken />
                     <RadzenButton ButtonType="ButtonType.Submit"
-                                  Text="Download my data"
+                                  Text="@T("PersonalData.DownloadButton")"
                                   ButtonStyle="ButtonStyle.Primary"
                                   Icon="download" />
                 </form>
 
-                <RadzenButton Text="Delete my account &amp; all data"
+                <RadzenButton Text="@T("PersonalData.DeleteButton")"
                               ButtonStyle="ButtonStyle.Danger"
                               Icon="delete_forever"
                               Click=@(() => NavigationManager.NavigateTo("/Account/Manage/DeletePersonalData")) />
             </div>
 
             <RadzenText TextStyle="TextStyle.Caption" class="rz-color-muted text-center mt-4">
-                The downloaded file usually contains your data in JSON or ZIP format.
+                @T("PersonalData.FooterHint")
             </RadzenText>
 
             </RadzenStack>
@@ -71,4 +71,5 @@
             NavigationManager.NavigateTo("/Account/Login");
         }
     }
+
 }

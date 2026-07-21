@@ -1,5 +1,6 @@
-﻿@page "/Account/Manage/DeletePersonalData"
+@page "/Account/Manage/DeletePersonalData"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<User> UserManager
@@ -8,13 +9,13 @@
 @inject NavigationManager NavigationManager
 @inject ConfirmService Confirm
 
-<AppPageTitle Title="Delete Account" Breadcrumb="Account / Personal data" />
+<AppPageTitle Title="@T("DeletePersonalData.PageTitle")" Breadcrumb="@T("DeletePersonalData.Breadcrumb")" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <PageHeader Title="Delete Account"
-                    Subtitle="Deactivate your account and schedule your personal data for permanent erasure" />
+        <PageHeader Title="@T("DeletePersonalData.Heading")"
+                    Subtitle="@T("DeletePersonalData.Subtitle")" />
 
         <RadzenCard>
             <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
@@ -23,8 +24,8 @@
             <RadzenAlert AlertStyle="AlertStyle.Danger"
                          AllowClose="false"
                          Icon="warning"
-                         Title="Your data will be permanently erased.">
-                    Your account is deactivated immediately and you are signed out. Your personal data is then <strong>permanently erased</strong> once the retention period elapses, after which it cannot be recovered. Until then, an administrator can still reverse the deletion.
+                         Title="@T("DeletePersonalData.AlertTitle")">
+                    @T("DeletePersonalData.AlertBodyPrefix") <strong>@T("DeletePersonalData.AlertBodyStrong")</strong> @T("DeletePersonalData.AlertBodySuffix")
             </RadzenAlert>
 
             <RadzenTemplateForm TItem="InputModel"
@@ -34,30 +35,30 @@
 
                     <RadzenStack Gap="1.5rem">
 
-                        <FormField Label="Enter your current password to confirm deletion" For="Password">
+                        <FormField Label="@T("DeletePersonalData.PasswordLabel")" For="Password">
                             <RadzenPassword @bind-Value="@Model.Password"
                                             Name="Password"
-                                            Placeholder="Enter your password to confirm"
+                                            Placeholder="@T("DeletePersonalData.PasswordPlaceholder")"
                                             Style="width:100%" />
-                            <RadzenRequiredValidator Component="Password" Text="Password is required to confirm deletion" />
+                            <RadzenRequiredValidator Component="Password" Text="@T("DeletePersonalData.PasswordRequired")" />
                         </FormField>
 
                         <RadzenText TextStyle="TextStyle.Body2" class="rz-color-danger">
-                            After successful verification your account is deactivated immediately and your personal data is permanently erased once the retention period elapses.
+                            @T("DeletePersonalData.WarningText")
                         </RadzenText>
 
                     </RadzenStack>
 
                     <div class="ag-card-actions">
-                        <RadzenButton Text="Cancel – keep my account"
+                        <RadzenButton Text="@T("DeletePersonalData.CancelButton")"
                                       ButtonStyle="ButtonStyle.Light"
                                       Click=@(() => NavigationManager.NavigateTo("/Account/Manage/Profile")) />
 
                         <RadzenButton ButtonType="ButtonType.Submit"
-                                      Text="Permanently delete my account"
+                                      Text="@T("DeletePersonalData.SubmitButton")"
                                       ButtonStyle="ButtonStyle.Danger"
                                       IsBusy="@_isDeleting"
-                                      BusyText="Deleting account..."
+                                      BusyText="@T("DeletePersonalData.DeletingBusyText")"
                                       Disabled="@_isDeleting" />
                     </div>
 
@@ -82,7 +83,7 @@
 
         if (_currentUser == null)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error", "Unable to load user profile.");
+            NotificationService.Notify(NotificationSeverity.Error, T("DeletePersonalData.ErrorTitle"), T("DeletePersonalData.UnableToLoadProfileDetail"));
             NavigationManager.NavigateTo("/Account/Manage/Profile");
         }
     }
@@ -91,20 +92,20 @@
     {
         if (_currentUser == null)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error", "User not loaded.");
+            NotificationService.Notify(NotificationSeverity.Error, T("DeletePersonalData.ErrorTitle"), T("DeletePersonalData.UserNotLoadedDetail"));
             return;
         }
 
         // Zweifache Absicherung über Dialog
         var confirm = await Confirm.ConfirmAsync(
-            "Your account will be deactivated now and your personal data permanently erased after the retention period. Continue?",
-            "Final Confirmation",
-            okText: "Yes, Delete My Account",
-            cancelText: "No, Cancel");
+            T("DeletePersonalData.ConfirmMessage"),
+            T("DeletePersonalData.ConfirmTitle"),
+            okText: T("DeletePersonalData.ConfirmOk"),
+            cancelText: T("DeletePersonalData.ConfirmCancel"));
 
         if (!confirm)
         {
-            NotificationService.Notify(NotificationSeverity.Info, "Cancelled", "Account deletion cancelled.");
+            NotificationService.Notify(NotificationSeverity.Info, T("DeletePersonalData.CancelledTitle"), T("DeletePersonalData.CancelledDetail"));
             return;
         }
 
@@ -116,7 +117,7 @@
             // Passwort prüfen
             if (!await UserManager.CheckPasswordAsync(_currentUser, model.Password))
             {
-                NotificationService.Notify(NotificationSeverity.Error, "Error", "The password you entered is incorrect.");
+                NotificationService.Notify(NotificationSeverity.Error, T("DeletePersonalData.ErrorTitle"), T("DeletePersonalData.WrongPasswordDetail"));
                 return;
             }
 
@@ -126,7 +127,7 @@
             if (!result.Succeeded)
             {
                 var errors = string.Join(" ", result.Errors.Select(e => e.Description));
-                NotificationService.Notify(NotificationSeverity.Error, "Deletion failed", errors);
+                NotificationService.Notify(NotificationSeverity.Error, T("DeletePersonalData.DeletionFailedTitle"), errors);
                 Logger.LogWarning("Failed to delete user {UserId}: {Errors}", userId, errors);
                 return;
             }
@@ -141,8 +142,8 @@
             Logger.LogError(ex, "Unexpected error while deleting user {UserId}", await UserManager.GetUserIdAsync(_currentUser));
             NotificationService.Notify(
                 NotificationSeverity.Error,
-                "Critical Error",
-                "An unexpected error occurred during account deletion. The process was aborted."
+                T("DeletePersonalData.CriticalErrorTitle"),
+                T("DeletePersonalData.CriticalErrorDetail")
             );
         }
         finally
@@ -161,4 +162,5 @@
         [DataType(DataType.Password)]
         public string Password { get; set; } = "";
     }
+
 }

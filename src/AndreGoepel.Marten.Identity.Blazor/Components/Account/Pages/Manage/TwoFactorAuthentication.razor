@@ -1,32 +1,33 @@
-﻿@page "/Account/Manage/TwoFactorAuthentication"
+@page "/Account/Manage/TwoFactorAuthentication"
+@inherits LocalizedComponentBase
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
 
-<AppPageTitle Title="Two-Factor Authentication" Breadcrumb="Account / Two-factor authentication" />
+<AppPageTitle Title="@T("TwoFactorAuthentication.PageTitle")" Breadcrumb="@T("TwoFactorAuthentication.Breadcrumb")" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
         <div>
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Two-Factor Authentication (2FA)</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Add an extra layer of security to your account</RadzenText>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">@T("TwoFactorAuthentication.Heading")</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">@T("TwoFactorAuthentication.Subheading")</RadzenText>
         </div>
 
         @if (_is2FaEnabled)
         {
             <RadzenAlert AlertStyle="AlertStyle.Success" Icon="shield" AllowClose="false">
-                Two-factor authentication is <strong>currently enabled</strong>.
+                @T("TwoFactorAuthentication.EnabledPrefix") <strong>@T("TwoFactorAuthentication.EnabledStrong")</strong>.
             </RadzenAlert>
 
             @if (_recoveryCodesLeft == 0)
             {
                 <RadzenAlert AlertStyle="AlertStyle.Danger" Icon="error_outline" AllowClose="false">
-                    <strong>You have no recovery codes left!</strong><br />
-                    Generate a new set before you can use recovery codes to log in.
+                    <strong>@T("TwoFactorAuthentication.NoCodesStrong")</strong><br />
+                    @T("TwoFactorAuthentication.NoCodesText")
                     <div class="mt-4">
-                        <RadzenButton Text="Generate new recovery codes"
+                        <RadzenButton Text="@T("TwoFactorAuthentication.GenerateCodesButton")"
                                       ButtonStyle="ButtonStyle.Danger"
                                       Click="@(() => NavigationManager.NavigateTo("/Account/Manage/GenerateRecoveryCodes"))" />
                     </div>
@@ -35,10 +36,12 @@
             else if (_recoveryCodesLeft <= 3)
             {
                 <RadzenAlert AlertStyle="AlertStyle.Warning" Icon="warning" AllowClose="false">
-                    <strong>@_recoveryCodesLeft recovery code@(_recoveryCodesLeft == 1 ? "" : "s") remaining</strong><br />
-                    Consider generating a new set soon.
+                    <strong>@(_recoveryCodesLeft == 1
+                        ? T("TwoFactorAuthentication.RecoveryCodesRemainingSingular", _recoveryCodesLeft)
+                        : T("TwoFactorAuthentication.RecoveryCodesRemainingPlural", _recoveryCodesLeft))</strong><br />
+                    @T("TwoFactorAuthentication.ConsiderGeneratingText")
                     <div class="mt-4">
-                        <RadzenButton Text="Generate new recovery codes"
+                        <RadzenButton Text="@T("TwoFactorAuthentication.GenerateCodesButton")"
                                       ButtonStyle="ButtonStyle.Warning"
                                       Click="@(() => NavigationManager.NavigateTo("/Account/Manage/GenerateRecoveryCodes"))" />
                     </div>
@@ -48,7 +51,7 @@
         else
         {
             <RadzenAlert AlertStyle="AlertStyle.Warning" Icon="warning" AllowClose="false">
-                Two-factor authentication is currently <strong>disabled</strong>.
+                @T("TwoFactorAuthentication.DisabledPrefix") <strong>@T("TwoFactorAuthentication.DisabledStrong")</strong>.
             </RadzenAlert>
         }
 
@@ -58,27 +61,26 @@
             @if (_is2FaEnabled)
             {
                 <div class="ag-actions-inline">
-                    <LinkButton Text="Disable 2FA"
+                    <LinkButton Text="@T("TwoFactorAuthentication.DisableButton")"
                                 ButtonStyle="ButtonStyle.Danger"
                                 Path="/Account/Manage/Disable2fa" />
 
-                    <LinkButton Text="Reset recovery codes"
+                    <LinkButton Text="@T("TwoFactorAuthentication.ResetCodesButton")"
                                 ButtonStyle="ButtonStyle.Warning"
                                 Path="/Account/Manage/GenerateRecoveryCodes" />
                 </div>
             }
 
             <RadzenStack Gap="1.5rem">
-                <RadzenText TextStyle="TextStyle.Subtitle1">Authenticator app</RadzenText>
+                <RadzenText TextStyle="TextStyle.Subtitle1">@T("TwoFactorAuthentication.AuthenticatorAppHeading")</RadzenText>
                 <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color); line-height: 1.55;">
-                    Use a time-based one-time password (TOTP) app such as Google Authenticator,
-                    Microsoft Authenticator, Authy, Bitwarden, 1Password, etc.
+                    @T("TwoFactorAuthentication.AuthenticatorAppText")
                 </RadzenText>
 
                 @if (!_hasAuthenticator)
                 {
                     <div class="ag-actions-inline">
-                        <LinkButton Text="Add authenticator app"
+                        <LinkButton Text="@T("TwoFactorAuthentication.AddAuthenticatorButton")"
                                     ButtonStyle="ButtonStyle.Primary"
                                     Path="/Account/Manage/EnableAuthenticator" />
                     </div>
@@ -86,11 +88,11 @@
                 else
                 {
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem" Wrap="FlexWrap.Wrap">
-                        <LinkButton Text="Reconfigure authenticator app"
+                        <LinkButton Text="@T("TwoFactorAuthentication.ReconfigureAuthenticatorButton")"
                                     ButtonStyle="ButtonStyle.Primary"
                                     Path="/Account/Manage/EnableAuthenticator" />
 
-                        <LinkButton Text="Reset authenticator app"
+                        <LinkButton Text="@T("TwoFactorAuthentication.ResetAuthenticatorButton")"
                                     ButtonStyle="ButtonStyle.Danger"
                                     Path="/Account/Manage/ResetAuthenticator" />
                     </RadzenStack>
@@ -123,4 +125,5 @@
         _is2FaEnabled = await UserManager.GetTwoFactorEnabledAsync(user);
         _recoveryCodesLeft = await UserManager.CountRecoveryCodesAsync(user);
     }
+
 }

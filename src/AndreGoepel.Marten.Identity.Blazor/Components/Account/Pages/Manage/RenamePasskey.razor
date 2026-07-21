@@ -1,5 +1,6 @@
-﻿@page "/Account/Manage/Passkeys/Rename/{Id}"
+@page "/Account/Manage/Passkeys/Rename/{Id}"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 @using System.Buffers.Text
 
@@ -8,13 +9,13 @@
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
 
-<AppPageTitle Title="Rename Passkey" Breadcrumb="Account / Passkeys" />
+<AppPageTitle Title="@T("RenamePasskey.PageTitle")" Breadcrumb="@T("RenamePasskey.Breadcrumb")" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <PageHeader Title="@(_passkey?.Name?.Length > 0 ? "Rename Passkey" : "Name Your New Passkey")"
-                    Subtitle="Choose a recognizable name for this security key" />
+        <PageHeader Title="@(_passkey?.Name?.Length > 0 ? T("RenamePasskey.RenameHeading") : T("RenamePasskey.NameNewHeading"))"
+                    Subtitle="@T("RenamePasskey.Subtitle")" />
 
         @if (_isLoading)
         {
@@ -22,7 +23,7 @@
                 <div class="text-center my-8">
                     <RadzenProgressBar Mode="ProgressBarMode.Indeterminate" Style="width: 240px;" />
                     <RadzenText TextStyle="TextStyle.Body2" class="rz-color-muted mt-4">
-                        Loading passkey information...
+                        @T("RenamePasskey.LoadingText")
                     </RadzenText>
                 </div>
             </RadzenCard>
@@ -30,7 +31,7 @@
         else if (_hasError || _passkey is null)
         {
             <RadzenAlert AlertStyle="AlertStyle.Danger" AllowClose="false" Icon="error">
-                @(_errorMessage ?? "Passkey not found or session expired.")
+                @(_errorMessage ?? T("RenamePasskey.NotFoundOrExpired"))
             </RadzenAlert>
         }
         else
@@ -39,15 +40,15 @@
                       Data="@_model"
                       Submit="@OnValidSubmit"
                       Cancel="@(() => NavigationManager.NavigateTo("/Account/Manage/Passkeys"))"
-                      SubmitText="Save name"
+                      SubmitText="@T("RenamePasskey.SaveButton")"
                       IsBusy="@_isSaving">
-                <FormField Label="Passkey name" For="NameField">
+                <FormField Label="@T("RenamePasskey.NameLabel")" For="NameField">
                     <RadzenTextBox @bind-Value="_model.Name"
                                    Name="NameField"
-                                   Placeholder="e.g. My iPhone 15, Work Laptop Key, Blue YubiKey"
+                                   Placeholder="@T("RenamePasskey.NamePlaceholder")"
                                    Style="width: 100%;" />
-                    <RadzenRequiredValidator Component="NameField" Text="Name is required" />
-                    <RadzenLengthValidator Component="NameField" Min="3" Max="100" Text="Name must be 3–100 characters long" />
+                    <RadzenRequiredValidator Component="NameField" Text="@T("RenamePasskey.NameRequired")" />
+                    <RadzenLengthValidator Component="NameField" Min="3" Max="100" Text="@T("RenamePasskey.NameLength")" />
                 </FormField>
             </CardForm>
         }
@@ -71,7 +72,7 @@
         if (string.IsNullOrWhiteSpace(Id))
         {
             _hasError = true;
-            _errorMessage = "Missing passkey identifier.";
+            _errorMessage = T("RenamePasskey.MissingIdentifierError");
             _isLoading = false;
             return;
         }
@@ -84,7 +85,7 @@
         catch (FormatException)
         {
             _hasError = true;
-            _errorMessage = "Invalid passkey identifier format.";
+            _errorMessage = T("RenamePasskey.InvalidFormatError");
             _isLoading = false;
             return;
         }
@@ -95,7 +96,7 @@
         if (user is null)
         {
             _hasError = true;
-            _errorMessage = "Cannot load user profile. Please sign in again.";
+            _errorMessage = T("RenamePasskey.CannotLoadProfileError");
             NavigationManager.NavigateTo("/Account/Login", forceLoad: true);
             _isLoading = false;
             return;
@@ -106,7 +107,7 @@
         if (_passkey is null)
         {
             _hasError = true;
-            _errorMessage = "This passkey could not be found.";
+            _errorMessage = T("RenamePasskey.NotFoundError");
             _isLoading = false;
             return;
         }
@@ -119,7 +120,7 @@
     {
         if (_passkey is null)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error", "Passkey not loaded.");
+            NotificationService.Notify(NotificationSeverity.Error, T("RenamePasskey.ErrorTitle"), T("RenamePasskey.PasskeyNotLoadedDetail"));
             return;
         }
 
@@ -130,7 +131,7 @@
         {
             if (string.IsNullOrWhiteSpace(input.Name))
             {
-                NotificationService.Notify(NotificationSeverity.Error, "Error", "Name is required.");
+                NotificationService.Notify(NotificationSeverity.Error, T("RenamePasskey.ErrorTitle"), T("RenamePasskey.NameRequiredDetail"));
                 return;
             }
 
@@ -141,7 +142,7 @@
 
             if (user is null)
             {
-                NotificationService.Notify(NotificationSeverity.Error, "Error", "User session expired.");
+                NotificationService.Notify(NotificationSeverity.Error, T("RenamePasskey.ErrorTitle"), T("RenamePasskey.SessionExpiredDetail"));
                 NavigationManager.NavigateTo("/Account/Login", forceLoad: true);
                 return;
             }
@@ -152,16 +153,16 @@
             {
                 NotificationService.Notify(
                     NotificationSeverity.Success,
-                    "Success",
-                    "Passkey name saved successfully."
+                    T("RenamePasskey.SuccessTitle"),
+                    T("RenamePasskey.SavedDetail")
                 );
                 NavigationManager.NavigateTo("/Account/Manage/Passkeys");
             }
             else
             {
                 var msg = result.Errors.FirstOrDefault()?.Description
-                       ?? "Failed to update passkey name.";
-                NotificationService.Notify(NotificationSeverity.Error, "Error", msg);
+                       ?? T("RenamePasskey.UpdateFailedDefaultDetail");
+                NotificationService.Notify(NotificationSeverity.Error, T("RenamePasskey.ErrorTitle"), msg);
             }
         }
         finally
@@ -179,4 +180,5 @@
     {
         public string Name { get; set; } = "";
     }
+
 }

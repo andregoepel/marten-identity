@@ -1,18 +1,19 @@
 @page "/Account/Manage/Passkeys/Create"
+@inherits LocalizedComponentBase
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
 
-<AppPageTitle Title="Register New Passkey" Breadcrumb="Account / Passkeys" />
+<AppPageTitle Title="@T("PasskeyCreate.PageTitle")" Breadcrumb="@T("PasskeyCreate.Breadcrumb")" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
         <div>
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Register New Passkey</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Add a secure, passwordless sign-in method using your device</RadzenText>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">@T("PasskeyCreate.Heading")</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">@T("PasskeyCreate.Subheading")</RadzenText>
         </div>
 
         <RadzenCard>
@@ -20,15 +21,14 @@
 
             <RadzenStack Gap="1.25rem">
                 <RadzenText TextStyle="TextStyle.Body1">
-                    A passkey allows you to sign in using your device's built-in security features
-                    (fingerprint, face recognition, PIN or security key) — no password needed.
+                    @T("PasskeyCreate.IntroText")
                 </RadzenText>
 
                 <RadzenText TextStyle="TextStyle.Body2" class="rz-color-muted">
-                    <strong>Steps:</strong><br />
-                    1. Click the button below<br />
-                    2. Follow your browser or device instructions<br />
-                    3. Give your new passkey a name (you can change it later)
+                    <strong>@T("PasskeyCreate.StepsHeading")</strong><br />
+                    1. @T("PasskeyCreate.Step1")<br />
+                    2. @T("PasskeyCreate.Step2")<br />
+                    3. @T("PasskeyCreate.Step3")
                 </RadzenText>
             </RadzenStack>
 
@@ -41,19 +41,18 @@
                                class="rz-button rz-button-lg rz-variant-filled rz-primary rz-shade-default rz-border-radius-4">
                     <RadzenStack Orientation="Orientation.Horizontal" Gap="0.75rem" AlignItems="AlignItems.Center">
                         <RadzenIcon Icon="fingerprint" />
-                        <span>Register Passkey</span>
+                        <span>@T("PasskeyCreate.SubmitButtonText")</span>
                     </RadzenStack>
                 </PasskeySubmit>
 
-                <RadzenButton Text="Cancel"
+                <RadzenButton Text="@T("PasskeyCreate.CancelButton")"
                               ButtonStyle="ButtonStyle.Secondary"
                               Size="ButtonSize.Medium"
                               Click=@(() => NavigationManager.NavigateTo("/Account/Manage/Passkeys")) />
             </RadzenStack>
 
             <RadzenText TextStyle="TextStyle.Caption" class="rz-color-muted text-center mt-4">
-                Supported on Windows Hello, macOS Touch ID, Android biometrics,
-                iOS Face ID / Touch ID, YubiKey and most FIDO2 security keys.
+                @T("PasskeyCreate.SupportedDevicesText")
             </RadzenText>
 
             </RadzenStack>
@@ -70,7 +69,7 @@
 
         if (user is null)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error", "Could not load user profile.");
+            NotificationService.Notify(NotificationSeverity.Error, T("PasskeyCreate.ErrorTitle"), T("PasskeyCreate.UserNotFoundDetail"));
             NavigationManager.NavigateTo("/Account/Login", forceLoad: true);
         }
     }
@@ -79,5 +78,6 @@
         NavigationManager.NavigateTo($"/Account/Manage/Passkeys/Rename/{credentialId}");
 
     private void HandlePasskeyError(string message) =>
-        NotificationService.Notify(NotificationSeverity.Error, "Error", message);
+        NotificationService.Notify(NotificationSeverity.Error, T("PasskeyCreate.ErrorTitle"), message);
+
 }
