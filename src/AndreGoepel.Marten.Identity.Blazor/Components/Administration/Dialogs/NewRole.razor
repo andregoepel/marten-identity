@@ -1,14 +1,15 @@
-﻿@inject DialogService DialogService
+﻿@inherits LocalizedComponentBase
+@inject DialogService DialogService
 @inject RoleManager<Role> RoleManager
 
 <RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween">
     <RadzenStack>
-        <RadzenLabel Text="Rolename" Component="Rolename" />
+        <RadzenLabel Text="@T("NewRole.RolenameLabel")" Component="Rolename" />
         <RadzenTextBox Name="Rolename" Style="width: 100%" @bind-Value="@Rolename" />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
-        <RadzenButton Click="@(() => SaveRole())" ButtonStyle="ButtonStyle.Primary" Text="Save" Style="width: 120px" />
-        <RadzenButton Click="@(() => DialogService.Close(false))" ButtonStyle="ButtonStyle.Light" Text="Close" Style="width: 120px" />
+        <RadzenButton Click="@(() => SaveRole())" ButtonStyle="ButtonStyle.Primary" Text="@T("NewRole.SaveButton")" Style="width: 120px" />
+        <RadzenButton Click="@(() => DialogService.Close(false))" ButtonStyle="ButtonStyle.Light" Text="@T("NewRole.CloseButton")" Style="width: 120px" />
     </RadzenStack>
 </RadzenStack>
 
@@ -23,7 +24,8 @@
 
         if (!result.Succeeded)
         {
-            await DialogService.Alert($"Role cannot be added: {string.Join("\r\n", result.Errors.Select(error => error.Description))}", "Error adding role");
+            var reasons = string.Join("\r\n", result.Errors.Select(error => error.Description));
+            await DialogService.Alert(T("NewRole.CreateFailedDetail", reasons), T("NewRole.CreateFailedTitle"));
         }
         else
         {

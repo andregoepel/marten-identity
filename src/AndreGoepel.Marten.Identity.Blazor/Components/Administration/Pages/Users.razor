@@ -1,5 +1,6 @@
 @page "/Administration/Users"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 @using AndreGoepel.Marten.Identity.Blazor.Components.Administration.Dialogs
 @using AndreGoepel.Marten.Identity.Blazor.Email
 
@@ -13,17 +14,17 @@
 
 @attribute [Authorize(Roles = "Administrator")]
 
-<AppPageTitle Title="Users" Breadcrumb="Administration / Users" />
+<AppPageTitle Title="@T("Users.PageTitle")" Breadcrumb="@T("Users.Breadcrumb")" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <PageHeader Title="Users" Subtitle="Manage user accounts">
+        <PageHeader Title="@T("Users.PageTitle")" Subtitle="@T("Users.Subtitle")">
             <Actions>
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem">
                     <RadzenCheckBox Name="ShowDeleted" @bind-Value="@ShowDeleted" Change="@((bool value) => ShowDeletedChangedAsync(value))" />
-                    <RadzenLabel Text="Show deleted" Component="ShowDeleted" />
-                    <RadzenButton Text="Invite user"
+                    <RadzenLabel Text="@T("Users.ShowDeleted")" Component="ShowDeleted" />
+                    <RadzenButton Text="@T("Users.InviteUserButton")"
                                   Icon="person_add"
                                   ButtonStyle="ButtonStyle.Primary"
                                   Size="ButtonSize.Small"
@@ -33,8 +34,8 @@
         </PageHeader>
 
         <DataCard>
-            <GridToolbar Search="_filter" SearchChanged="OnFilterChangedAsync" SearchPlaceholder="Filter users…"
-                         Count="@($"{FilteredUsers.Count} of {(_users?.Count ?? 0)} users")" />
+            <GridToolbar Search="_filter" SearchChanged="OnFilterChangedAsync" SearchPlaceholder="@T("Users.SearchPlaceholder")"
+                         Count="@T("Users.Count", FilteredUsers.Count, _users?.Count ?? 0)" />
             <RadzenDataGrid @ref="_usersGrid"
                             Data="@FilteredUsers"
                             AllowFiltering="false"
@@ -48,7 +49,7 @@
                             Density="Density.Compact"
                             Style="width: 100%;">
                 <Columns>
-                    <RadzenDataGridColumn Property="@nameof(User.Email)" Title="Email" Width="240px">
+                    <RadzenDataGridColumn Property="@nameof(User.Email)" Title="@T("Users.EmailColumn")" Width="240px">
                         <Template Context="user">
                             <div style="display:flex; flex-direction:column; gap:2px;">
                                 <span class="ag-cell-name">@user.Email</span>
@@ -56,50 +57,50 @@
                             </div>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="@nameof(User.CreatedAt)" FormatString="{0:d} {0:t}" Title="Created" Width="150px" />
-                    <RadzenDataGridColumn Property="@nameof(User.ChangedAt)" FormatString="{0:d} {0:t}" Title="Changed" Width="150px" />
-                    <RadzenDataGridColumn Property="@nameof(User.EmailConfirmed)" Title="Confirmed" Width="110px">
+                    <RadzenDataGridColumn Property="@nameof(User.CreatedAt)" FormatString="{0:d} {0:t}" Title="@T("Users.CreatedColumn")" Width="150px" />
+                    <RadzenDataGridColumn Property="@nameof(User.ChangedAt)" FormatString="{0:d} {0:t}" Title="@T("Users.ChangedColumn")" Width="150px" />
+                    <RadzenDataGridColumn Property="@nameof(User.EmailConfirmed)" Title="@T("Users.ConfirmedColumn")" Width="110px">
                         <Template Context="user">
                             @if (user.EmailConfirmed)
                             {
-                                <StatusBadge Text="Confirmed" Variant="BadgeVariant.Success" />
+                                <StatusBadge Text="@T("Users.Confirmed")" Variant="BadgeVariant.Success" />
                             }
                             else if (UserInvitationService.IsPending(user))
                             {
-                                <StatusBadge Text="Invited" Variant="BadgeVariant.Warning" />
+                                <StatusBadge Text="@T("Users.Invited")" Variant="BadgeVariant.Warning" />
                             }
                             else
                             {
-                                <StatusBadge Text="Unconfirmed" Variant="BadgeVariant.Danger" />
+                                <StatusBadge Text="@T("Users.Unconfirmed")" Variant="BadgeVariant.Danger" />
                             }
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="@nameof(User.Deleted)" Title="Status" Width="100px">
+                    <RadzenDataGridColumn Property="@nameof(User.Deleted)" Title="@T("Users.StatusColumn")" Width="100px">
                         <Template Context="user">
                             @if (user.Deleted)
                             {
-                                <StatusBadge Text="Deleted" Variant="BadgeVariant.Danger" />
+                                <StatusBadge Text="@T("Users.Deleted")" Variant="BadgeVariant.Danger" />
                             }
                             else
                             {
-                                <StatusBadge Text="Active" Variant="BadgeVariant.Success" />
+                                <StatusBadge Text="@T("Users.Active")" Variant="BadgeVariant.Success" />
                             }
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="@nameof(User.Deletable)" Title="Deletable" Width="100px">
-                        <Template Context="user">@(user.Deletable ? "Yes" : "No")</Template>
+                    <RadzenDataGridColumn Property="@nameof(User.Deletable)" Title="@T("Users.DeletableColumn")" Width="100px">
+                        <Template Context="user">@(user.Deletable ? T("Users.Yes") : T("Users.No"))</Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false" Width="150px" TextAlign="TextAlign.Right">
+                    <RadzenDataGridColumn Title="@T("Users.ActionsColumn")" Sortable="false" Filterable="false" Width="150px" TextAlign="TextAlign.Right">
                         <Template Context="data">
                             <RowActions>
-                                <RadzenButton Text="Roles"
+                                <RadzenButton Text="@T("Users.RolesButton")"
                                               ButtonStyle="ButtonStyle.Light"
                                               Size="ButtonSize.Small"
                                               Disabled="@data.Deleted"
                                               Click="@(() => SetRolesAsync(data))" />
                                 @if (RowHasMenu(data))
                                 {
-                                    <IconButton Icon="more_horiz" Title="More actions" Click="@(args => OpenRowMenu(args, data))" />
+                                    <IconButton Icon="more_horiz" Title="@T("Users.MoreActions")" Click="@(args => OpenRowMenu(args, data))" />
                                 }
                             </RowActions>
                         </Template>
@@ -140,7 +141,7 @@
 
     private async Task SetRolesAsync(User user)
     {
-        var result = await DialogService.OpenAsync<UserRoleDialog>("Edit User Roles",
+        var result = await DialogService.OpenAsync<UserRoleDialog>(T("Users.EditUserRolesDialogTitle"),
             new Dictionary<string, object?>() { { "UserId", user.Id } },
             new DialogOptions() { Width = "600px", Height = "400px" });
 
@@ -152,13 +153,13 @@
 
     private async Task InviteUserAsync()
     {
-        var result = await DialogService.OpenAsync<InviteUser>("Invite user",
+        var result = await DialogService.OpenAsync<InviteUser>(T("Users.InviteUserDialogTitle"),
             new Dictionary<string, object?>(),
             new DialogOptions() { Width = "480px" });
 
         if (result == true)
         {
-            NotificationService.Notify(NotificationSeverity.Success, "Invitation sent");
+            NotificationService.Notify(NotificationSeverity.Success, T("Users.InvitationSent"));
             await LoadUsersAsync();
         }
     }
@@ -168,20 +169,20 @@
         var result = await InvitationMailer.ResendAsync(user);
         if (result.Succeeded)
         {
-            NotificationService.Notify(NotificationSeverity.Success, "Invitation resent");
+            NotificationService.Notify(NotificationSeverity.Success, T("Users.InvitationResent"));
         }
         else
         {
             await DialogService.Alert(
                 string.Join(", ", result.Errors.Select(e => e.Description)),
-                "Could not resend invitation"
+                T("Users.ResendInvitationFailedTitle")
             );
         }
     }
 
     private async Task DeleteUserAsync(User user)
     {
-        if (await Confirm.ConfirmDeleteAsync(user.Email ?? "this user", title: "Delete user"))
+        if (await Confirm.ConfirmDeleteAsync(user.Email ?? T("Users.ThisUser"), title: T("Users.DeleteUserConfirmTitle")))
         {
             var deleteResult = await UserManager.DeleteAsync(user);
             if (deleteResult.Succeeded)
@@ -190,14 +191,14 @@
             }
             else
             {
-                await DialogService.Alert("User could not be deleted", "Error");
+                await DialogService.Alert(T("Users.UserCouldNotBeDeleted"), T("Users.ErrorTitle"));
             }
         }
     }
 
     private async Task RestoreUserAsync(User user)
     {
-        if (await Confirm.ConfirmAsync($"Restore {user.Email}?", "Restore user", okText: "Restore"))
+        if (await Confirm.ConfirmAsync(T("Users.RestorePrompt", user.Email ?? ""), T("Users.RestoreUserConfirmTitle"), okText: T("Users.Restore")))
         {
             var result = await UserStore.RestoreAsync(user);
             if (result.Succeeded)
@@ -206,7 +207,7 @@
             }
             else
             {
-                await DialogService.Alert("User could not be restored", "Error");
+                await DialogService.Alert(T("Users.UserCouldNotBeRestored"), T("Users.ErrorTitle"));
             }
         }
     }
@@ -225,18 +226,18 @@
         var items = new List<ContextMenuItem>();
         if (user.Deleted)
         {
-            items.Add(new ContextMenuItem { Text = "Restore", Value = "restore", Icon = "restore" });
+            items.Add(new ContextMenuItem { Text = T("Users.Restore"), Value = "restore", Icon = "restore" });
         }
         else
         {
             if (UserInvitationService.IsPending(user))
             {
-                items.Add(new ContextMenuItem { Text = "Resend invitation", Value = "resend", Icon = "mail" });
+                items.Add(new ContextMenuItem { Text = T("Users.ResendInvitationMenuItem"), Value = "resend", Icon = "mail" });
             }
 
             if (user.Deletable)
             {
-                items.Add(new ContextMenuItem { Text = "Delete", Value = "delete", Icon = "delete", IconColor = "var(--ag-danger)" });
+                items.Add(new ContextMenuItem { Text = T("Users.DeleteMenuItem"), Value = "delete", Icon = "delete", IconColor = "var(--ag-danger)" });
             }
         }
 
