@@ -13,13 +13,14 @@
 @inject IIdentityAuthorizer Authorizer
 @inject IQuerySession QuerySession
 @inject NavigationManager Nav
+@inject IStringLocalizer<Strings> L
 
-<PageTitle>First-run setup</PageTitle>
+<PageTitle>@L["Setup.PageTitle"]</PageTitle>
 
 <div class="ag-login-head">
-    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="Create the first administrator" />
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H4" Text="@L["Setup.Heading"]" />
     <RadzenText TextStyle="TextStyle.Body2" class="ag-login-sub"
-                Text="No administrator exists yet. The account you create here becomes the un-deletable root administrator, so complete this step on a trusted network before exposing the app." />
+                Text="@L["Setup.Subheading"]" />
 </div>
 
 @if (errors.Count > 0)
@@ -37,23 +38,23 @@
 <RadzenTemplateForm TItem="Model" Data="@model" Submit="@OnSubmitAsync">
     <RadzenStack Gap="1.25rem">
         <RadzenStack Gap="0.4rem">
-            <RadzenLabel Text="Email" Component="Email" />
+            <RadzenLabel Text="@L["Setup.EmailLabel"]" Component="Email" />
             <RadzenTextBox @bind-Value="model.Email" Name="Email"
                            Placeholder="name@example.com" autocomplete="username" Style="width:100%" />
         </RadzenStack>
         <RadzenStack Gap="0.4rem">
-            <RadzenLabel Text="Password (at least 12 characters)" Component="Password" />
+            <RadzenLabel Text="@L["Setup.PasswordLabel"]" Component="Password" />
             <RadzenPassword @bind-Value="model.Password" Name="Password"
                             autocomplete="new-password" Style="width:100%" />
         </RadzenStack>
         <RadzenStack Gap="0.4rem">
-            <RadzenLabel Text="Confirm password" Component="ConfirmPassword" />
+            <RadzenLabel Text="@L["Setup.ConfirmPasswordLabel"]" Component="ConfirmPassword" />
             <RadzenPassword @bind-Value="model.ConfirmPassword" Name="ConfirmPassword"
                             autocomplete="new-password" Style="width:100%" />
         </RadzenStack>
         <div class="ag-login-actions">
-            <RadzenButton ButtonType="ButtonType.Submit" Text="Create administrator"
-                          ButtonStyle="ButtonStyle.Primary" Disabled="@busy" IsBusy="@busy" BusyText="Creating…" />
+            <RadzenButton ButtonType="ButtonType.Submit" Text="@L["Setup.CreateButton"]"
+                          ButtonStyle="ButtonStyle.Primary" Disabled="@busy" IsBusy="@busy" BusyText="@L["Setup.CreatingBusyText"]" />
         </div>
     </RadzenStack>
 </RadzenTemplateForm>
@@ -78,11 +79,11 @@
         errors.Clear();
 
         if (string.IsNullOrWhiteSpace(model.Email))
-            errors.Add("Email is required.");
+            errors.Add(L["Setup.EmailRequired"]);
         if (string.IsNullOrEmpty(model.Password) || model.Password.Length < 12)
-            errors.Add("Password must be at least 12 characters.");
+            errors.Add(L["Setup.PasswordMinLength"]);
         if (model.Password != model.ConfirmPassword)
-            errors.Add("The passwords do not match.");
+            errors.Add(L["Setup.PasswordMismatch"]);
         if (errors.Count > 0)
             return;
 
