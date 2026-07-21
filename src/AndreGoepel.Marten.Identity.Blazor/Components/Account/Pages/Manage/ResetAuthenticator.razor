@@ -1,16 +1,17 @@
-﻿@page "/Account/Manage/ResetAuthenticator"
+@page "/Account/Manage/ResetAuthenticator"
 @rendermode InteractiveServer
 
 @inject NavigationManager NavigationManager
+@inject IServiceProvider Services
 
-<AppPageTitle Title="Reset Authenticator Key" Breadcrumb="Account / Two-factor authentication" />
+<AppPageTitle Title="@T("ResetAuthenticator.PageTitle")" Breadcrumb="@T("ResetAuthenticator.Breadcrumb")" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
         <div>
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Reset Authenticator Key</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Remove current authenticator app and start setup again</RadzenText>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">@T("ResetAuthenticator.Heading")</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">@T("ResetAuthenticator.Subheading")</RadzenText>
         </div>
 
         <RadzenCard>
@@ -19,11 +20,11 @@
             <!-- Warning (prominent, danger style) -->
             <RadzenAlert AlertStyle="AlertStyle.Danger" Icon="warning" AllowClose="false">
                 <div class="font-medium">
-                    Resetting your authenticator key will make your current app stop working.
+                    @T("ResetAuthenticator.AlertLine1")
                 </div>
                 <div class="mt-2">
-                    You will need to set up your authenticator app again immediately after this step.
-                    <strong>If you do not complete the setup, you may lose access to your account.</strong>
+                    @T("ResetAuthenticator.AlertLine2Prefix")
+                    <strong>@T("ResetAuthenticator.AlertLine2Strong")</strong>
                 </div>
             </RadzenAlert>
 
@@ -34,13 +35,13 @@
                     <AntiforgeryToken />
 
                     <RadzenButton ButtonType="ButtonType.Submit"
-                                  Text="Reset Authenticator Key"
+                                  Text="@T("ResetAuthenticator.SubmitButton")"
                                   ButtonStyle="ButtonStyle.Danger"
                                   Size="ButtonSize.Large"
                                   Icon="restart_alt" />
                 </form>
 
-                <RadzenButton Text="Cancel – Keep current setup"
+                <RadzenButton Text="@T("ResetAuthenticator.CancelButton")"
                               ButtonStyle="ButtonStyle.Secondary"
                               Size="ButtonSize.Large"
                               Click="@(() => NavigationManager.NavigateTo("/Account/Manage/TwoFactorAuthentication"))" />
@@ -52,3 +53,8 @@
     </RadzenStack>
 </div>
 
+@code {
+    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
+    // still renders on a host (or bUnit test) without localization registered.
+    private string T(string key) => Services.IdentityText(key);
+}

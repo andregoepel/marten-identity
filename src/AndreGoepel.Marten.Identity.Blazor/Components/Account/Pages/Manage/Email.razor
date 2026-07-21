@@ -1,4 +1,4 @@
-﻿@page "/Account/Manage/Email"
+@page "/Account/Manage/Email"
 @rendermode InteractiveServer
 @using Microsoft.AspNetCore.WebUtilities
 
@@ -7,22 +7,23 @@
 @inject IEmailSender<User> EmailSender
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
+@inject IServiceProvider Services
 
-<AppPageTitle Title="Manage Email" Breadcrumb="Account / Email" />
+<AppPageTitle Title="@T("Email.PageTitle")" Breadcrumb="@T("Email.Breadcrumb")" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <PageHeader Title="Manage Email" Subtitle="Update or verify your email address" />
+        <PageHeader Title="@T("Email.Heading")" Subtitle="@T("Email.Subtitle")" />
 
         <CardForm TItem="ChangeEmailModel"
                   Data="@Model"
                   Submit="@OnValidSubmit"
                   Cancel="@(() => NavigationManager.NavigateTo("/Account/Manage/Profile"))"
-                  SubmitText="Change email"
-                  BusyText="Processing…"
+                  SubmitText="@T("Email.Submit")"
+                  BusyText="@T("Email.Processing")"
                   IsBusy="@_isChangingEmail">
-            <FormField Label="Current email" For="CurrentEmail">
+            <FormField Label="@T("Email.CurrentEmailLabel")" For="CurrentEmail">
                 <div style="display:flex; align-items:center; gap:12px;">
                     <RadzenTextBox @bind-Value="@_currentEmail"
                                    Name="CurrentEmail"
@@ -30,35 +31,35 @@
                                    Style="flex:1; background-color: var(--rz-input-disabled-background);" />
                     @if (_isEmailConfirmed)
                     {
-                        <span class="ag-badge ag-badge-success">✓ Confirmed</span>
+                        <span class="ag-badge ag-badge-success">@T("Email.ConfirmedBadge")</span>
                     }
                 </div>
                 @if (!_isEmailConfirmed)
                 {
                     <div>
                         <RadzenText TextStyle="TextStyle.Body2" class="rz-color-warning">
-                            Your email is not yet confirmed.
+                            @T("Email.NotConfirmedText")
                         </RadzenText>
-                        <RadzenButton Text="Send verification email"
+                        <RadzenButton Text="@T("Email.SendVerificationButton")"
                                       ButtonStyle="ButtonStyle.Warning"
                                       Size="ButtonSize.Medium"
                                       IsBusy=@_isSendingVerification
-                                      BusyText="Sending..."
+                                      BusyText="@T("Email.SendingBusyText")"
                                       Click=@SendVerificationEmail
                                       Style="margin-top: 0.75rem;" />
                     </div>
                 }
             </FormField>
 
-            <FormField Label="New email address" For="NewEmail">
+            <FormField Label="@T("Email.NewEmailLabel")" For="NewEmail">
                 <RadzenTextBox @bind-Value="@Model.NewEmail"
                                Name="NewEmail"
                                Placeholder="you@yourdomain.com"
                                AutoCompleteType="AutoCompleteType.Email"
                                Style="width:100%" />
-                <RadzenRequiredValidator Component="NewEmail" Text="New email is required" />
-                <RadzenEmailValidator Component="NewEmail" Text="Please enter a valid email address" />
-                <RadzenCompareValidator Component="NewEmail" Value="@_currentEmail" Text="New email must be different from current email" Operator="CompareOperator.NotEqual" />
+                <RadzenRequiredValidator Component="NewEmail" Text="@T("Email.NewEmailRequired")" />
+                <RadzenEmailValidator Component="NewEmail" Text="@T("Email.NewEmailInvalid")" />
+                <RadzenCompareValidator Component="NewEmail" Value="@_currentEmail" Text="@T("Email.NewEmailSameAsCurrent")" Operator="CompareOperator.NotEqual" />
             </FormField>
         </CardForm>
 
@@ -80,7 +81,7 @@
 
         if (_currentUser == null)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error", "Could not load user profile.");
+            NotificationService.Notify(NotificationSeverity.Error, T("Email.ErrorTitle"), T("Email.UserNotFoundDetail"));
             return;
         }
 
@@ -93,13 +94,13 @@
     {
         if (_currentUser == null || string.IsNullOrWhiteSpace(_currentEmail))
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error", "User not loaded.");
+            NotificationService.Notify(NotificationSeverity.Error, T("Email.ErrorTitle"), T("Email.UserNotLoadedDetail"));
             return;
         }
 
         if (model.NewEmail?.Trim() == _currentEmail?.Trim())
         {
-            NotificationService.Notify(NotificationSeverity.Info, "Info", "No email change detected.");
+            NotificationService.Notify(NotificationSeverity.Info, T("Email.InfoTitle"), T("Email.NoChangeDetail"));
             return;
         }
 
@@ -128,8 +129,8 @@
 
             NotificationService.Notify(
                 NotificationSeverity.Success,
-                "Success",
-                "A confirmation link has been sent to your new email address. Please check your inbox."
+                T("Email.SuccessTitle"),
+                T("Email.ConfirmationSentDetail")
             );
 
             // Optional: zurück zur Profile-Seite
@@ -139,8 +140,8 @@
         {
             NotificationService.Notify(
                 NotificationSeverity.Error,
-                "Error",
-                "Failed to send confirmation email. Please try again later."
+                T("Email.ErrorTitle"),
+                T("Email.SendFailedDetail")
             );
         }
         finally
@@ -179,16 +180,16 @@
 
             NotificationService.Notify(
                 NotificationSeverity.Success,
-                "Sent",
-                "Verification email has been resent. Please check your inbox."
+                T("Email.SentTitle"),
+                T("Email.ResentDetail")
             );
         }
         catch
         {
             NotificationService.Notify(
                 NotificationSeverity.Error,
-                "Error",
-                "Could not send verification email. Try again later."
+                T("Email.ErrorTitle"),
+                T("Email.VerificationSendFailedDetail")
             );
         }
         finally
@@ -206,4 +207,8 @@
     {
         public string? NewEmail { get; set; }
     }
+
+    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
+    // still renders on a host (or bUnit test) without localization registered.
+    private string T(string key) => Services.IdentityText(key);
 }

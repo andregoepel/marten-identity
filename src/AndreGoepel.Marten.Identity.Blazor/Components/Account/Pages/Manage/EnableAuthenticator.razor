@@ -1,4 +1,4 @@
-﻿@page "/Account/Manage/EnableAuthenticator"
+@page "/Account/Manage/EnableAuthenticator"
 @rendermode InteractiveServer
 
 @using System.Globalization
@@ -9,8 +9,9 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
+@inject IServiceProvider Services
 
-<AppPageTitle Title="Configure authenticator app" Breadcrumb="Account / Two-factor authentication" />
+<AppPageTitle Title="@T("EnableAuthenticator.PageTitle")" Breadcrumb="@T("EnableAuthenticator.Breadcrumb")" />
 
 @if (_recoveryCodes is not null)
 {
@@ -18,7 +19,7 @@
         <RadzenStack Gap="1.5rem">
 
             <div>
-                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Authenticator verified</RadzenText>
+                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">@T("EnableAuthenticator.VerifiedTitle")</RadzenText>
             </div>
 
             <RadzenCard>
@@ -34,33 +35,33 @@ else
         <RadzenStack Gap="1.5rem">
 
             <div>
-                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Configure authenticator app</RadzenText>
-                <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Set up two-factor authentication using an authenticator app.</RadzenText>
+                <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">@T("EnableAuthenticator.Heading")</RadzenText>
+                <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">@T("EnableAuthenticator.Subheading")</RadzenText>
             </div>
 
             <RadzenCard>
                 <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
 
                 <RadzenStack Gap="1.5rem">
-                    <RadzenText TextStyle="TextStyle.Subtitle1">Step 1 — Download an authenticator app</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1">@T("EnableAuthenticator.Step1Heading")</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body2">
-                        Download Microsoft Authenticator for
-                        <RadzenLink Path="https://go.microsoft.com/fwlink/?Linkid=825072" Text="Android" /> /
-                        <RadzenLink Path="https://go.microsoft.com/fwlink/?Linkid=825073" Text="iOS" />,
-                        or Google Authenticator for
-                        <RadzenLink Path="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en" Text="Android" /> /
-                        <RadzenLink Path="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8" Text="iOS" />.
+                        @T("EnableAuthenticator.Step1TextPart1")
+                        <RadzenLink Path="https://go.microsoft.com/fwlink/?Linkid=825072" Text="@T("EnableAuthenticator.AndroidLinkText")" /> /
+                        <RadzenLink Path="https://go.microsoft.com/fwlink/?Linkid=825073" Text="@T("EnableAuthenticator.IosLinkText")" />,
+                        @T("EnableAuthenticator.Step1TextPart2")
+                        <RadzenLink Path="https://play.google.com/store/apps/details?id=com.google.android.apps.authenticator2&hl=en" Text="@T("EnableAuthenticator.AndroidLinkText")" /> /
+                        <RadzenLink Path="https://itunes.apple.com/us/app/google-authenticator/id388497605?mt=8" Text="@T("EnableAuthenticator.IosLinkText")" />.
                     </RadzenText>
 
-                    <RadzenText TextStyle="TextStyle.Subtitle1">Step 2 — Scan the QR code</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1">@T("EnableAuthenticator.Step2Heading")</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body2">
-                        Scan the QR code below or enter the key <strong>@_sharedKey</strong> into your app. Spaces and casing do not matter.
+                        @T("EnableAuthenticator.Step2TextPrefix") <strong>@_sharedKey</strong> @T("EnableAuthenticator.Step2TextSuffix")
                     </RadzenText>
                     <RadzenQRCode style="max-width: 200px" Value="@_authenticatorUri" />
 
-                    <RadzenText TextStyle="TextStyle.Subtitle1">Step 3 — Enter the verification code</RadzenText>
+                    <RadzenText TextStyle="TextStyle.Subtitle1">@T("EnableAuthenticator.Step3Heading")</RadzenText>
                     <RadzenText TextStyle="TextStyle.Body2">
-                        Once you have scanned the QR code, your app will show a 6-digit code. Enter it below.
+                        @T("EnableAuthenticator.Step3Text")
                     </RadzenText>
                 </RadzenStack>
 
@@ -68,14 +69,14 @@ else
                     <RadzenStack Gap="1.5rem">
 
                         <RadzenStack Gap="0.4rem">
-                            <RadzenLabel Text="Verification code" Component="VerificationCode" />
+                            <RadzenLabel Text="@T("EnableAuthenticator.CodeLabel")" Component="VerificationCode" />
                             <RadzenTextBox @bind-Value="Input.Code" Name="VerificationCode" Style="width:100%" />
-                            <RadzenRequiredValidator Component="VerificationCode" Text="Verification code is required" />
+                            <RadzenRequiredValidator Component="VerificationCode" Text="@T("EnableAuthenticator.CodeRequired")" />
                         </RadzenStack>
 
                         <div class="ag-card-actions">
                             <RadzenButton ButtonType="ButtonType.Submit"
-                                          Text="Verify"
+                                          Text="@T("EnableAuthenticator.SubmitButton")"
                                           ButtonStyle="ButtonStyle.Primary" />
                         </div>
 
@@ -128,7 +129,7 @@ else
 
         if (!is2FaTokenValid)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Verification Error", "Verification code is invalid.");
+            NotificationService.Notify(NotificationSeverity.Error, T("EnableAuthenticator.VerificationErrorTitle"), T("EnableAuthenticator.InvalidCodeDetail"));
             return;
         }
 
@@ -139,11 +140,11 @@ else
         if (await UserManager.CountRecoveryCodesAsync(_user) == 0)
         {
             _recoveryCodes = await UserManager.GenerateNewTwoFactorRecoveryCodesAsync(_user, 10);
-            NotificationService.Notify(NotificationSeverity.Success, "Authenticator verified", "Your authenticator app has been verified.");
+            NotificationService.Notify(NotificationSeverity.Success, T("EnableAuthenticator.VerifiedTitle"), T("EnableAuthenticator.VerifiedDetail"));
         }
         else
         {
-            NotificationService.Notify(NotificationSeverity.Success, "Authenticator added", "Your authenticator app has been verified.");
+            NotificationService.Notify(NotificationSeverity.Success, T("EnableAuthenticator.AddedTitle"), T("EnableAuthenticator.VerifiedDetail"));
             NavigationManager.NavigateTo("/Account/Manage/TwoFactorAuthentication");
         }
     }
@@ -192,4 +193,8 @@ else
     {
         public string? Code { get; set; }
     }
+
+    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
+    // still renders on a host (or bUnit test) without localization registered.
+    private string T(string key) => Services.IdentityText(key);
 }

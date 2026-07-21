@@ -1,4 +1,4 @@
-﻿@page "/Account/Manage/Disable2fa"
+@page "/Account/Manage/Disable2fa"
 @rendermode InteractiveServer
 
 @inject UserManager<User> UserManager
@@ -6,38 +6,39 @@
 @inject ILogger<Disable2fa> Logger
 @inject NotificationService NotificationService
 @inject AuthenticationStateProvider AuthenticationStateProvider
+@inject IServiceProvider Services
 
-<AppPageTitle Title="Disable two-factor authentication (2FA)" Breadcrumb="Account / Two-factor authentication" />
+<AppPageTitle Title="@T("Disable2fa.PageTitle")" Breadcrumb="@T("Disable2fa.Breadcrumb")" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
         <div>
-            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">Disable two-factor authentication (2FA)</RadzenText>
-            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">Turn off 2FA for your account</RadzenText>
+            <RadzenText TextStyle="TextStyle.H5" TagName="TagName.H1">@T("Disable2fa.Heading")</RadzenText>
+            <RadzenText TextStyle="TextStyle.Body2" Style="color: var(--rz-text-secondary-color);">@T("Disable2fa.Subheading")</RadzenText>
         </div>
 
         <RadzenCard>
             <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
 
             <RadzenAlert AlertStyle="AlertStyle.Warning" Shade="Shade.Lighter" Variant="Variant.Flat" Icon="warning">
-                <strong>This action only disables 2FA.</strong><br />
-                Disabling 2FA does <strong>not</strong> change the keys used in your authenticator apps.<br />
-                If you want to change the authenticator key, please <a href="/Account/Manage/ResetAuthenticator">reset your authenticator keys</a> instead.
+                <strong>@T("Disable2fa.AlertOnlyDisables")</strong><br />
+                @T("Disable2fa.AlertKeysPrefix") <strong>@T("Disable2fa.AlertKeysStrong")</strong> @T("Disable2fa.AlertKeysSuffix")<br />
+                @T("Disable2fa.AlertResetPrefix") <a href="/Account/Manage/ResetAuthenticator">@T("Disable2fa.AlertResetLinkText")</a> @T("Disable2fa.AlertResetSuffix")
             </RadzenAlert>
 
             <RadzenStack Gap="1rem" AlignItems="AlignItems.Center">
-                <RadzenButton Text="Disable 2FA"
+                <RadzenButton Text="@T("Disable2fa.SubmitButton")"
                               ButtonStyle="ButtonStyle.Danger"
                               Size="ButtonSize.Large"
                               IsBusy="@_isProcessing"
-                              BusyText="Disabling..."
+                              BusyText="@T("Disable2fa.DisablingBusyText")"
                               Style="width: 100%; max-width: 360px;"
                               Click="@OnSubmitAsync" />
             </RadzenStack>
 
             <RadzenText TextStyle="TextStyle.Caption" class="text-center rz-color-muted">
-                You can re-enable 2FA at any time from your security settings.
+                @T("Disable2fa.FooterHint")
             </RadzenText>
 
             </RadzenStack>
@@ -57,7 +58,7 @@
 
         if (_user is null)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error", "Could not load user profile.");
+            NotificationService.Notify(NotificationSeverity.Error, T("Disable2fa.ErrorTitle"), T("Disable2fa.UserNotFoundDetail"));
         }
     }
 
@@ -70,7 +71,7 @@
         {
             if(_user == null)
             {
-                NotificationService.Notify(NotificationSeverity.Error, "Error", "Invalid user.");
+                NotificationService.Notify(NotificationSeverity.Error, T("Disable2fa.ErrorTitle"), T("Disable2fa.InvalidUserDetail"));
                 return;
             }
 
@@ -84,8 +85,8 @@
             var userId = await UserManager.GetUserIdAsync(_user);
             Logger.LogInformation("User {UserId} disabled 2FA", userId);
 
-            NotificationService.Notify(NotificationSeverity.Info, "2FA has been disabled",
-                "Two-factor authentication is now turned off. You can re-enable it anytime by setting up an authenticator app.");
+            NotificationService.Notify(NotificationSeverity.Info, T("Disable2fa.DisabledTitle"),
+                T("Disable2fa.DisabledDetail"));
             NavigationManager.NavigateTo("/Account/Manage/TwoFactorAuthentication");
         }
         catch (Exception ex)
@@ -93,8 +94,8 @@
             Logger.LogError(ex, "Failed to disable 2FA for user {UserId}", _user?.Id);
             NotificationService.Notify(
                 NotificationSeverity.Error,
-                summary: "Error",
-                detail: "Could not disable 2FA. Please try again or contact support."
+                summary: T("Disable2fa.ErrorTitle"),
+                detail: T("Disable2fa.DisableFailedDetail")
             );
         }
         finally
@@ -103,4 +104,8 @@
             StateHasChanged();
         }
     }
+
+    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
+    // still renders on a host (or bUnit test) without localization registered.
+    private string T(string key) => Services.IdentityText(key);
 }

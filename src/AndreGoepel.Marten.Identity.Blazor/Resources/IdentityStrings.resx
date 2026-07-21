@@ -288,4 +288,367 @@
   <data name="ResetPasswordConfirmation.Heading" xml:space="preserve"><value><![CDATA[Password reset]]></value></data>
   <data name="ResetPasswordConfirmation.Detail" xml:space="preserve"><value><![CDATA[Your password has been reset successfully.]]></value></data>
   <data name="ResetPasswordConfirmation.LogIn" xml:space="preserve"><value><![CDATA[Log in]]></value></data>
+
+  <!-- Manage/ChangePassword.razor -->
+  <data name="ChangePassword.PageTitle" xml:space="preserve"><value><![CDATA[Change Password]]></value></data>
+  <data name="ChangePassword.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Password]]></value></data>
+  <data name="ChangePassword.Heading" xml:space="preserve"><value><![CDATA[Change Password]]></value></data>
+  <data name="ChangePassword.Subtitle" xml:space="preserve"><value><![CDATA[Update your account password]]></value></data>
+  <data name="ChangePassword.Submit" xml:space="preserve"><value><![CDATA[Update password]]></value></data>
+  <data name="ChangePassword.Updating" xml:space="preserve"><value><![CDATA[Updating…]]></value></data>
+  <data name="ChangePassword.CurrentPasswordLabel" xml:space="preserve"><value><![CDATA[Current password]]></value></data>
+  <data name="ChangePassword.CurrentPasswordRequired" xml:space="preserve"><value><![CDATA[Current password is required]]></value></data>
+  <data name="ChangePassword.NewPasswordLabel" xml:space="preserve"><value><![CDATA[New password]]></value></data>
+  <data name="ChangePassword.NewPasswordRequired" xml:space="preserve"><value><![CDATA[New password is required]]></value></data>
+  <data name="ChangePassword.PasswordLength" xml:space="preserve">
+    <value><![CDATA[Password must be between {0} and 100 characters]]></value>
+    <comment>{0} is the configured minimum password length (IdentityOptions.Password.RequiredLength).</comment>
+  </data>
+  <data name="ChangePassword.ConfirmPasswordLabel" xml:space="preserve"><value><![CDATA[Confirm new password]]></value></data>
+  <data name="ChangePassword.ConfirmPasswordRequired" xml:space="preserve"><value><![CDATA[Please confirm the new password]]></value></data>
+  <data name="ChangePassword.PasswordMismatch" xml:space="preserve"><value><![CDATA[The passwords do not match]]></value></data>
+  <data name="ChangePassword.ErrorTitle" xml:space="preserve">
+    <value><![CDATA[Error]]></value>
+    <comment>Shared across several error notifications on this page.</comment>
+  </data>
+  <data name="ChangePassword.UserNotFoundDetail" xml:space="preserve"><value><![CDATA[Could not load user profile.]]></value></data>
+  <data name="ChangePassword.UserNotLoadedDetail" xml:space="preserve"><value><![CDATA[User not loaded.]]></value></data>
+  <data name="ChangePassword.NewPasswordMismatchDetail" xml:space="preserve"><value><![CDATA[New passwords do not match.]]></value></data>
+  <data name="ChangePassword.SuccessTitle" xml:space="preserve"><value><![CDATA[Success]]></value></data>
+  <data name="ChangePassword.SuccessDetail" xml:space="preserve"><value><![CDATA[Your password has been updated successfully.]]></value></data>
+  <data name="ChangePassword.PasswordChangeFailedTitle" xml:space="preserve"><value><![CDATA[Password change failed]]></value></data>
+  <data name="ChangePassword.UnexpectedErrorDetail" xml:space="preserve"><value><![CDATA[An unexpected error occurred. Please try again.]]></value></data>
+
+  <!-- Manage/DeletePersonalData.razor -->
+  <data name="DeletePersonalData.PageTitle" xml:space="preserve"><value><![CDATA[Delete Account]]></value></data>
+  <data name="DeletePersonalData.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Personal data]]></value></data>
+  <data name="DeletePersonalData.Heading" xml:space="preserve"><value><![CDATA[Delete Account]]></value></data>
+  <data name="DeletePersonalData.Subtitle" xml:space="preserve"><value><![CDATA[Deactivate your account and schedule your personal data for permanent erasure]]></value></data>
+  <data name="DeletePersonalData.AlertTitle" xml:space="preserve"><value><![CDATA[Your data will be permanently erased.]]></value></data>
+  <data name="DeletePersonalData.AlertBodyPrefix" xml:space="preserve">
+    <value><![CDATA[Your account is deactivated immediately and you are signed out. Your personal data is then]]></value>
+    <comment>First fragment of a sentence that wraps a &lt;strong&gt; emphasis in the markup; continues in AlertBodyStrong/AlertBodySuffix.</comment>
+  </data>
+  <data name="DeletePersonalData.AlertBodyStrong" xml:space="preserve"><value><![CDATA[permanently erased]]></value></data>
+  <data name="DeletePersonalData.AlertBodySuffix" xml:space="preserve"><value><![CDATA[once the retention period elapses, after which it cannot be recovered. Until then, an administrator can still reverse the deletion.]]></value></data>
+  <data name="DeletePersonalData.PasswordLabel" xml:space="preserve"><value><![CDATA[Enter your current password to confirm deletion]]></value></data>
+  <data name="DeletePersonalData.PasswordPlaceholder" xml:space="preserve"><value><![CDATA[Enter your password to confirm]]></value></data>
+  <data name="DeletePersonalData.PasswordRequired" xml:space="preserve"><value><![CDATA[Password is required to confirm deletion]]></value></data>
+  <data name="DeletePersonalData.WarningText" xml:space="preserve"><value><![CDATA[After successful verification your account is deactivated immediately and your personal data is permanently erased once the retention period elapses.]]></value></data>
+  <data name="DeletePersonalData.CancelButton" xml:space="preserve"><value><![CDATA[Cancel – keep my account]]></value></data>
+  <data name="DeletePersonalData.SubmitButton" xml:space="preserve"><value><![CDATA[Permanently delete my account]]></value></data>
+  <data name="DeletePersonalData.DeletingBusyText" xml:space="preserve"><value><![CDATA[Deleting account...]]></value></data>
+  <data name="DeletePersonalData.ErrorTitle" xml:space="preserve">
+    <value><![CDATA[Error]]></value>
+    <comment>Shared across several error notifications on this page.</comment>
+  </data>
+  <data name="DeletePersonalData.UnableToLoadProfileDetail" xml:space="preserve"><value><![CDATA[Unable to load user profile.]]></value></data>
+  <data name="DeletePersonalData.UserNotLoadedDetail" xml:space="preserve"><value><![CDATA[User not loaded.]]></value></data>
+  <data name="DeletePersonalData.ConfirmMessage" xml:space="preserve"><value><![CDATA[Your account will be deactivated now and your personal data permanently erased after the retention period. Continue?]]></value></data>
+  <data name="DeletePersonalData.ConfirmTitle" xml:space="preserve"><value><![CDATA[Final Confirmation]]></value></data>
+  <data name="DeletePersonalData.ConfirmOk" xml:space="preserve"><value><![CDATA[Yes, Delete My Account]]></value></data>
+  <data name="DeletePersonalData.ConfirmCancel" xml:space="preserve"><value><![CDATA[No, Cancel]]></value></data>
+  <data name="DeletePersonalData.CancelledTitle" xml:space="preserve"><value><![CDATA[Cancelled]]></value></data>
+  <data name="DeletePersonalData.CancelledDetail" xml:space="preserve"><value><![CDATA[Account deletion cancelled.]]></value></data>
+  <data name="DeletePersonalData.WrongPasswordDetail" xml:space="preserve"><value><![CDATA[The password you entered is incorrect.]]></value></data>
+  <data name="DeletePersonalData.DeletionFailedTitle" xml:space="preserve"><value><![CDATA[Deletion failed]]></value></data>
+  <data name="DeletePersonalData.CriticalErrorTitle" xml:space="preserve"><value><![CDATA[Critical Error]]></value></data>
+  <data name="DeletePersonalData.CriticalErrorDetail" xml:space="preserve"><value><![CDATA[An unexpected error occurred during account deletion. The process was aborted.]]></value></data>
+
+  <!-- Manage/Disable2fa.razor -->
+  <data name="Disable2fa.PageTitle" xml:space="preserve"><value><![CDATA[Disable two-factor authentication (2FA)]]></value></data>
+  <data name="Disable2fa.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Two-factor authentication]]></value></data>
+  <data name="Disable2fa.Heading" xml:space="preserve"><value><![CDATA[Disable two-factor authentication (2FA)]]></value></data>
+  <data name="Disable2fa.Subheading" xml:space="preserve"><value><![CDATA[Turn off 2FA for your account]]></value></data>
+  <data name="Disable2fa.AlertOnlyDisables" xml:space="preserve"><value><![CDATA[This action only disables 2FA.]]></value></data>
+  <data name="Disable2fa.AlertKeysPrefix" xml:space="preserve"><value><![CDATA[Disabling 2FA does]]></value></data>
+  <data name="Disable2fa.AlertKeysStrong" xml:space="preserve"><value><![CDATA[not]]></value></data>
+  <data name="Disable2fa.AlertKeysSuffix" xml:space="preserve"><value><![CDATA[change the keys used in your authenticator apps.]]></value></data>
+  <data name="Disable2fa.AlertResetPrefix" xml:space="preserve"><value><![CDATA[If you want to change the authenticator key, please]]></value></data>
+  <data name="Disable2fa.AlertResetLinkText" xml:space="preserve"><value><![CDATA[reset your authenticator keys]]></value></data>
+  <data name="Disable2fa.AlertResetSuffix" xml:space="preserve"><value><![CDATA[instead.]]></value></data>
+  <data name="Disable2fa.SubmitButton" xml:space="preserve"><value><![CDATA[Disable 2FA]]></value></data>
+  <data name="Disable2fa.DisablingBusyText" xml:space="preserve"><value><![CDATA[Disabling...]]></value></data>
+  <data name="Disable2fa.FooterHint" xml:space="preserve"><value><![CDATA[You can re-enable 2FA at any time from your security settings.]]></value></data>
+  <data name="Disable2fa.ErrorTitle" xml:space="preserve">
+    <value><![CDATA[Error]]></value>
+    <comment>Shared across several error notifications on this page.</comment>
+  </data>
+  <data name="Disable2fa.UserNotFoundDetail" xml:space="preserve"><value><![CDATA[Could not load user profile.]]></value></data>
+  <data name="Disable2fa.InvalidUserDetail" xml:space="preserve"><value><![CDATA[Invalid user.]]></value></data>
+  <data name="Disable2fa.DisabledTitle" xml:space="preserve"><value><![CDATA[2FA has been disabled]]></value></data>
+  <data name="Disable2fa.DisabledDetail" xml:space="preserve"><value><![CDATA[Two-factor authentication is now turned off. You can re-enable it anytime by setting up an authenticator app.]]></value></data>
+  <data name="Disable2fa.DisableFailedDetail" xml:space="preserve"><value><![CDATA[Could not disable 2FA. Please try again or contact support.]]></value></data>
+
+  <!-- Manage/Email.razor -->
+  <data name="Email.PageTitle" xml:space="preserve"><value><![CDATA[Manage Email]]></value></data>
+  <data name="Email.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Email]]></value></data>
+  <data name="Email.Heading" xml:space="preserve"><value><![CDATA[Manage Email]]></value></data>
+  <data name="Email.Subtitle" xml:space="preserve"><value><![CDATA[Update or verify your email address]]></value></data>
+  <data name="Email.Submit" xml:space="preserve"><value><![CDATA[Change email]]></value></data>
+  <data name="Email.Processing" xml:space="preserve"><value><![CDATA[Processing…]]></value></data>
+  <data name="Email.CurrentEmailLabel" xml:space="preserve"><value><![CDATA[Current email]]></value></data>
+  <data name="Email.ConfirmedBadge" xml:space="preserve"><value><![CDATA[✓ Confirmed]]></value></data>
+  <data name="Email.NotConfirmedText" xml:space="preserve"><value><![CDATA[Your email is not yet confirmed.]]></value></data>
+  <data name="Email.SendVerificationButton" xml:space="preserve"><value><![CDATA[Send verification email]]></value></data>
+  <data name="Email.SendingBusyText" xml:space="preserve"><value><![CDATA[Sending...]]></value></data>
+  <data name="Email.NewEmailLabel" xml:space="preserve"><value><![CDATA[New email address]]></value></data>
+  <data name="Email.NewEmailRequired" xml:space="preserve"><value><![CDATA[New email is required]]></value></data>
+  <data name="Email.NewEmailInvalid" xml:space="preserve"><value><![CDATA[Please enter a valid email address]]></value></data>
+  <data name="Email.NewEmailSameAsCurrent" xml:space="preserve"><value><![CDATA[New email must be different from current email]]></value></data>
+  <data name="Email.ErrorTitle" xml:space="preserve">
+    <value><![CDATA[Error]]></value>
+    <comment>Shared across several error notifications on this page.</comment>
+  </data>
+  <data name="Email.UserNotFoundDetail" xml:space="preserve"><value><![CDATA[Could not load user profile.]]></value></data>
+  <data name="Email.UserNotLoadedDetail" xml:space="preserve"><value><![CDATA[User not loaded.]]></value></data>
+  <data name="Email.InfoTitle" xml:space="preserve"><value><![CDATA[Info]]></value></data>
+  <data name="Email.NoChangeDetail" xml:space="preserve"><value><![CDATA[No email change detected.]]></value></data>
+  <data name="Email.SuccessTitle" xml:space="preserve"><value><![CDATA[Success]]></value></data>
+  <data name="Email.ConfirmationSentDetail" xml:space="preserve"><value><![CDATA[A confirmation link has been sent to your new email address. Please check your inbox.]]></value></data>
+  <data name="Email.SendFailedDetail" xml:space="preserve"><value><![CDATA[Failed to send confirmation email. Please try again later.]]></value></data>
+  <data name="Email.SentTitle" xml:space="preserve"><value><![CDATA[Sent]]></value></data>
+  <data name="Email.ResentDetail" xml:space="preserve"><value><![CDATA[Verification email has been resent. Please check your inbox.]]></value></data>
+  <data name="Email.VerificationSendFailedDetail" xml:space="preserve"><value><![CDATA[Could not send verification email. Try again later.]]></value></data>
+
+  <!-- Manage/EnableAuthenticator.razor -->
+  <data name="EnableAuthenticator.PageTitle" xml:space="preserve"><value><![CDATA[Configure authenticator app]]></value></data>
+  <data name="EnableAuthenticator.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Two-factor authentication]]></value></data>
+  <data name="EnableAuthenticator.VerifiedTitle" xml:space="preserve">
+    <value><![CDATA[Authenticator verified]]></value>
+    <comment>Shown as the page heading once recovery codes have been generated, and reused as the toast title for the same success event.</comment>
+  </data>
+  <data name="EnableAuthenticator.Heading" xml:space="preserve"><value><![CDATA[Configure authenticator app]]></value></data>
+  <data name="EnableAuthenticator.Subheading" xml:space="preserve"><value><![CDATA[Set up two-factor authentication using an authenticator app.]]></value></data>
+  <data name="EnableAuthenticator.Step1Heading" xml:space="preserve"><value><![CDATA[Step 1 — Download an authenticator app]]></value></data>
+  <data name="EnableAuthenticator.Step1TextPart1" xml:space="preserve"><value><![CDATA[Download Microsoft Authenticator for]]></value></data>
+  <data name="EnableAuthenticator.Step1TextPart2" xml:space="preserve"><value><![CDATA[or Google Authenticator for]]></value></data>
+  <data name="EnableAuthenticator.AndroidLinkText" xml:space="preserve">
+    <value><![CDATA[Android]]></value>
+    <comment>Platform name (unchanged in German); used at two call sites for the Microsoft/Google Authenticator links.</comment>
+  </data>
+  <data name="EnableAuthenticator.IosLinkText" xml:space="preserve">
+    <value><![CDATA[iOS]]></value>
+    <comment>Platform name (unchanged in German); used at two call sites for the Microsoft/Google Authenticator links.</comment>
+  </data>
+  <data name="EnableAuthenticator.Step2Heading" xml:space="preserve"><value><![CDATA[Step 2 — Scan the QR code]]></value></data>
+  <data name="EnableAuthenticator.Step2TextPrefix" xml:space="preserve"><value><![CDATA[Scan the QR code below or enter the key]]></value></data>
+  <data name="EnableAuthenticator.Step2TextSuffix" xml:space="preserve"><value><![CDATA[into your app. Spaces and casing do not matter.]]></value></data>
+  <data name="EnableAuthenticator.Step3Heading" xml:space="preserve"><value><![CDATA[Step 3 — Enter the verification code]]></value></data>
+  <data name="EnableAuthenticator.Step3Text" xml:space="preserve"><value><![CDATA[Once you have scanned the QR code, your app will show a 6-digit code. Enter it below.]]></value></data>
+  <data name="EnableAuthenticator.CodeLabel" xml:space="preserve"><value><![CDATA[Verification code]]></value></data>
+  <data name="EnableAuthenticator.CodeRequired" xml:space="preserve"><value><![CDATA[Verification code is required]]></value></data>
+  <data name="EnableAuthenticator.SubmitButton" xml:space="preserve"><value><![CDATA[Verify]]></value></data>
+  <data name="EnableAuthenticator.VerificationErrorTitle" xml:space="preserve"><value><![CDATA[Verification Error]]></value></data>
+  <data name="EnableAuthenticator.InvalidCodeDetail" xml:space="preserve"><value><![CDATA[Verification code is invalid.]]></value></data>
+  <data name="EnableAuthenticator.AddedTitle" xml:space="preserve"><value><![CDATA[Authenticator added]]></value></data>
+  <data name="EnableAuthenticator.VerifiedDetail" xml:space="preserve">
+    <value><![CDATA[Your authenticator app has been verified.]]></value>
+    <comment>Shared between the recovery-codes-generated and already-configured success notifications.</comment>
+  </data>
+
+  <!-- Manage/GenerateRecoveryCodes.razor -->
+  <data name="GenerateRecoveryCodes.PageTitle" xml:space="preserve"><value><![CDATA[Generate two-factor authentication (2FA) recovery codes]]></value></data>
+  <data name="GenerateRecoveryCodes.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Two-factor authentication]]></value></data>
+  <data name="GenerateRecoveryCodes.Heading" xml:space="preserve"><value><![CDATA[Generate Recovery Codes]]></value></data>
+  <data name="GenerateRecoveryCodes.Subheading" xml:space="preserve"><value><![CDATA[Two-factor authentication recovery codes]]></value></data>
+  <data name="GenerateRecoveryCodes.AlertStrong" xml:space="preserve"><value><![CDATA[Put these codes in a safe place.]]></value></data>
+  <data name="GenerateRecoveryCodes.AlertLine2" xml:space="preserve"><value><![CDATA[If you lose your device and don't have the recovery codes you will lose access to your account.]]></value></data>
+  <data name="GenerateRecoveryCodes.AlertLine3Prefix" xml:space="preserve"><value><![CDATA[Generating new recovery codes does not change the keys used in authenticator apps. If you wish to change the key used in an authenticator app you should]]></value></data>
+  <data name="GenerateRecoveryCodes.AlertLinkText" xml:space="preserve"><value><![CDATA[reset your authenticator keys]]></value></data>
+  <data name="GenerateRecoveryCodes.GenerateButton" xml:space="preserve"><value><![CDATA[Generate Recovery Codes]]></value></data>
+  <data name="GenerateRecoveryCodes.GeneratingBusyText" xml:space="preserve"><value><![CDATA[Generating...]]></value></data>
+  <data name="GenerateRecoveryCodes.ErrorTitle" xml:space="preserve">
+    <value><![CDATA[Error]]></value>
+    <comment>Shared across several error notifications on this page.</comment>
+  </data>
+  <data name="GenerateRecoveryCodes.UserNotFoundDetail" xml:space="preserve"><value><![CDATA[Could not load user profile.]]></value></data>
+  <data name="GenerateRecoveryCodes.TwoFactorRequiredDetail" xml:space="preserve"><value><![CDATA[You must have 2FA enabled to generate recovery codes.]]></value></data>
+  <data name="GenerateRecoveryCodes.GeneratedTitle" xml:space="preserve"><value><![CDATA[Recovery codes generated]]></value></data>
+  <data name="GenerateRecoveryCodes.GeneratedDetail" xml:space="preserve"><value><![CDATA[You have generated new recovery codes.]]></value></data>
+
+  <!-- Manage/PasskeyCreate.razor -->
+  <data name="PasskeyCreate.PageTitle" xml:space="preserve"><value><![CDATA[Register New Passkey]]></value></data>
+  <data name="PasskeyCreate.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Passkeys]]></value></data>
+  <data name="PasskeyCreate.Heading" xml:space="preserve"><value><![CDATA[Register New Passkey]]></value></data>
+  <data name="PasskeyCreate.Subheading" xml:space="preserve"><value><![CDATA[Add a secure, passwordless sign-in method using your device]]></value></data>
+  <data name="PasskeyCreate.IntroText" xml:space="preserve"><value><![CDATA[A passkey allows you to sign in using your device's built-in security features (fingerprint, face recognition, PIN or security key) — no password needed.]]></value></data>
+  <data name="PasskeyCreate.StepsHeading" xml:space="preserve"><value><![CDATA[Steps:]]></value></data>
+  <data name="PasskeyCreate.Step1" xml:space="preserve"><value><![CDATA[Click the button below]]></value></data>
+  <data name="PasskeyCreate.Step2" xml:space="preserve"><value><![CDATA[Follow your browser or device instructions]]></value></data>
+  <data name="PasskeyCreate.Step3" xml:space="preserve"><value><![CDATA[Give your new passkey a name (you can change it later)]]></value></data>
+  <data name="PasskeyCreate.SubmitButtonText" xml:space="preserve"><value><![CDATA[Register Passkey]]></value></data>
+  <data name="PasskeyCreate.CancelButton" xml:space="preserve"><value><![CDATA[Cancel]]></value></data>
+  <data name="PasskeyCreate.SupportedDevicesText" xml:space="preserve"><value><![CDATA[Supported on Windows Hello, macOS Touch ID, Android biometrics, iOS Face ID / Touch ID, YubiKey and most FIDO2 security keys.]]></value></data>
+  <data name="PasskeyCreate.ErrorTitle" xml:space="preserve">
+    <value><![CDATA[Error]]></value>
+    <comment>Shared between the profile-load and passkey-registration error notifications.</comment>
+  </data>
+  <data name="PasskeyCreate.UserNotFoundDetail" xml:space="preserve"><value><![CDATA[Could not load user profile.]]></value></data>
+
+  <!-- Manage/Passkeys.razor -->
+  <data name="Passkeys.PageTitle" xml:space="preserve"><value><![CDATA[Manage Passkeys]]></value></data>
+  <data name="Passkeys.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Passkeys]]></value></data>
+  <data name="Passkeys.Heading" xml:space="preserve"><value><![CDATA[Manage Passkeys]]></value></data>
+  <data name="Passkeys.Subtitle" xml:space="preserve"><value><![CDATA[Add, rename or remove your security keys (WebAuthn / passkeys)]]></value></data>
+  <data name="Passkeys.RegisterButton" xml:space="preserve"><value><![CDATA[Register passkey]]></value></data>
+  <data name="Passkeys.MaxReachedAlert" xml:space="preserve">
+    <value><![CDATA[You have reached the maximum number of passkeys ({0}). Delete one before adding a new one.]]></value>
+    <comment>{0} is the configured maximum passkey count (MaxPasskeyCount).</comment>
+  </data>
+  <data name="Passkeys.ColumnPasskeyName" xml:space="preserve"><value><![CDATA[Passkey name]]></value></data>
+  <data name="Passkeys.ColumnRegistered" xml:space="preserve"><value><![CDATA[Registered]]></value></data>
+  <data name="Passkeys.ColumnActions" xml:space="preserve"><value><![CDATA[Actions]]></value></data>
+  <data name="Passkeys.RenameButton" xml:space="preserve"><value><![CDATA[Rename]]></value></data>
+  <data name="Passkeys.DeleteButton" xml:space="preserve"><value><![CDATA[Delete]]></value></data>
+  <data name="Passkeys.EmptyTitle" xml:space="preserve"><value><![CDATA[No passkeys registered yet]]></value></data>
+  <data name="Passkeys.EmptyText" xml:space="preserve"><value><![CDATA[Passkeys let you sign in without a password, using your device.]]></value></data>
+  <data name="Passkeys.ErrorTitle" xml:space="preserve">
+    <value><![CDATA[Error]]></value>
+    <comment>Shared across several error notifications on this page.</comment>
+  </data>
+  <data name="Passkeys.UserNotFoundDetail" xml:space="preserve"><value><![CDATA[Could not load user profile.]]></value></data>
+  <data name="Passkeys.LoadFailedDetail" xml:space="preserve"><value><![CDATA[Failed to load passkeys.]]></value></data>
+  <data name="Passkeys.DeleteConfirmItem" xml:space="preserve">
+    <value><![CDATA[passkey **{0}**]]></value>
+    <comment>{0} is the passkey's display name, rendered inside markdown bold in the confirm-delete dialog.</comment>
+  </data>
+  <data name="Passkeys.DeleteConfirmTitle" xml:space="preserve"><value><![CDATA[Delete passkey]]></value></data>
+  <data name="Passkeys.SuccessTitle" xml:space="preserve"><value><![CDATA[Success]]></value></data>
+  <data name="Passkeys.DeletedDetail" xml:space="preserve"><value><![CDATA[Passkey deleted.]]></value></data>
+  <data name="Passkeys.DeleteFailedDefaultDetail" xml:space="preserve"><value><![CDATA[Could not delete passkey.]]></value></data>
+  <data name="Passkeys.UnexpectedErrorDetail" xml:space="preserve"><value><![CDATA[An unexpected error occurred.]]></value></data>
+
+  <!-- Manage/Profile.razor -->
+  <data name="Profile.PageTitle" xml:space="preserve"><value><![CDATA[Profile]]></value></data>
+  <data name="Profile.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Profile]]></value></data>
+  <data name="Profile.Heading" xml:space="preserve"><value><![CDATA[Your Profile]]></value></data>
+  <data name="Profile.Subtitle" xml:space="preserve"><value><![CDATA[Update your personal information]]></value></data>
+  <data name="Profile.UsernameLabel" xml:space="preserve"><value><![CDATA[Username]]></value></data>
+  <data name="Profile.UsernameHint" xml:space="preserve"><value><![CDATA[Your unique identifier (cannot be changed)]]></value></data>
+  <data name="Profile.PhoneLabel" xml:space="preserve"><value><![CDATA[Phone number]]></value></data>
+  <data name="Profile.PhoneRequired" xml:space="preserve"><value><![CDATA[Phone number is required]]></value></data>
+  <data name="Profile.PhoneInvalid" xml:space="preserve"><value><![CDATA[Please enter a valid phone number]]></value></data>
+  <data name="Profile.ErrorTitle" xml:space="preserve">
+    <value><![CDATA[Error]]></value>
+    <comment>Shared across several error notifications on this page.</comment>
+  </data>
+  <data name="Profile.UserNotFoundDetail" xml:space="preserve"><value><![CDATA[Could not load your profile. Please try again.]]></value></data>
+  <data name="Profile.UserNotLoadedDetail" xml:space="preserve"><value><![CDATA[No user loaded.]]></value></data>
+  <data name="Profile.SuccessTitle" xml:space="preserve"><value><![CDATA[Success]]></value></data>
+  <data name="Profile.SuccessDetail" xml:space="preserve"><value><![CDATA[Your profile has been updated.]]></value></data>
+  <data name="Profile.InfoTitle" xml:space="preserve"><value><![CDATA[Info]]></value></data>
+  <data name="Profile.NoChangesDetail" xml:space="preserve"><value><![CDATA[No changes were made.]]></value></data>
+  <data name="Profile.UnexpectedErrorDetail" xml:space="preserve"><value><![CDATA[An unexpected error occurred while saving.]]></value></data>
+
+  <!-- Manage/RenamePasskey.razor -->
+  <data name="RenamePasskey.PageTitle" xml:space="preserve"><value><![CDATA[Rename Passkey]]></value></data>
+  <data name="RenamePasskey.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Passkeys]]></value></data>
+  <data name="RenamePasskey.RenameHeading" xml:space="preserve"><value><![CDATA[Rename Passkey]]></value></data>
+  <data name="RenamePasskey.NameNewHeading" xml:space="preserve"><value><![CDATA[Name Your New Passkey]]></value></data>
+  <data name="RenamePasskey.Subtitle" xml:space="preserve"><value><![CDATA[Choose a recognizable name for this security key]]></value></data>
+  <data name="RenamePasskey.LoadingText" xml:space="preserve"><value><![CDATA[Loading passkey information...]]></value></data>
+  <data name="RenamePasskey.NotFoundOrExpired" xml:space="preserve"><value><![CDATA[Passkey not found or session expired.]]></value></data>
+  <data name="RenamePasskey.SaveButton" xml:space="preserve"><value><![CDATA[Save name]]></value></data>
+  <data name="RenamePasskey.NameLabel" xml:space="preserve"><value><![CDATA[Passkey name]]></value></data>
+  <data name="RenamePasskey.NamePlaceholder" xml:space="preserve"><value><![CDATA[e.g. My iPhone 15, Work Laptop Key, Blue YubiKey]]></value></data>
+  <data name="RenamePasskey.NameRequired" xml:space="preserve"><value><![CDATA[Name is required]]></value></data>
+  <data name="RenamePasskey.NameLength" xml:space="preserve"><value><![CDATA[Name must be 3–100 characters long]]></value></data>
+  <data name="RenamePasskey.MissingIdentifierError" xml:space="preserve"><value><![CDATA[Missing passkey identifier.]]></value></data>
+  <data name="RenamePasskey.InvalidFormatError" xml:space="preserve"><value><![CDATA[Invalid passkey identifier format.]]></value></data>
+  <data name="RenamePasskey.CannotLoadProfileError" xml:space="preserve"><value><![CDATA[Cannot load user profile. Please sign in again.]]></value></data>
+  <data name="RenamePasskey.NotFoundError" xml:space="preserve"><value><![CDATA[This passkey could not be found.]]></value></data>
+  <data name="RenamePasskey.ErrorTitle" xml:space="preserve">
+    <value><![CDATA[Error]]></value>
+    <comment>Shared across several error notifications on this page.</comment>
+  </data>
+  <data name="RenamePasskey.PasskeyNotLoadedDetail" xml:space="preserve"><value><![CDATA[Passkey not loaded.]]></value></data>
+  <data name="RenamePasskey.NameRequiredDetail" xml:space="preserve"><value><![CDATA[Name is required.]]></value></data>
+  <data name="RenamePasskey.SessionExpiredDetail" xml:space="preserve"><value><![CDATA[User session expired.]]></value></data>
+  <data name="RenamePasskey.SuccessTitle" xml:space="preserve"><value><![CDATA[Success]]></value></data>
+  <data name="RenamePasskey.SavedDetail" xml:space="preserve"><value><![CDATA[Passkey name saved successfully.]]></value></data>
+  <data name="RenamePasskey.UpdateFailedDefaultDetail" xml:space="preserve"><value><![CDATA[Failed to update passkey name.]]></value></data>
+
+  <!-- Manage/ResetAuthenticator.razor -->
+  <data name="ResetAuthenticator.PageTitle" xml:space="preserve"><value><![CDATA[Reset Authenticator Key]]></value></data>
+  <data name="ResetAuthenticator.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Two-factor authentication]]></value></data>
+  <data name="ResetAuthenticator.Heading" xml:space="preserve"><value><![CDATA[Reset Authenticator Key]]></value></data>
+  <data name="ResetAuthenticator.Subheading" xml:space="preserve"><value><![CDATA[Remove current authenticator app and start setup again]]></value></data>
+  <data name="ResetAuthenticator.AlertLine1" xml:space="preserve"><value><![CDATA[Resetting your authenticator key will make your current app stop working.]]></value></data>
+  <data name="ResetAuthenticator.AlertLine2Prefix" xml:space="preserve"><value><![CDATA[You will need to set up your authenticator app again immediately after this step.]]></value></data>
+  <data name="ResetAuthenticator.AlertLine2Strong" xml:space="preserve"><value><![CDATA[If you do not complete the setup, you may lose access to your account.]]></value></data>
+  <data name="ResetAuthenticator.SubmitButton" xml:space="preserve"><value><![CDATA[Reset Authenticator Key]]></value></data>
+  <data name="ResetAuthenticator.CancelButton" xml:space="preserve"><value><![CDATA[Cancel – Keep current setup]]></value></data>
+
+  <!-- Manage/SetPassword.razor -->
+  <data name="SetPassword.PageTitle" xml:space="preserve"><value><![CDATA[Set Password]]></value></data>
+  <data name="SetPassword.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Password]]></value></data>
+  <data name="SetPassword.Heading" xml:space="preserve"><value><![CDATA[Set Password]]></value></data>
+  <data name="SetPassword.Subtitle" xml:space="preserve"><value><![CDATA[Add a local account so you can log in without an external login.]]></value></data>
+  <data name="SetPassword.Submit" xml:space="preserve"><value><![CDATA[Set password]]></value></data>
+  <data name="SetPassword.Setting" xml:space="preserve"><value><![CDATA[Setting…]]></value></data>
+  <data name="SetPassword.NewPasswordLabel" xml:space="preserve"><value><![CDATA[New password]]></value></data>
+  <data name="SetPassword.NewPasswordRequired" xml:space="preserve"><value><![CDATA[New password is required]]></value></data>
+  <data name="SetPassword.PasswordLength" xml:space="preserve">
+    <value><![CDATA[Password must be between {0} and 100 characters]]></value>
+    <comment>{0} is the configured minimum password length (IdentityOptions.Password.RequiredLength).</comment>
+  </data>
+  <data name="SetPassword.ConfirmPasswordLabel" xml:space="preserve"><value><![CDATA[Confirm new password]]></value></data>
+  <data name="SetPassword.ConfirmPasswordRequired" xml:space="preserve"><value><![CDATA[Please confirm the new password]]></value></data>
+  <data name="SetPassword.PasswordMismatch" xml:space="preserve"><value><![CDATA[The passwords do not match]]></value></data>
+  <data name="SetPassword.ErrorTitle" xml:space="preserve">
+    <value><![CDATA[Error]]></value>
+    <comment>Shared across the two error notifications on this page.</comment>
+  </data>
+  <data name="SetPassword.UserNotFoundDetail" xml:space="preserve"><value><![CDATA[Could not load user profile.]]></value></data>
+  <data name="SetPassword.SuccessTitle" xml:space="preserve"><value><![CDATA[Password set]]></value></data>
+  <data name="SetPassword.SuccessDetail" xml:space="preserve"><value><![CDATA[Your password has been set.]]></value></data>
+
+  <!-- Manage/PersonalData.razor -->
+  <data name="PersonalData.PageTitle" xml:space="preserve"><value><![CDATA[Personal Data]]></value></data>
+  <data name="PersonalData.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Personal data]]></value></data>
+  <data name="PersonalData.Heading" xml:space="preserve"><value><![CDATA[Personal Data]]></value></data>
+  <data name="PersonalData.Subheading" xml:space="preserve"><value><![CDATA[Download or delete the personal information associated with your account]]></value></data>
+  <data name="PersonalData.IntroText" xml:space="preserve"><value><![CDATA[This page lets you download a copy of all personal data we store about you (profile information, activity logs, etc.) or permanently delete your account and all related data.]]></value></data>
+  <data name="PersonalData.WarningLabel" xml:space="preserve"><value><![CDATA[Warning:]]></value></data>
+  <data name="PersonalData.WarningPart1" xml:space="preserve"><value><![CDATA[Deleting your account deactivates it immediately and]]></value></data>
+  <data name="PersonalData.WarningPart2Strong" xml:space="preserve"><value><![CDATA[permanently erases your personal data once the retention period elapses]]></value></data>
+  <data name="PersonalData.WarningPart3" xml:space="preserve"><value><![CDATA[— including all content, settings and history. After erasure this]]></value></data>
+  <data name="PersonalData.WarningPart4Strong" xml:space="preserve"><value><![CDATA[cannot be undone]]></value></data>
+  <data name="PersonalData.WarningSuffix" xml:space="preserve"><value><![CDATA[.]]></value></data>
+  <data name="PersonalData.DownloadButton" xml:space="preserve"><value><![CDATA[Download my data]]></value></data>
+  <data name="PersonalData.DeleteButton" xml:space="preserve"><value><![CDATA[Delete my account & all data]]></value></data>
+  <data name="PersonalData.FooterHint" xml:space="preserve"><value><![CDATA[The downloaded file usually contains your data in JSON or ZIP format.]]></value></data>
+
+  <!-- Manage/TwoFactorAuthentication.razor -->
+  <data name="TwoFactorAuthentication.PageTitle" xml:space="preserve"><value><![CDATA[Two-Factor Authentication]]></value></data>
+  <data name="TwoFactorAuthentication.Breadcrumb" xml:space="preserve"><value><![CDATA[Account / Two-factor authentication]]></value></data>
+  <data name="TwoFactorAuthentication.Heading" xml:space="preserve"><value><![CDATA[Two-Factor Authentication (2FA)]]></value></data>
+  <data name="TwoFactorAuthentication.Subheading" xml:space="preserve"><value><![CDATA[Add an extra layer of security to your account]]></value></data>
+  <data name="TwoFactorAuthentication.EnabledPrefix" xml:space="preserve"><value><![CDATA[Two-factor authentication is]]></value></data>
+  <data name="TwoFactorAuthentication.EnabledStrong" xml:space="preserve"><value><![CDATA[currently enabled]]></value></data>
+  <data name="TwoFactorAuthentication.NoCodesStrong" xml:space="preserve"><value><![CDATA[You have no recovery codes left!]]></value></data>
+  <data name="TwoFactorAuthentication.NoCodesText" xml:space="preserve"><value><![CDATA[Generate a new set before you can use recovery codes to log in.]]></value></data>
+  <data name="TwoFactorAuthentication.GenerateCodesButton" xml:space="preserve">
+    <value><![CDATA[Generate new recovery codes]]></value>
+    <comment>Shared between the "no codes left" and "codes running low" alerts.</comment>
+  </data>
+  <data name="TwoFactorAuthentication.RecoveryCodesRemainingSingular" xml:space="preserve">
+    <value><![CDATA[{0} recovery code remaining]]></value>
+    <comment>{0} is always 1 here; used only when exactly one recovery code remains.</comment>
+  </data>
+  <data name="TwoFactorAuthentication.RecoveryCodesRemainingPlural" xml:space="preserve">
+    <value><![CDATA[{0} recovery codes remaining]]></value>
+    <comment>{0} is the number of recovery codes remaining (2 or 3 in this context).</comment>
+  </data>
+  <data name="TwoFactorAuthentication.ConsiderGeneratingText" xml:space="preserve"><value><![CDATA[Consider generating a new set soon.]]></value></data>
+  <data name="TwoFactorAuthentication.DisabledPrefix" xml:space="preserve"><value><![CDATA[Two-factor authentication is currently]]></value></data>
+  <data name="TwoFactorAuthentication.DisabledStrong" xml:space="preserve"><value><![CDATA[disabled]]></value></data>
+  <data name="TwoFactorAuthentication.DisableButton" xml:space="preserve"><value><![CDATA[Disable 2FA]]></value></data>
+  <data name="TwoFactorAuthentication.ResetCodesButton" xml:space="preserve"><value><![CDATA[Reset recovery codes]]></value></data>
+  <data name="TwoFactorAuthentication.AuthenticatorAppHeading" xml:space="preserve"><value><![CDATA[Authenticator app]]></value></data>
+  <data name="TwoFactorAuthentication.AuthenticatorAppText" xml:space="preserve"><value><![CDATA[Use a time-based one-time password (TOTP) app such as Google Authenticator, Microsoft Authenticator, Authy, Bitwarden, 1Password, etc.]]></value></data>
+  <data name="TwoFactorAuthentication.AddAuthenticatorButton" xml:space="preserve"><value><![CDATA[Add authenticator app]]></value></data>
+  <data name="TwoFactorAuthentication.ReconfigureAuthenticatorButton" xml:space="preserve"><value><![CDATA[Reconfigure authenticator app]]></value></data>
+  <data name="TwoFactorAuthentication.ResetAuthenticatorButton" xml:space="preserve"><value><![CDATA[Reset authenticator app]]></value></data>
 </root>
