@@ -1,11 +1,11 @@
 @page "/Account/Manage/GenerateRecoveryCodes"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 @inject UserManager<User> UserManager
 @inject ILogger<GenerateRecoveryCodes> Logger
 @inject NotificationService NotificationService
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IServiceProvider Services
 
 <AppPageTitle Title="@T("GenerateRecoveryCodes.PageTitle")" Breadcrumb="@T("GenerateRecoveryCodes.Breadcrumb")" />
 
@@ -86,7 +86,4 @@
         _isProcessing = false;
     }
 
-    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
-    // still renders on a host (or bUnit test) without localization registered.
-    private string T(string key) => Services.IdentityText(key);
 }

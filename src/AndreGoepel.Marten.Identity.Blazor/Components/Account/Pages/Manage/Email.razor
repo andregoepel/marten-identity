@@ -1,5 +1,6 @@
 @page "/Account/Manage/Email"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 @using Microsoft.AspNetCore.WebUtilities
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
@@ -7,7 +8,6 @@
 @inject IEmailSender<User> EmailSender
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
-@inject IServiceProvider Services
 
 <AppPageTitle Title="@T("Email.PageTitle")" Breadcrumb="@T("Email.Breadcrumb")" />
 
@@ -208,7 +208,4 @@
         public string? NewEmail { get; set; }
     }
 
-    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
-    // still renders on a host (or bUnit test) without localization registered.
-    private string T(string key) => Services.IdentityText(key);
 }

@@ -1,12 +1,12 @@
 @page "/Account/Manage/Disable2fa"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
 @inject ILogger<Disable2fa> Logger
 @inject NotificationService NotificationService
 @inject AuthenticationStateProvider AuthenticationStateProvider
-@inject IServiceProvider Services
 
 <AppPageTitle Title="@T("Disable2fa.PageTitle")" Breadcrumb="@T("Disable2fa.Breadcrumb")" />
 
@@ -105,7 +105,4 @@
         }
     }
 
-    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
-    // still renders on a host (or bUnit test) without localization registered.
-    private string T(string key) => Services.IdentityText(key);
 }

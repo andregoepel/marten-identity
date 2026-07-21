@@ -1,5 +1,6 @@
 @page "/Account/Manage/Passkeys/Rename/{Id}"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 @using System.Buffers.Text
 
@@ -7,7 +8,6 @@
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
 @inject NotificationService NotificationService
-@inject IServiceProvider Services
 
 <AppPageTitle Title="@T("RenamePasskey.PageTitle")" Breadcrumb="@T("RenamePasskey.Breadcrumb")" />
 
@@ -181,7 +181,4 @@
         public string Name { get; set; } = "";
     }
 
-    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
-    // still renders on a host (or bUnit test) without localization registered.
-    private string T(string key) => Services.IdentityText(key);
 }

@@ -1,8 +1,8 @@
 @page "/Account/Manage/ResetAuthenticator"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 @inject NavigationManager NavigationManager
-@inject IServiceProvider Services
 
 <AppPageTitle Title="@T("ResetAuthenticator.PageTitle")" Breadcrumb="@T("ResetAuthenticator.Breadcrumb")" />
 
@@ -54,7 +54,4 @@
 </div>
 
 @code {
-    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
-    // still renders on a host (or bUnit test) without localization registered.
-    private string T(string key) => Services.IdentityText(key);
 }

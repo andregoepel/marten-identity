@@ -1,9 +1,9 @@
 @page "/Account/Manage/TwoFactorAuthentication"
+@inherits LocalizedComponentBase
 
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
-@inject IServiceProvider Services
 
 <AppPageTitle Title="@T("TwoFactorAuthentication.PageTitle")" Breadcrumb="@T("TwoFactorAuthentication.Breadcrumb")" />
 
@@ -126,9 +126,4 @@
         _recoveryCodesLeft = await UserManager.CountRecoveryCodesAsync(user);
     }
 
-    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
-    // still renders on a host (or bUnit test) without localization registered.
-    private string T(string key) => Services.IdentityText(key);
-
-    private string T(string key, params object[] arguments) => Services.IdentityText(key, arguments);
 }

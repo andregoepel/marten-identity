@@ -1,5 +1,6 @@
 @page "/Account/Manage/EnableAuthenticator"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 @using System.Globalization
 
@@ -9,7 +10,6 @@
 @inject AuthenticationStateProvider AuthenticationStateProvider
 @inject NotificationService NotificationService
 @inject NavigationManager NavigationManager
-@inject IServiceProvider Services
 
 <AppPageTitle Title="@T("EnableAuthenticator.PageTitle")" Breadcrumb="@T("EnableAuthenticator.Breadcrumb")" />
 
@@ -194,7 +194,4 @@ else
         public string? Code { get; set; }
     }
 
-    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
-    // still renders on a host (or bUnit test) without localization registered.
-    private string T(string key) => Services.IdentityText(key);
 }
