@@ -1,12 +1,12 @@
 @page "/Account/ConfirmEmailChange"
 @attribute [AllowAnonymous]
+@inherits LocalizedComponentBase
 
 @using Microsoft.AspNetCore.WebUtilities
 
 @inject UserManager<User> UserManager
 @inject SignInManager<User> SignInManager
 @inject NavigationManager NavigationManager
-@inject IServiceProvider Services
 
 <AppPageTitle Title="@T("ConfirmEmailChange.PageTitle")" />
 
@@ -90,7 +90,4 @@
         _succeeded = true;
     }
 
-    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
-    // still renders on a host (or bUnit test) without localization registered.
-    private string T(string key) => Services.IdentityText(key);
 }

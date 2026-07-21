@@ -2,11 +2,10 @@
 @attribute [AllowAnonymous]
 @layout LoginLayout
 @rendermode InteractiveServer
-
+@inherits LocalizedComponentBase
 
 @inject NotificationService NotificationService
 @inject LoginTokenProtector LoginTokens
-@inject IServiceProvider Services
 
 <AppPageTitle Title="@T("LoginWithRecoveryCode.PageTitle")" />
 
@@ -80,7 +79,4 @@
         public string RecoveryCode { get; set; } = "";
     }
 
-    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
-    // still renders on a host (or bUnit test) without localization registered.
-    private string T(string key) => Services.IdentityText(key);
 }
