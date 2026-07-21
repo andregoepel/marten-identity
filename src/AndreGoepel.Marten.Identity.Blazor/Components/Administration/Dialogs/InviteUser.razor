@@ -1,16 +1,17 @@
+@inherits LocalizedComponentBase
 @inject DialogService DialogService
 
 <RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween">
     <RadzenStack Gap="1rem">
         <RadzenStack Gap="0.4rem">
-            <RadzenLabel Text="Email" Component="Email" />
+            <RadzenLabel Text="@T("InviteUser.EmailLabel")" Component="Email" />
             <RadzenTextBox Name="Email"
                            Style="width: 100%"
                            Placeholder="name@example.com"
                            @bind-Value="@_email" />
         </RadzenStack>
         <RadzenStack Gap="0.4rem">
-            <RadzenLabel Text="Roles (optional)" Component="Roles" />
+            <RadzenLabel Text="@T("InviteUser.RolesLabel")" Component="Roles" />
             <RadzenListBox Name="Roles"
                            @bind-Value="@_selectedRoles"
                            Data="@_roles"
@@ -18,19 +19,19 @@
                            ValueProperty="@nameof(Role.Name)"
                            Multiple="true"
                            AllowClear="true"
-                           Placeholder="Select roles" />
+                           Placeholder="@T("InviteUser.RolesPlaceholder")" />
         </RadzenStack>
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
         <RadzenButton Click="@SendInvitationAsync"
                       ButtonStyle="ButtonStyle.Primary"
-                      Text="Send invitation"
+                      Text="@T("InviteUser.SendButton")"
                       IsBusy="@_busy"
-                      BusyText="Sending..."
+                      BusyText="@T("InviteUser.SendingBusyText")"
                       Style="width: 150px" />
         <RadzenButton Click="@(() => DialogService.Close(false))"
                       ButtonStyle="ButtonStyle.Light"
-                      Text="Cancel"
+                      Text="@T("InviteUser.CancelButton")"
                       Style="width: 120px" />
     </RadzenStack>
 </RadzenStack>

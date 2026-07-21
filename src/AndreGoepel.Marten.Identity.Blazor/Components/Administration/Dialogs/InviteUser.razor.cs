@@ -31,7 +31,7 @@ public partial class InviteUser
     {
         if (string.IsNullOrWhiteSpace(_email))
         {
-            await DialogService.Alert("Email is required.", "Invite user");
+            await DialogService.Alert(T("InviteUser.EmailRequired"), T("InviteUser.DialogTitle"));
             return;
         }
 
@@ -46,7 +46,7 @@ public partial class InviteUser
             {
                 await DialogService.Alert(
                     string.Join(", ", result.Errors.Select(e => e.Description)),
-                    "Could not invite user"
+                    T("InviteUser.InviteFailedTitle")
                 );
                 return;
             }

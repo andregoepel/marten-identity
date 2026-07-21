@@ -543,4 +543,130 @@
   <data name="TwoFactorAuthentication.AddAuthenticatorButton" xml:space="preserve"><value><![CDATA[Authenticator-App hinzufügen]]></value></data>
   <data name="TwoFactorAuthentication.ReconfigureAuthenticatorButton" xml:space="preserve"><value><![CDATA[Authenticator-App neu konfigurieren]]></value></data>
   <data name="TwoFactorAuthentication.ResetAuthenticatorButton" xml:space="preserve"><value><![CDATA[Authenticator-App zurücksetzen]]></value></data>
+  <data name="Users.PageTitle" xml:space="preserve"><value><![CDATA[Benutzer]]></value></data>
+  <data name="Users.Breadcrumb" xml:space="preserve"><value><![CDATA[Administration / Benutzer]]></value></data>
+  <data name="Users.Subtitle" xml:space="preserve"><value><![CDATA[Benutzerkonten, Rollen und Zugriff verwalten.]]></value></data>
+  <data name="Users.ShowDeleted" xml:space="preserve"><value><![CDATA[Gelöschte anzeigen]]></value></data>
+  <data name="Users.InviteUserButton" xml:space="preserve"><value><![CDATA[Benutzer einladen]]></value></data>
+  <data name="Users.SearchPlaceholder" xml:space="preserve"><value><![CDATA[Suchen...]]></value></data>
+  <data name="Users.Count" xml:space="preserve">
+    <value><![CDATA[{0} von {1}]]></value>
+    <comment>{0} is the filtered count, {1} is the total count, e.g. "9 of 12".</comment>
+  </data>
+  <data name="Users.EmailColumn" xml:space="preserve"><value><![CDATA[E-Mail]]></value></data>
+  <data name="Users.CreatedColumn" xml:space="preserve"><value><![CDATA[Erstellt]]></value></data>
+  <data name="Users.ChangedColumn" xml:space="preserve"><value><![CDATA[Geändert]]></value></data>
+  <data name="Users.ConfirmedColumn" xml:space="preserve"><value><![CDATA[Bestätigt]]></value></data>
+  <data name="Users.Confirmed" xml:space="preserve"><value><![CDATA[Bestätigt]]></value></data>
+  <data name="Users.Invited" xml:space="preserve"><value><![CDATA[Eingeladen]]></value></data>
+  <data name="Users.Unconfirmed" xml:space="preserve"><value><![CDATA[Unbestätigt]]></value></data>
+  <data name="Users.StatusColumn" xml:space="preserve"><value><![CDATA[Status]]></value></data>
+  <data name="Users.Deleted" xml:space="preserve"><value><![CDATA[Gelöscht]]></value></data>
+  <data name="Users.Active" xml:space="preserve"><value><![CDATA[Aktiv]]></value></data>
+  <data name="Users.DeletableColumn" xml:space="preserve"><value><![CDATA[Löschbar]]></value></data>
+  <data name="Users.Yes" xml:space="preserve"><value><![CDATA[Ja]]></value></data>
+  <data name="Users.No" xml:space="preserve"><value><![CDATA[Nein]]></value></data>
+  <data name="Users.ActionsColumn" xml:space="preserve"><value><![CDATA[Aktionen]]></value></data>
+  <data name="Users.RolesButton" xml:space="preserve"><value><![CDATA[Rollen]]></value></data>
+  <data name="Users.MoreActions" xml:space="preserve"><value><![CDATA[Weitere Aktionen]]></value></data>
+  <data name="Users.EditUserRolesDialogTitle" xml:space="preserve"><value><![CDATA[Benutzerrollen bearbeiten]]></value></data>
+  <data name="Users.InviteUserDialogTitle" xml:space="preserve"><value><![CDATA[Benutzer einladen]]></value></data>
+  <data name="Users.InvitationSent" xml:space="preserve"><value><![CDATA[Einladung gesendet.]]></value></data>
+  <data name="Users.InvitationResent" xml:space="preserve"><value><![CDATA[Einladung erneut gesendet.]]></value></data>
+  <data name="Users.ResendInvitationFailedTitle" xml:space="preserve"><value><![CDATA[Einladung konnte nicht erneut gesendet werden]]></value></data>
+  <data name="Users.ThisUser" xml:space="preserve"><value><![CDATA[diesen Benutzer]]></value></data>
+  <data name="Users.DeleteUserConfirmTitle" xml:space="preserve"><value><![CDATA[Benutzer löschen]]></value></data>
+  <data name="Users.UserCouldNotBeDeleted" xml:space="preserve"><value><![CDATA[Benutzer konnte nicht gelöscht werden.]]></value></data>
+  <data name="Users.ErrorTitle" xml:space="preserve"><value><![CDATA[Fehler]]></value></data>
+  <data name="Users.RestorePrompt" xml:space="preserve">
+    <value><![CDATA[{0} wiederherstellen?]]></value>
+    <comment>{0} is the user's email address.</comment>
+  </data>
+  <data name="Users.RestoreUserConfirmTitle" xml:space="preserve"><value><![CDATA[Benutzer wiederherstellen]]></value></data>
+  <data name="Users.Restore" xml:space="preserve"><value><![CDATA[Wiederherstellen]]></value></data>
+  <data name="Users.UserCouldNotBeRestored" xml:space="preserve"><value><![CDATA[Benutzer konnte nicht wiederhergestellt werden.]]></value></data>
+  <data name="Users.ResendInvitationMenuItem" xml:space="preserve"><value><![CDATA[Einladung erneut senden]]></value></data>
+  <data name="Users.DeleteMenuItem" xml:space="preserve"><value><![CDATA[Löschen]]></value></data>
+  <data name="Roles.PageTitle" xml:space="preserve"><value><![CDATA[Rollen]]></value></data>
+  <data name="Roles.Breadcrumb" xml:space="preserve"><value><![CDATA[Administration / Rollen]]></value></data>
+  <data name="Roles.Subtitle" xml:space="preserve"><value><![CDATA[Rollen und deren Berechtigungen verwalten.]]></value></data>
+  <data name="Roles.ShowDeleted" xml:space="preserve"><value><![CDATA[Gelöschte anzeigen]]></value></data>
+  <data name="Roles.NewRoleButton" xml:space="preserve"><value><![CDATA[Neue Rolle]]></value></data>
+  <data name="Roles.SearchPlaceholder" xml:space="preserve"><value><![CDATA[Suchen...]]></value></data>
+  <data name="Roles.Count" xml:space="preserve">
+    <value><![CDATA[{0} von {1}]]></value>
+    <comment>{0} is the filtered count, {1} is the total count, e.g. "9 of 12".</comment>
+  </data>
+  <data name="Roles.RoleNameColumn" xml:space="preserve"><value><![CDATA[Name]]></value></data>
+  <data name="Roles.CreatedColumn" xml:space="preserve"><value><![CDATA[Erstellt]]></value></data>
+  <data name="Roles.ChangedColumn" xml:space="preserve"><value><![CDATA[Geändert]]></value></data>
+  <data name="Roles.StatusColumn" xml:space="preserve"><value><![CDATA[Status]]></value></data>
+  <data name="Roles.Deleted" xml:space="preserve"><value><![CDATA[Gelöscht]]></value></data>
+  <data name="Roles.Active" xml:space="preserve"><value><![CDATA[Aktiv]]></value></data>
+  <data name="Roles.ActionsColumn" xml:space="preserve"><value><![CDATA[Aktionen]]></value></data>
+  <data name="Roles.UsersButton" xml:space="preserve"><value><![CDATA[Benutzer]]></value></data>
+  <data name="Roles.MoreActions" xml:space="preserve"><value><![CDATA[Weitere Aktionen]]></value></data>
+  <data name="Roles.NewRoleDialogTitle" xml:space="preserve"><value><![CDATA[Neue Rolle]]></value></data>
+  <data name="Roles.UsersInRoleDialogTitle" xml:space="preserve">
+    <value><![CDATA[Benutzer in Rolle {0}]]></value>
+    <comment>{0} is the role name.</comment>
+  </data>
+  <data name="Roles.ThisRole" xml:space="preserve"><value><![CDATA[diese Rolle]]></value></data>
+  <data name="Roles.DeleteRoleConfirmTitle" xml:space="preserve"><value><![CDATA[Rolle löschen]]></value></data>
+  <data name="Roles.DeletionFailedTitle" xml:space="preserve"><value><![CDATA[Rolle konnte nicht gelöscht werden]]></value></data>
+  <data name="Roles.RestorePrompt" xml:space="preserve">
+    <value><![CDATA[{0} wiederherstellen?]]></value>
+    <comment>{0} is the role name.</comment>
+  </data>
+  <data name="Roles.RestoreRoleConfirmTitle" xml:space="preserve"><value><![CDATA[Rolle wiederherstellen]]></value></data>
+  <data name="Roles.Restore" xml:space="preserve"><value><![CDATA[Wiederherstellen]]></value></data>
+  <data name="Roles.RestoreFailedTitle" xml:space="preserve"><value><![CDATA[Rolle konnte nicht wiederhergestellt werden]]></value></data>
+  <data name="Roles.DeleteMenuItem" xml:space="preserve"><value><![CDATA[Löschen]]></value></data>
+  <data name="UserCleanup.PageTitle" xml:space="preserve"><value><![CDATA[Benutzerbereinigung]]></value></data>
+  <data name="UserCleanup.Breadcrumb" xml:space="preserve"><value><![CDATA[Administration / Benutzerbereinigung]]></value></data>
+  <data name="UserCleanup.Subtitle" xml:space="preserve"><value><![CDATA[Automatische endgültige Löschung soft-gelöschter Benutzer konfigurieren.]]></value></data>
+  <data name="UserCleanup.RetentionDaysLabel" xml:space="preserve"><value><![CDATA[Aufbewahrungsdauer (Tage)]]></value></data>
+  <data name="UserCleanup.CronScheduleLabel" xml:space="preserve"><value><![CDATA[Cron-Zeitplan]]></value></data>
+  <data name="UserCleanup.CronScheduleHint" xml:space="preserve"><value><![CDATA[Quartz-Cron-Format: Sekunden Minuten Stunden Tag-des-Monats Monat Wochentag. Beispiel: 0 0 3 * * ? läuft täglich um 03:00 UTC. Änderungen wirken sofort.]]></value></data>
+  <data name="UserCleanup.NextRunLabel" xml:space="preserve"><value><![CDATA[Nächster geplanter Lauf]]></value></data>
+  <data name="UserCleanup.SavedTitle" xml:space="preserve"><value><![CDATA[Gespeichert]]></value></data>
+  <data name="UserCleanup.SavedMessage" xml:space="preserve"><value><![CDATA[Einstellungen gespeichert.]]></value></data>
+  <data name="UserCleanup.ErrorTitle" xml:space="preserve"><value><![CDATA[Fehler]]></value></data>
+  <data name="InviteUser.EmailLabel" xml:space="preserve"><value><![CDATA[E-Mail]]></value></data>
+  <data name="InviteUser.RolesLabel" xml:space="preserve"><value><![CDATA[Rollen (optional)]]></value></data>
+  <data name="InviteUser.RolesPlaceholder" xml:space="preserve"><value><![CDATA[Rollen auswählen]]></value></data>
+  <data name="InviteUser.SendButton" xml:space="preserve"><value><![CDATA[Einladung senden]]></value></data>
+  <data name="InviteUser.SendingBusyText" xml:space="preserve"><value><![CDATA[Wird gesendet...]]></value></data>
+  <data name="InviteUser.CancelButton" xml:space="preserve"><value><![CDATA[Abbrechen]]></value></data>
+  <data name="InviteUser.EmailRequired" xml:space="preserve"><value><![CDATA[E-Mail ist erforderlich.]]></value></data>
+  <data name="InviteUser.DialogTitle" xml:space="preserve"><value><![CDATA[Benutzer einladen]]></value></data>
+  <data name="InviteUser.InviteFailedTitle" xml:space="preserve"><value><![CDATA[Benutzer konnte nicht eingeladen werden]]></value></data>
+  <data name="NewRole.RolenameLabel" xml:space="preserve"><value><![CDATA[Rollenname]]></value></data>
+  <data name="NewRole.SaveButton" xml:space="preserve"><value><![CDATA[Speichern]]></value></data>
+  <data name="NewRole.CloseButton" xml:space="preserve"><value><![CDATA[Schließen]]></value></data>
+  <data name="NewRole.CreateFailedDetail" xml:space="preserve">
+    <value><![CDATA[Rolle kann nicht hinzugefügt werden: {0}]]></value>
+    <comment>{0} is the joined list of error descriptions.</comment>
+  </data>
+  <data name="NewRole.CreateFailedTitle" xml:space="preserve"><value><![CDATA[Fehler beim Hinzufügen der Rolle]]></value></data>
+  <data name="RoleUserDialog.NameColumn" xml:space="preserve"><value><![CDATA[Name]]></value></data>
+  <data name="RoleUserDialog.ActionsColumn" xml:space="preserve"><value><![CDATA[Aktionen]]></value></data>
+  <data name="RoleUserDialog.RemoveButton" xml:space="preserve"><value><![CDATA[Entfernen]]></value></data>
+  <data name="RoleUserDialog.CloseButton" xml:space="preserve"><value><![CDATA[Schließen]]></value></data>
+  <data name="RoleUserDialog.RemoveConfirmMessage" xml:space="preserve"><value><![CDATA[Möchten Sie diesen Benutzer wirklich entfernen?]]></value></data>
+  <data name="RoleUserDialog.RemoveConfirmTitle" xml:space="preserve"><value><![CDATA[Benutzer entfernen]]></value></data>
+  <data name="RoleUserDialog.RootUserCannotBeRemoved" xml:space="preserve">
+    <value><![CDATA[Benutzer {0} kann nicht aus der Rolle {1} entfernt werden, da der Root-Benutzer die Rolle {2} benötigt]]></value>
+    <comment>{0} is the username, {1} is the role name being removed from, {2} is the Administrator role name (data, not translated).</comment>
+  </data>
+  <data name="RoleUserDialog.ErrorTitle" xml:space="preserve"><value><![CDATA[Fehler]]></value></data>
+  <data name="RoleUserDialog.UserCouldNotBeDeleted" xml:space="preserve"><value><![CDATA[Benutzer konnte nicht gelöscht werden]]></value></data>
+  <data name="UserRoleDialog.RolesPlaceholder" xml:space="preserve"><value><![CDATA[Rollen auswählen]]></value></data>
+  <data name="UserRoleDialog.SaveButton" xml:space="preserve"><value><![CDATA[Speichern]]></value></data>
+  <data name="UserRoleDialog.CloseButton" xml:space="preserve"><value><![CDATA[Schließen]]></value></data>
+  <data name="UserRoleDialog.RootUserMustHaveAdminRole" xml:space="preserve">
+    <value><![CDATA[Root-Benutzer muss die Rolle {0} haben.]]></value>
+    <comment>{0} is the Administrator role name (data, not translated).</comment>
+  </data>
+  <data name="UserRoleDialog.WarningTitle" xml:space="preserve"><value><![CDATA[Warnung]]></value></data>
 </root>

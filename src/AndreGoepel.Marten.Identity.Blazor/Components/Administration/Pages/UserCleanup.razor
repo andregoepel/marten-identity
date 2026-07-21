@@ -1,32 +1,33 @@
 @page "/Administration/UserCleanup"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 
 @inject CleanupSettingsService CleanupSettingsService
 @inject NotificationService NotificationService
 
 @attribute [Authorize(Roles = "Administrator")]
 
-<AppPageTitle Title="User Cleanup" Breadcrumb="Administration / User cleanup" />
+<AppPageTitle Title="@T("UserCleanup.PageTitle")" Breadcrumb="@T("UserCleanup.Breadcrumb")" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <PageHeader Title="User Cleanup" Subtitle="Configure automatic permanent deletion of soft-deleted users." />
+        <PageHeader Title="@T("UserCleanup.PageTitle")" Subtitle="@T("UserCleanup.Subtitle")" />
 
         <CardForm TItem="InputModel" Data="_input" Submit="SaveAsync" IsBusy="_saving">
-            <FormField Label="Retention period (days)" For="RetentionDays">
+            <FormField Label="@T("UserCleanup.RetentionDaysLabel")" For="RetentionDays">
                 <RadzenNumeric @bind-Value="@_input.RetentionDays" Name="RetentionDays" Min="1" Max="3650" Style="width: 140px;" />
             </FormField>
 
-            <FormField Label="Cron schedule" For="CronSchedule"
-                       Hint="Quartz cron format: seconds minutes hours day-of-month month day-of-week. Example: 0 0 3 * * ? runs daily at 03:00 UTC. Changes take effect immediately.">
+            <FormField Label="@T("UserCleanup.CronScheduleLabel")" For="CronSchedule"
+                       Hint="@T("UserCleanup.CronScheduleHint")">
                 <RadzenTextBox @bind-Value="@_input.CronSchedule" Name="CronSchedule"
                                Style="width: 240px; max-width: 100%; font-family: 'JetBrains Mono', ui-monospace, monospace;" />
             </FormField>
 
             @if (_nextFireTime.HasValue)
             {
-                <InfoBox Label="Next scheduled run" Value="@($"{_nextFireTime.Value:f} UTC")" />
+                <InfoBox Label="@T("UserCleanup.NextRunLabel")" Value="@($"{_nextFireTime.Value:f} UTC")" />
             }
         </CardForm>
 
@@ -60,11 +61,11 @@
 
             await CleanupSettingsService.SaveAsync(settings);
             _nextFireTime = await CleanupSettingsService.GetNextFireTimeAsync();
-            NotificationService.Notify(NotificationSeverity.Success, "Saved", "Settings saved.");
+            NotificationService.Notify(NotificationSeverity.Success, T("UserCleanup.SavedTitle"), T("UserCleanup.SavedMessage"));
         }
         catch (Exception ex)
         {
-            NotificationService.Notify(NotificationSeverity.Error, "Error", ex.Message);
+            NotificationService.Notify(NotificationSeverity.Error, T("UserCleanup.ErrorTitle"), ex.Message);
         }
         finally
         {

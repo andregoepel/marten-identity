@@ -1,4 +1,5 @@
-﻿@inject DialogService DialogService
+﻿@inherits LocalizedComponentBase
+@inject DialogService DialogService
 @inject UserManager<User> UserManager
 @inject RoleManager<Role> RoleManager
 
@@ -11,13 +12,13 @@
         ValueProperty="@nameof(Role.RoleId)"
         Multiple="true"
         AllowClear="true"
-        Placeholder="Select Roles"
+        Placeholder="@T("UserRoleDialog.RolesPlaceholder")"
         Change="@(() => OnChange())"
         />
     </RadzenStack>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
-        <RadzenButton Click="@(() => SaveRoles())" ButtonStyle="ButtonStyle.Primary" Text="Save" Style="width: 120px" />
-        <RadzenButton Click="@(() => DialogService.Close(false))" ButtonStyle="ButtonStyle.Light" Text="Close" Style="width: 120px" />
+        <RadzenButton Click="@(() => SaveRoles())" ButtonStyle="ButtonStyle.Primary" Text="@T("UserRoleDialog.SaveButton")" Style="width: 120px" />
+        <RadzenButton Click="@(() => DialogService.Close(false))" ButtonStyle="ButtonStyle.Light" Text="@T("UserRoleDialog.CloseButton")" Style="width: 120px" />
     </RadzenStack>
 </RadzenStack>
 
@@ -34,7 +35,7 @@
     {
         if (_user.RootUser && !_values.Contains(AdminRole))
         {
-            await DialogService.Alert("Root user must have Administrator role.", "Warning");
+            await DialogService.Alert(T("UserRoleDialog.RootUserMustHaveAdminRole", Roles.Administrator), T("UserRoleDialog.WarningTitle"));
             _values.Add(AdminRole);
         }
     }

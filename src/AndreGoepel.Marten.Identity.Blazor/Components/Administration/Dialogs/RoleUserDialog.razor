@@ -1,4 +1,5 @@
-﻿@inject DialogService DialogService
+﻿@inherits LocalizedComponentBase
+@inject DialogService DialogService
 @inject ConfirmService Confirm
 @inject UserManager<User> UserManager
 @inject RoleManager<Role> RoleManager
@@ -17,11 +18,11 @@
                         Density="Density.Compact"
                         Style="width: 100%;">
             <Columns>
-                <RadzenDataGridColumn Property="@nameof(User.UserName)" Title="Name" />
-                <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false" Width="120px" TextAlign="TextAlign.Right">
+                <RadzenDataGridColumn Property="@nameof(User.UserName)" Title="@T("RoleUserDialog.NameColumn")" />
+                <RadzenDataGridColumn Title="@T("RoleUserDialog.ActionsColumn")" Sortable="false" Filterable="false" Width="120px" TextAlign="TextAlign.Right">
                     <Template Context="data">
                         <div class="ag-row-actions">
-                            <RadzenButton Text="Remove"
+                            <RadzenButton Text="@T("RoleUserDialog.RemoveButton")"
                                           ButtonStyle="ButtonStyle.Danger"
                                           Size="ButtonSize.Small"
                                           Click="@(() => RemoveUser(data))" />
@@ -32,7 +33,7 @@
         </RadzenDataGrid>
     </RadzenCard>
     <RadzenStack Orientation="Orientation.Horizontal" JustifyContent="JustifyContent.End" Gap="0.5rem">
-        <RadzenButton Click="@(() => DialogService.Close(true))" ButtonStyle="ButtonStyle.Light" Text="Close" Style="width: 120px" />
+        <RadzenButton Click="@(() => DialogService.Close(true))" ButtonStyle="ButtonStyle.Light" Text="@T("RoleUserDialog.CloseButton")" Style="width: 120px" />
     </RadzenStack>
 </RadzenStack>
 
@@ -47,11 +48,11 @@
         if(string.IsNullOrEmpty(_role.Name))
             return;
 
-        if (await Confirm.ConfirmAsync("Are you sure you want to remove this user?", "Remove User"))
+        if (await Confirm.ConfirmAsync(T("RoleUserDialog.RemoveConfirmMessage"), T("RoleUserDialog.RemoveConfirmTitle")))
         {
             if (user.RootUser && _role.Name == Roles.Administrator)
             {
-                await DialogService.Alert($"User {user.UserName} cannot be removed from role {_role.Name}, because root user needs the role {Roles.Administrator}", "Error");
+                await DialogService.Alert(T("RoleUserDialog.RootUserCannotBeRemoved", user.UserName ?? "", _role.Name, Roles.Administrator), T("RoleUserDialog.ErrorTitle"));
                 return;
             }
 
@@ -62,7 +63,7 @@
                 await InvokeAsync(StateHasChanged);
             }
             else
-                await DialogService.Alert("User could not be deleted", "Error");
+                await DialogService.Alert(T("RoleUserDialog.UserCouldNotBeDeleted"), T("RoleUserDialog.ErrorTitle"));
         }
     }
 

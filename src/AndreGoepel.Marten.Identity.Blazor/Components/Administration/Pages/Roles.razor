@@ -1,5 +1,6 @@
 @page "/Administration/Roles"
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 @using AndreGoepel.Marten.Identity.Blazor.Components.Administration.Dialogs
 
 @inject RoleManager<Role> RoleManager
@@ -10,19 +11,19 @@
 
 @attribute [Authorize(Roles = "Administrator")]
 
-<AppPageTitle Title="Roles" Breadcrumb="Administration / Roles" />
+<AppPageTitle Title="@T("Roles.PageTitle")" Breadcrumb="@T("Roles.Breadcrumb")" />
 
 <div class="rz-p-4 rz-p-md-6">
     <RadzenStack Gap="1.5rem">
 
-        <PageHeader Title="Roles" Subtitle="Manage user roles and permissions">
+        <PageHeader Title="@T("Roles.PageTitle")" Subtitle="@T("Roles.Subtitle")">
             <Actions>
                 <RadzenStack Orientation="Orientation.Horizontal" AlignItems="AlignItems.Center" Gap="0.75rem">
                     <RadzenCheckBox Name="ShowDeleted"
                                     @bind-Value="@ShowDeleted"
                                     Change="@((bool value) => ShowDeletedChangedAsync(value))" />
-                    <RadzenLabel Text="Show deleted" Component="ShowDeleted" />
-                    <RadzenButton Text="New role"
+                    <RadzenLabel Text="@T("Roles.ShowDeleted")" Component="ShowDeleted" />
+                    <RadzenButton Text="@T("Roles.NewRoleButton")"
                                   Icon="add"
                                   ButtonStyle="ButtonStyle.Primary"
                                   Size="ButtonSize.Small"
@@ -32,8 +33,8 @@
         </PageHeader>
 
         <DataCard>
-            <GridToolbar Search="_filter" SearchChanged="OnFilterChangedAsync" SearchPlaceholder="Filter roles…"
-                         Count="@($"{FilteredRoles.Count} of {(_roles?.Count ?? 0)} roles")" />
+            <GridToolbar Search="_filter" SearchChanged="OnFilterChangedAsync" SearchPlaceholder="@T("Roles.SearchPlaceholder")"
+                         Count="@T("Roles.Count", FilteredRoles.Count, _roles?.Count ?? 0)" />
             <RadzenDataGrid @ref="_rolesGrid"
                             Data="@FilteredRoles"
                             AllowFiltering="false"
@@ -47,7 +48,7 @@
                             Density="Density.Compact"
                             Style="width: 100%;">
                 <Columns>
-                    <RadzenDataGridColumn Property="@nameof(Role.Name)" Title="Role name" Width="260px">
+                    <RadzenDataGridColumn Property="@nameof(Role.Name)" Title="@T("Roles.RoleNameColumn")" Width="260px">
                         <Template Context="role">
                             <div style="display:flex; flex-direction:column; gap:2px;">
                                 <span class="ag-cell-name">@role.Name</span>
@@ -55,31 +56,31 @@
                             </div>
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Property="@nameof(Role.CreatedAt)" FormatString="{0:d} {0:t}" Title="Created" Width="160px" />
-                    <RadzenDataGridColumn Property="@nameof(Role.ChangedAt)" FormatString="{0:d} {0:t}" Title="Changed" Width="160px" />
-                    <RadzenDataGridColumn Property="@nameof(Role.Deleted)" Title="Status" Width="110px">
+                    <RadzenDataGridColumn Property="@nameof(Role.CreatedAt)" FormatString="{0:d} {0:t}" Title="@T("Roles.CreatedColumn")" Width="160px" />
+                    <RadzenDataGridColumn Property="@nameof(Role.ChangedAt)" FormatString="{0:d} {0:t}" Title="@T("Roles.ChangedColumn")" Width="160px" />
+                    <RadzenDataGridColumn Property="@nameof(Role.Deleted)" Title="@T("Roles.StatusColumn")" Width="110px">
                         <Template Context="role">
                             @if (role.Deleted)
                             {
-                                <StatusBadge Text="Deleted" Variant="BadgeVariant.Danger" />
+                                <StatusBadge Text="@T("Roles.Deleted")" Variant="BadgeVariant.Danger" />
                             }
                             else
                             {
-                                <StatusBadge Text="Active" Variant="BadgeVariant.Success" />
+                                <StatusBadge Text="@T("Roles.Active")" Variant="BadgeVariant.Success" />
                             }
                         </Template>
                     </RadzenDataGridColumn>
-                    <RadzenDataGridColumn Title="Actions" Sortable="false" Filterable="false" Width="150px" TextAlign="TextAlign.Right">
+                    <RadzenDataGridColumn Title="@T("Roles.ActionsColumn")" Sortable="false" Filterable="false" Width="150px" TextAlign="TextAlign.Right">
                         <Template Context="data">
                             <RowActions>
-                                <RadzenButton Text="Users"
+                                <RadzenButton Text="@T("Roles.UsersButton")"
                                               ButtonStyle="ButtonStyle.Light"
                                               Size="ButtonSize.Small"
                                               Disabled="@data.Deleted"
                                               Click="@(() => ShowUsersAsync(data))" />
                                 @if (RowHasMenu(data))
                                 {
-                                    <IconButton Icon="more_horiz" Title="More actions" Click="@(args => OpenRowMenu(args, data))" />
+                                    <IconButton Icon="more_horiz" Title="@T("Roles.MoreActions")" Click="@(args => OpenRowMenu(args, data))" />
                                 }
                             </RowActions>
                         </Template>
@@ -121,7 +122,7 @@
 
     private async Task NewRoleAsync()
     {
-        var result = await DialogService.OpenAsync<NewRole>("Create New Role");
+        var result = await DialogService.OpenAsync<NewRole>(T("Roles.NewRoleDialogTitle"));
         if (result is true)
         {
             await LoadRolesAsync();
@@ -133,7 +134,7 @@
         if (string.IsNullOrWhiteSpace(role?.Name)) return;
 
         await DialogService.OpenAsync<RoleUserDialog>(
-            $"Users in role: {role.Name}",
+            T("Roles.UsersInRoleDialogTitle", role.Name),
             new Dictionary<string, object?> { { "RoleId", role.Id } },
             new DialogOptions { Width = "700px", Height = "500px" }
         );
@@ -141,7 +142,7 @@
 
     private async Task DeleteRoleAsync(Role role)
     {
-        if (!await Confirm.ConfirmDeleteAsync(role.Name ?? "this role", title: "Delete role"))
+        if (!await Confirm.ConfirmDeleteAsync(role.Name ?? T("Roles.ThisRole"), title: T("Roles.DeleteRoleConfirmTitle")))
         {
             return;
         }
@@ -156,13 +157,13 @@
         {
             await DialogService.Alert(
                 string.Join("\n", result.Errors.Select(e => e.Description)),
-                "Deletion failed");
+                T("Roles.DeletionFailedTitle"));
         }
     }
 
     private async Task RestoreRoleAsync(Role role)
     {
-        if (!await Confirm.ConfirmAsync($"Restore the role {role.Name}?", "Restore role", okText: "Restore"))
+        if (!await Confirm.ConfirmAsync(T("Roles.RestorePrompt", role.Name ?? ""), T("Roles.RestoreRoleConfirmTitle"), okText: T("Roles.Restore")))
         {
             return;
         }
@@ -177,7 +178,7 @@
         {
             await DialogService.Alert(
                 string.Join("\n", result.Errors.Select(e => e.Description)),
-                "Restore failed");
+                T("Roles.RestoreFailedTitle"));
         }
     }
 
@@ -194,11 +195,11 @@
         var items = new List<ContextMenuItem>();
         if (role.Deleted)
         {
-            items.Add(new ContextMenuItem { Text = "Restore", Value = "restore", Icon = "restore" });
+            items.Add(new ContextMenuItem { Text = T("Roles.Restore"), Value = "restore", Icon = "restore" });
         }
         else if (role.Deletable)
         {
-            items.Add(new ContextMenuItem { Text = "Delete", Value = "delete", Icon = "delete", IconColor = "var(--ag-danger)" });
+            items.Add(new ContextMenuItem { Text = T("Roles.DeleteMenuItem"), Value = "delete", Icon = "delete", IconColor = "var(--ag-danger)" });
         }
 
         ContextMenuService.Open(args, items, async e =>
