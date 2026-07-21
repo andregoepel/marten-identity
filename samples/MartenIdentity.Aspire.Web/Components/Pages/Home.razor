@@ -2,37 +2,35 @@
 @* The library's cookie-login middleware redirects here (DefaultRedirect = "/dashboard")
    after a successful sign-in when no explicit ReturnUrl was supplied. *@
 @page "/dashboard"
+@inject IStringLocalizer<Strings> L
 
-<PageTitle>Marten Identity Sample</PageTitle>
+<PageTitle>@L["Home.PageTitle"]</PageTitle>
 
 <RadzenStack Gap="1rem" Style="max-width: 720px;">
-    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H3">Marten Identity Sample</RadzenText>
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H3">@L["Home.PageTitle"]</RadzenText>
 
     <RadzenText TextStyle="TextStyle.Body1">
-        This .NET Aspire sample hosts the event-sourced ASP.NET Core Identity stack from
+        @L["Home.DescriptionPrefix"]
         <RadzenLink Path="https://github.com/andregoepel/marten-identity"
-                    Text="AndreGoepel.Marten.Identity" Target="_blank" />,
-        backed by a PostgreSQL container provisioned by the Aspire AppHost and projected
-        with Marten. The full Blazor Identity UI — login, registration, 2FA, passkeys, and
-        user/role administration — is wired up out of the box.
+                    Text="AndreGoepel.Marten.Identity" Target="_blank" />@L["Home.DescriptionSuffix"]
     </RadzenText>
 
     <AuthorizeView>
         <Authorized>
             <RadzenText TextStyle="TextStyle.Body1">
-                You are signed in as <strong>@context.User.Identity?.Name</strong>.
+                @L["Home.SignedInAsPrefix"] <strong>@context.User.Identity?.Name</strong>@L["Home.SignedInAsSuffix"]
             </RadzenText>
             <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
-                <RadzenLink Path="Account/Manage/Profile" Text="Manage account" />
+                <RadzenLink Path="Account/Manage/Profile" Text="@L["Home.ManageAccount"]" />
                 <AuthorizeView Roles="@Roles.Administrator" Context="admin">
-                    <RadzenLink Path="Administration/Users" Text="Administer users" />
+                    <RadzenLink Path="Administration/Users" Text="@L["Home.AdministerUsers"]" />
                 </AuthorizeView>
             </RadzenStack>
         </Authorized>
         <NotAuthorized>
             <RadzenStack Orientation="Orientation.Horizontal" Gap="1rem">
-                <RadzenLink Path="Account/Login" Text="Log in" />
-                <RadzenLink Path="Account/Register" Text="Register" />
+                <RadzenLink Path="Account/Login" Text="@L["Home.LogIn"]" />
+                <RadzenLink Path="Account/Register" Text="@L["Home.Register"]" />
             </RadzenStack>
         </NotAuthorized>
     </AuthorizeView>

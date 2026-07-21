@@ -1,11 +1,12 @@
 @page "/Error"
+@inject IStringLocalizer<Strings> L
 
-<PageTitle>Error</PageTitle>
+<PageTitle>@L["Error.PageTitle"]</PageTitle>
 
 <RadzenStack Gap="1rem" Style="max-width: 720px;">
-    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H3">Something went wrong</RadzenText>
+    <RadzenText TagName="TagName.H1" TextStyle="TextStyle.H3">@L["Error.Heading"]</RadzenText>
     <RadzenText TextStyle="TextStyle.Body1">
-        An unexpected error occurred while processing your request.
+        @L["Error.Message"]
     </RadzenText>
-    <RadzenLink Path="/" Text="Back to home" />
+    <RadzenLink Path="/" Text="@L["Error.BackToHome"]" />
 </RadzenStack>

@@ -1,5 +1,6 @@
 @inherits LayoutComponentBase
 @inject IOptions<MartenIdentityBlazorOptions> IdentityOptions
+@inject IStringLocalizer<Strings> L
 
 @* Radzen overlay hosts. They live in an interactive island so DialogService /
    NotificationService calls from the (also interactive) admin & manage pages work. *@
@@ -10,26 +11,26 @@
 
 <AppShell BrandName="@AppName">
     <Sidebar>
-        <NavLink class="ag-nav-item ag-home" href="" Match="NavLinkMatch.All">⌂&nbsp;&nbsp;Home</NavLink>
+        <NavLink class="ag-nav-item ag-home" href="" Match="NavLinkMatch.All">⌂&nbsp;&nbsp;@L["Nav.Home"]</NavLink>
 
         <AuthorizeView>
             <Authorized>
-                <div class="ag-nav-section">ACCOUNT</div>
+                <div class="ag-nav-section">@L["Nav.AccountSection"]</div>
                 <div class="ag-nav-group">
-                    <NavLink class="ag-nav-item" href="Account/Manage/Profile">Profile</NavLink>
-                    <NavLink class="ag-nav-item" href="Account/Manage/Email">Email</NavLink>
-                    <NavLink class="ag-nav-item" href="Account/Manage/ChangePassword">Password</NavLink>
-                    <NavLink class="ag-nav-item" href="Account/Manage/TwoFactorAuthentication">Two-factor authentication</NavLink>
-                    <NavLink class="ag-nav-item" href="Account/Manage/Passkeys">Passkeys</NavLink>
-                    <NavLink class="ag-nav-item" href="Account/Manage/PersonalData">Personal data</NavLink>
+                    <NavLink class="ag-nav-item" href="Account/Manage/Profile">@L["Nav.Profile"]</NavLink>
+                    <NavLink class="ag-nav-item" href="Account/Manage/Email">@L["Nav.Email"]</NavLink>
+                    <NavLink class="ag-nav-item" href="Account/Manage/ChangePassword">@L["Nav.Password"]</NavLink>
+                    <NavLink class="ag-nav-item" href="Account/Manage/TwoFactorAuthentication">@L["Nav.TwoFactorAuth"]</NavLink>
+                    <NavLink class="ag-nav-item" href="Account/Manage/Passkeys">@L["Nav.Passkeys"]</NavLink>
+                    <NavLink class="ag-nav-item" href="Account/Manage/PersonalData">@L["Nav.PersonalData"]</NavLink>
                 </div>
 
                 <AuthorizeView Roles="@Roles.Administrator" Context="admin">
-                    <div class="ag-nav-section">ADMINISTRATION</div>
+                    <div class="ag-nav-section">@L["Nav.AdministrationSection"]</div>
                     <div class="ag-nav-group">
-                        <NavLink class="ag-nav-item" href="Administration/Users">Users</NavLink>
-                        <NavLink class="ag-nav-item" href="Administration/Roles">Roles</NavLink>
-                        <NavLink class="ag-nav-item" href="Administration/UserCleanup">User cleanup</NavLink>
+                        <NavLink class="ag-nav-item" href="Administration/Users">@L["Nav.Users"]</NavLink>
+                        <NavLink class="ag-nav-item" href="Administration/Roles">@L["Nav.Roles"]</NavLink>
+                        <NavLink class="ag-nav-item" href="Administration/UserCleanup">@L["Nav.UserCleanup"]</NavLink>
                     </div>
                 </AuthorizeView>
             </Authorized>
@@ -53,14 +54,14 @@
                     <AntiforgeryToken />
                     <input type="hidden" name="returnUrl" value="/" />
                     <RadzenButton ButtonType="ButtonType.Submit"
-                                  Text="Log out"
+                                  Text="@L["Nav.LogOut"]"
                                   Size="ButtonSize.Small"
                                   ButtonStyle="ButtonStyle.Light" />
                 </form>
             </Authorized>
             <NotAuthorized>
-                <RadzenLink Path="Account/Login" Text="Log in" />
-                <RadzenLink Path="Account/Register" Text="Register" />
+                <RadzenLink Path="Account/Login" Text="@L["Nav.LogIn"]" />
+                <RadzenLink Path="Account/Register" Text="@L["Nav.Register"]" />
             </NotAuthorized>
         </AuthorizeView>
     </TopbarActions>

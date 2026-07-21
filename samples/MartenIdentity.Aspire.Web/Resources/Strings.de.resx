@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <!--
+    German UI strings for the sample app. Mirrors the keys in Strings.resx
+    (English, neutral) — keep both files in sync.
+  -->
+  <xsd:schema id="root" xmlns="" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata">
+    <xsd:import namespace="http://www.w3.org/XML/1998/namespace" />
+    <xsd:element name="root" msdata:IsDataSet="true">
+      <xsd:complexType>
+        <xsd:choice maxOccurs="unbounded">
+          <xsd:element name="metadata">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" />
+              </xsd:sequence>
+              <xsd:attribute name="name" use="required" type="xsd:string" />
+              <xsd:attribute name="type" type="xsd:string" />
+              <xsd:attribute name="mimetype" type="xsd:string" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="assembly">
+            <xsd:complexType>
+              <xsd:attribute name="alias" type="xsd:string" />
+              <xsd:attribute name="name" type="xsd:string" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="data">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+                <xsd:element name="comment" type="xsd:string" minOccurs="0" msdata:Ordinal="2" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" msdata:Ordinal="1" />
+              <xsd:attribute name="type" type="xsd:string" msdata:Ordinal="3" />
+              <xsd:attribute name="mimetype" type="xsd:string" msdata:Ordinal="4" />
+              <xsd:attribute ref="xml:space" />
+            </xsd:complexType>
+          </xsd:element>
+          <xsd:element name="resheader">
+            <xsd:complexType>
+              <xsd:sequence>
+                <xsd:element name="value" type="xsd:string" minOccurs="0" msdata:Ordinal="1" />
+              </xsd:sequence>
+              <xsd:attribute name="name" type="xsd:string" use="required" />
+            </xsd:complexType>
+          </xsd:element>
+        </xsd:choice>
+      </xsd:complexType>
+    </xsd:element>
+  </xsd:schema>
+  <resheader name="resmimetype">
+    <value>text/microsoft-resx</value>
+  </resheader>
+  <resheader name="version">
+    <value>2.0</value>
+  </resheader>
+  <resheader name="reader">
+    <value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+  <resheader name="writer">
+    <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </resheader>
+
+  <!-- Shell -->
+  <data name="Shell.UnhandledError" xml:space="preserve"><value><![CDATA[Ein unbehandelter Fehler ist aufgetreten.]]></value></data>
+  <data name="Shell.Reload" xml:space="preserve"><value><![CDATA[Neu laden]]></value></data>
+
+  <!-- MainLayout -->
+  <data name="Nav.Home" xml:space="preserve"><value><![CDATA[Start]]></value></data>
+  <data name="Nav.AccountSection" xml:space="preserve"><value><![CDATA[KONTO]]></value></data>
+  <data name="Nav.Profile" xml:space="preserve"><value><![CDATA[Profil]]></value></data>
+  <data name="Nav.Email" xml:space="preserve"><value><![CDATA[E-Mail]]></value></data>
+  <data name="Nav.Password" xml:space="preserve"><value><![CDATA[Passwort]]></value></data>
+  <data name="Nav.TwoFactorAuth" xml:space="preserve"><value><![CDATA[Zwei-Faktor-Authentifizierung]]></value></data>
+  <data name="Nav.Passkeys" xml:space="preserve"><value><![CDATA[Passkeys]]></value></data>
+  <data name="Nav.PersonalData" xml:space="preserve"><value><![CDATA[Persönliche Daten]]></value></data>
+  <data name="Nav.AdministrationSection" xml:space="preserve"><value><![CDATA[ADMINISTRATION]]></value></data>
+  <data name="Nav.Users" xml:space="preserve"><value><![CDATA[Benutzer]]></value></data>
+  <data name="Nav.Roles" xml:space="preserve"><value><![CDATA[Rollen]]></value></data>
+  <data name="Nav.UserCleanup" xml:space="preserve"><value><![CDATA[Benutzerbereinigung]]></value></data>
+  <data name="Nav.LogOut" xml:space="preserve"><value><![CDATA[Abmelden]]></value></data>
+  <data name="Nav.LogIn" xml:space="preserve"><value><![CDATA[Anmelden]]></value></data>
+  <data name="Nav.Register" xml:space="preserve"><value><![CDATA[Registrieren]]></value></data>
+
+  <!-- Home.razor -->
+  <data name="Home.PageTitle" xml:space="preserve"><value><![CDATA[Marten Identity Beispiel]]></value></data>
+  <data name="Home.DescriptionPrefix" xml:space="preserve">
+    <value><![CDATA[Dieses .NET-Aspire-Beispiel betreibt den event-sourced ASP.NET-Core-Identity-Stack von]]></value>
+    <comment>Gefolgt von einem festen RadzenLink zum GitHub-Repo, dann DescriptionSuffix.</comment>
+  </data>
+  <data name="Home.DescriptionSuffix" xml:space="preserve"><value><![CDATA[, unterstützt von einem PostgreSQL-Container, der vom Aspire-AppHost bereitgestellt und mit Marten projiziert wird. Die vollständige Blazor-Identity-Oberfläche — Anmeldung, Registrierung, 2FA, Passkeys und Benutzer-/Rollenverwaltung — ist bereits fertig eingerichtet.]]></value></data>
+  <data name="Home.SignedInAsPrefix" xml:space="preserve">
+    <value><![CDATA[Sie sind angemeldet als]]></value>
+    <comment>Gefolgt vom Benutzernamen in einem &lt;strong&gt;-Tag, dann SignedInAsSuffix.</comment>
+  </data>
+  <data name="Home.SignedInAsSuffix" xml:space="preserve"><value><![CDATA[.]]></value></data>
+  <data name="Home.ManageAccount" xml:space="preserve"><value><![CDATA[Konto verwalten]]></value></data>
+  <data name="Home.AdministerUsers" xml:space="preserve"><value><![CDATA[Benutzer verwalten]]></value></data>
+  <data name="Home.LogIn" xml:space="preserve"><value><![CDATA[Anmelden]]></value></data>
+  <data name="Home.Register" xml:space="preserve"><value><![CDATA[Registrieren]]></value></data>
+
+  <!-- Error.razor -->
+  <data name="Error.PageTitle" xml:space="preserve"><value><![CDATA[Fehler]]></value></data>
+  <data name="Error.Heading" xml:space="preserve"><value><![CDATA[Es ist ein Fehler aufgetreten]]></value></data>
+  <data name="Error.Message" xml:space="preserve"><value><![CDATA[Bei der Verarbeitung Ihrer Anfrage ist ein unerwarteter Fehler aufgetreten.]]></value></data>
+  <data name="Error.BackToHome" xml:space="preserve"><value><![CDATA[Zurück zur Startseite]]></value></data>
+
+  <!-- Setup.razor -->
+  <data name="Setup.PageTitle" xml:space="preserve"><value><![CDATA[Ersteinrichtung]]></value></data>
+  <data name="Setup.Heading" xml:space="preserve"><value><![CDATA[Ersten Administrator anlegen]]></value></data>
+  <data name="Setup.Subheading" xml:space="preserve"><value><![CDATA[Es existiert noch kein Administrator. Das hier angelegte Konto wird zum nicht löschbaren Root-Administrator — schließen Sie diesen Schritt daher in einem vertrauenswürdigen Netzwerk ab, bevor Sie die App zugänglich machen.]]></value></data>
+  <data name="Setup.EmailLabel" xml:space="preserve"><value><![CDATA[E-Mail]]></value></data>
+  <data name="Setup.PasswordLabel" xml:space="preserve"><value><![CDATA[Passwort (mindestens 12 Zeichen)]]></value></data>
+  <data name="Setup.ConfirmPasswordLabel" xml:space="preserve"><value><![CDATA[Passwort bestätigen]]></value></data>
+  <data name="Setup.CreateButton" xml:space="preserve"><value><![CDATA[Administrator anlegen]]></value></data>
+  <data name="Setup.CreatingBusyText" xml:space="preserve"><value><![CDATA[Wird angelegt…]]></value></data>
+  <data name="Setup.EmailRequired" xml:space="preserve"><value><![CDATA[E-Mail ist erforderlich.]]></value></data>
+  <data name="Setup.PasswordMinLength" xml:space="preserve"><value><![CDATA[Das Passwort muss mindestens 12 Zeichen lang sein.]]></value></data>
+  <data name="Setup.PasswordMismatch" xml:space="preserve"><value><![CDATA[Die Passwörter stimmen nicht überein.]]></value></data>
+</root>

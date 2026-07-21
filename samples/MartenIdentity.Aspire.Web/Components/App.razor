@@ -1,5 +1,7 @@
+@using System.Globalization
+@inject IStringLocalizer<Strings> L
 <!DOCTYPE html>
-<html lang="en">
+<html lang="@CultureInfo.CurrentUICulture.TwoLetterISOLanguageName">
 
 <head>
     <meta charset="utf-8" />
@@ -30,8 +32,8 @@
     <Routes @rendermode="InteractiveServer" />
 
     <div id="blazor-error-ui">
-        An unhandled error has occurred.
-        <a href="." class="reload">Reload</a>
+        @L["Shell.UnhandledError"]
+        <a href="." class="reload">@L["Shell.Reload"]</a>
         <span class="dismiss">🗙</span>
     </div>
 
