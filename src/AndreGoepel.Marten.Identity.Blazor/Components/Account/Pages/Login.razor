@@ -1,6 +1,7 @@
 @page "/Account/Login"
 @attribute [AllowAnonymous]
 @layout LoginLayout
+@inherits LocalizedComponentBase
 
 @using AndreGoepel.Marten.Identity.Blazor.Features
 @implements IAsyncDisposable
@@ -8,7 +9,6 @@
 @inject NavigationManager NavigationManager
 @inject IJSRuntime JsRuntime
 @inject IIdentityFeatureProvider Features
-@inject IServiceProvider Services
 
 <AppPageTitle Title="@T("Login.PageTitle")" />
 
@@ -117,7 +117,4 @@
         }
     }
 
-    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
-    // still renders on a host (or bUnit test) without localization registered.
-    private string T(string key) => Services.IdentityText(key);
 }

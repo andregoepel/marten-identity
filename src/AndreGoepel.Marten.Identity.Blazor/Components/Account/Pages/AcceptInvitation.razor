@@ -2,6 +2,7 @@
 @attribute [AllowAnonymous]
 @layout LoginLayout
 @rendermode InteractiveServer
+@inherits LocalizedComponentBase
 @using Microsoft.AspNetCore.WebUtilities
 
 @inject UserManager<User> UserManager
@@ -9,7 +10,6 @@
 @inject NotificationService NotificationService
 @inject IOptions<IdentityOptions> IdentityOptions
 @inject LoginTokenProtector LoginTokens
-@inject IServiceProvider Services
 
 @* Deliberately NOT registered in IdentityFeatureGateMiddleware.MapPathToFeature: this page
    is the way a host adds people while self-service registration is disabled, so gating it
@@ -196,10 +196,4 @@ else
         public string ConfirmPassword { get; set; } = "";
     }
 
-    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
-    // still renders on a host (or bUnit test) without localization registered.
-    private string T(string key) => Services.IdentityText(key);
-
-    private string T(string key, params object[] arguments) =>
-        Services.IdentityText(key, arguments);
 }

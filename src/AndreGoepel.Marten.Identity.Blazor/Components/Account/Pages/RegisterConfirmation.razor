@@ -1,9 +1,9 @@
 @page "/Account/RegisterConfirmation"
 @attribute [AllowAnonymous]
+@inherits LocalizedComponentBase
 
 @inject UserManager<User> UserManager
 @inject NavigationManager NavigationManager
-@inject IServiceProvider Services
 
 <AppPageTitle Title="@T("RegisterConfirmation.PageTitle")" />
 
@@ -59,7 +59,4 @@
         }
     }
 
-    // Resolved through IServiceProvider rather than an injected IStringLocalizer so the page
-    // still renders on a host (or bUnit test) without localization registered.
-    private string T(string key) => Services.IdentityText(key);
 }
