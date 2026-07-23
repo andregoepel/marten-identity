@@ -13,15 +13,23 @@ namespace AndreGoepel.Marten.Identity.Blazor.Components;
 /// called <c>AddMartenIdentityBlazor</c>. Resolving through <see cref="IServiceProvider"/>
 /// instead avoids that, which is why every translated page needs the same pair of methods;
 /// this base class is the one place that pair is defined. Inherit it with <c>@inherits
-/// LocalizedComponentBase</c> rather than repeating <c>@inject IServiceProvider Services</c> +
-/// the two <c>T</c> overloads in each page.
+/// IdentityLocalizedComponentBase</c> rather than repeating <c>@inject IServiceProvider
+/// Services</c> + the two <c>T</c> overloads in each page.
+/// <para>
+/// Not to be confused with — or replaced by — <c>LocalizedComponentBase</c> from
+/// AndreGoepel.Design.Blazor: that one resolves against the design system's own
+/// <c>DesignStrings</c> resx and returns the key unchanged for anything it does not know,
+/// so inheriting it here renders every identity page as raw resource keys. The name differs
+/// deliberately: <c>_Imports.razor</c> pulls in both namespaces, so a shared name would be
+/// ambiguous (CS0104).
+/// </para>
 /// <para>
 /// Public rather than internal: the Razor compiler generates a routable (<c>@page</c>)
 /// component's partial class as public, and a public class cannot derive from an internal
 /// base (CS0060). Not intended for use outside this assembly regardless.
 /// </para>
 /// </remarks>
-public abstract class LocalizedComponentBase : ComponentBase
+public abstract class IdentityLocalizedComponentBase : ComponentBase
 {
     [Inject]
     private IServiceProvider Services { get; set; } = default!;
