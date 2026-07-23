@@ -7,7 +7,7 @@
 
   <PropertyGroup>
     <PackageId>AndreGoepel.Marten.Identity</PackageId>
-    <Version>1.5.0</Version>
+    <Version>1.6.0</Version>
     <Description>ASP.NET Core Identity stores backed by Marten (PostgreSQL). Provides user, role, and user-role stores, middleware, and DI extensions.</Description>
     <PackageTags>aspnetcore;identity;marten;postgresql</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
