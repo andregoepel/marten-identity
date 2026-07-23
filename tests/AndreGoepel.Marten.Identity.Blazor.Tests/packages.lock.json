@@ -370,7 +370,7 @@
       "andregoepel.marten.identity": {
         "type": "Project",
         "dependencies": {
-          "AndreGoepel.Marten.Identity.Abstractions": "[1.0.0, )",
+          "AndreGoepel.Marten.Identity.Abstractions": "[1.5.0, )",
           "Marten": "[9.16.0, )",
           "Marten.AspNetCore": "[9.16.0, )",
           "Quartz.Extensions.Hosting": "[3.18.2, )"
@@ -383,7 +383,7 @@
         "type": "Project",
         "dependencies": {
           "AndreGoepel.Design.Blazor": "[1.2.1, )",
-          "AndreGoepel.Marten.Identity": "[1.0.0, )",
+          "AndreGoepel.Marten.Identity": "[1.5.0, )",
           "Marten": "[9.16.0, )",
           "Radzen.Blazor": "[11.1.6, )"
         }
