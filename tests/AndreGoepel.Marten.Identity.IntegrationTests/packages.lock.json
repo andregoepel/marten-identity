@@ -417,7 +417,7 @@
       "andregoepel.marten.identity": {
         "type": "Project",
         "dependencies": {
-          "AndreGoepel.Marten.Identity.Abstractions": "[1.6.0, )",
+          "AndreGoepel.Marten.Identity.Abstractions": "[1.7.0, )",
           "Marten": "[9.18.0, )",
           "Marten.AspNetCore": "[9.18.0, )",
           "Quartz.Extensions.Hosting": "[3.18.2, )"
