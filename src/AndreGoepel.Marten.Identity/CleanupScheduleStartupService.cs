@@ -20,40 +20,54 @@ internal sealed class CleanupScheduleStartupService(
 
     public Task StartAsync(CancellationToken cancellationToken)
     {
-        lifetime.ApplicationStarted.Register(() => _ = ApplyStoredScheduleAsync());
+        var stoppingToken = lifetime.ApplicationStopping;
+        lifetime.ApplicationStarted.Register(() =>
+        {
+            _ = RunApplyStoredScheduleAsync(stoppingToken);
+        });
         return Task.CompletedTask;
     }
 
     public Task StopAsync(CancellationToken cancellationToken) => Task.CompletedTask;
 
-    private async Task ApplyStoredScheduleAsync()
+    // Guards the fire-and-forget invocation from StartAsync: an exception surfacing from an
+    // unawaited Task here would be unobserved and could crash the process.
+    private async Task RunApplyStoredScheduleAsync(CancellationToken cancellationToken)
     {
         try
         {
-            await using var session = documentStore.QuerySession();
-            var settings = await session.LoadAsync<CleanupSettings>(CleanupSettings.DocumentId);
-            if (settings is null)
-                return;
-
-            var scheduler = await schedulerFactory.GetScheduler();
-            var newTrigger = TriggerBuilder
-                .Create()
-                .WithIdentity(TriggerKey)
-                .ForJob(JobKey)
-                .WithCronSchedule(settings.CronSchedule)
-                .Build();
-
-            var nextFire = await scheduler.RescheduleJob(TriggerKey, newTrigger);
-            if (nextFire.HasValue)
-                logger.LogInformation(
-                    "Applied stored cleanup schedule '{CronSchedule}'. Next run: {NextFire:u}.",
-                    settings.CronSchedule,
-                    nextFire.Value
-                );
+            await ApplyStoredScheduleAsync(cancellationToken);
         }
         catch (Exception ex)
         {
             logger.LogError(ex, "Failed to apply stored cleanup schedule on startup.");
         }
+    }
+
+    private async Task ApplyStoredScheduleAsync(CancellationToken cancellationToken)
+    {
+        await using var session = documentStore.QuerySession();
+        var settings = await session.LoadAsync<CleanupSettings>(
+            CleanupSettings.DocumentId,
+            cancellationToken
+        );
+        if (settings is null)
+            return;
+
+        var scheduler = await schedulerFactory.GetScheduler(cancellationToken);
+        var newTrigger = TriggerBuilder
+            .Create()
+            .WithIdentity(TriggerKey)
+            .ForJob(JobKey)
+            .WithCronSchedule(settings.CronSchedule)
+            .Build();
+
+        var nextFire = await scheduler.RescheduleJob(TriggerKey, newTrigger, cancellationToken);
+        if (nextFire.HasValue)
+            logger.LogInformation(
+                "Applied stored cleanup schedule '{CronSchedule}'. Next run: {NextFire:u}.",
+                settings.CronSchedule,
+                nextFire.Value
+            );
     }
 }
