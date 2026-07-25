@@ -121,7 +121,6 @@ else
             return;
         }
 
-        // Strip spaces and hyphens
         var verificationCode = model.Code?.Replace(" ", string.Empty).Replace("-", string.Empty) ?? "";
 
         var is2FaTokenValid = await UserManager.VerifyTwoFactorTokenAsync(
@@ -151,7 +150,6 @@ else
 
     private async ValueTask LoadSharedKeyAndQrCodeUriAsync(User user)
     {
-        // Load the authenticator key & QR code URI to display on the form
         var unformattedKey = await UserManager.GetAuthenticatorKeyAsync(user);
         if (string.IsNullOrEmpty(unformattedKey))
         {

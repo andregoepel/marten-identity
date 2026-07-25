@@ -105,7 +105,6 @@
     protected override async Task OnInitializedAsync()
     {
         _isLoading = true;
-        StateHasChanged();
 
         try
         {
@@ -128,7 +127,6 @@
         finally
         {
             _isLoading = false;
-            StateHasChanged();
         }
     }
 

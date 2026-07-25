@@ -4,7 +4,7 @@ using Marten.Events.Aggregation;
 
 namespace AndreGoepel.Marten.Identity.Users;
 
-internal partial class UserProjection : SingleStreamProjection<User, Guid>
+internal sealed partial class UserProjection : SingleStreamProjection<User, Guid>
 {
     [SuppressMessage(
         "Performance",
@@ -145,8 +145,7 @@ internal partial class UserProjection : SingleStreamProjection<User, Guid>
     )]
     public void Apply(PasskeyCreated @event, User user)
     {
-        // Masked (erased) events carry a null payload; skip them so a projection
-        // rebuild over a GDPR-erased stream stays safe (#67).
+        // Masked events carry a null payload; skip so a rebuild over an erased stream stays safe (#67).
         if (@event.Passkey is null)
             return;
 
@@ -161,8 +160,7 @@ internal partial class UserProjection : SingleStreamProjection<User, Guid>
     )]
     public void Apply(PasskeyUpdated @event, User user)
     {
-        // Masked (erased) events carry a null payload; skip them so a projection
-        // rebuild over a GDPR-erased stream stays safe (#67).
+        // Masked events carry a null payload; skip so a rebuild over an erased stream stays safe (#67).
         if (@event.Passkey is null)
             return;
 

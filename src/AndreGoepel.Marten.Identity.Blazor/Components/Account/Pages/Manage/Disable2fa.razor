@@ -65,7 +65,6 @@
     private async Task OnSubmitAsync()
     {
         _isProcessing = true;
-        StateHasChanged();
 
         try
         {
@@ -79,7 +78,17 @@
 
             if (!result.Succeeded)
             {
-                throw new InvalidOperationException("Failed to disable 2FA: " + string.Join(", ", result.Errors.Select(e => e.Description)));
+                Logger.LogError(
+                    "Failed to disable 2FA for user {UserId}: {Errors}",
+                    _user.Id,
+                    string.Join(", ", result.Errors.Select(e => e.Description))
+                );
+                NotificationService.Notify(
+                    NotificationSeverity.Error,
+                    summary: T("Disable2fa.ErrorTitle"),
+                    detail: T("Disable2fa.DisableFailedDetail")
+                );
+                return;
             }
 
             var userId = await UserManager.GetUserIdAsync(_user);
@@ -91,7 +100,7 @@
         }
         catch (Exception ex)
         {
-            Logger.LogError(ex, "Failed to disable 2FA for user {UserId}", _user?.Id);
+            Logger.LogError(ex, "Unexpected error while disabling 2FA for user {UserId}", _user?.Id);
             NotificationService.Notify(
                 NotificationSeverity.Error,
                 summary: T("Disable2fa.ErrorTitle"),
@@ -101,7 +110,6 @@
         finally
         {
             _isProcessing = false;
-            StateHasChanged();
         }
     }
 

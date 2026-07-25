@@ -4,7 +4,8 @@ using Microsoft.AspNetCore.Components.Authorization;
 
 namespace AndreGoepel.Marten.Identity.Services;
 
-public class CurrentUserService(AuthenticationStateProvider authStateProvider) : ICurrentUserService
+internal sealed class CurrentUserService(AuthenticationStateProvider authStateProvider)
+    : ICurrentUserService
 {
     public async Task<UserId> GetCurrentUserIdAsync(CancellationToken cancellationToken = default)
     {

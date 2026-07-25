@@ -87,10 +87,6 @@
 
         if (!result.Succeeded)
         {
-            // Pre-existing bug fixed in passing: this joined the IdentityError objects
-            // themselves, not their Description — IdentityError doesn't override ToString(),
-            // so the notification showed the bare type name instead of the actual reason.
-            // No test covered the text, only that a notification fired, so it went unnoticed.
             var reasons = string.Join(' ', result.Errors.Select(e => e.Description));
             NotificationService.Notify(
                 NotificationSeverity.Error,
