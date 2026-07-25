@@ -60,7 +60,7 @@ public sealed class TwoFactorTests(E2EAppFixture fixture) : E2ETestBase(fixture)
     }
 
     [Fact]
-    public async Task Disable2fa_RemovesTheChallenge()
+    public async Task Disable2fa_ThenLogin_RemovesTheChallenge()
     {
         // Arrange
         var (email, _, _) = await CreateUserWithTwoFactorAsync();
