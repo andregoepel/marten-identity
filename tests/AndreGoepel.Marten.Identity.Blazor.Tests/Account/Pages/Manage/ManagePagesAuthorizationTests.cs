@@ -19,8 +19,9 @@ public class ManagePagesAuthorizationTests
         "AndreGoepel.Marten.Identity.Blazor.Components.Account.Pages.Manage";
 
     [Fact]
-    public void EveryRoutableManagePage_RequiresAuthorization()
+    public void ManagePages_EveryRoutablePage_RequiresAuthorization()
     {
+        // Arrange / Act
         var routableManagePages = typeof(ChangePassword)
             .Assembly.GetTypes()
             .Where(t =>
@@ -38,6 +39,7 @@ public class ManagePagesAuthorizationTests
             .Select(t => t.Name)
             .ToList();
 
+        // Assert
         Assert.True(
             unprotected.Count == 0,
             $"These Manage pages are missing [Authorize]: {string.Join(", ", unprotected)}"

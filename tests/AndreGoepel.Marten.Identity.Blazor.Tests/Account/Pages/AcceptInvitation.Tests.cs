@@ -70,7 +70,7 @@ public class AcceptInvitationTests : BunitContext
     #endregion
 
     [Fact]
-    public void MissingQueryParameters_ShowsInvalidLink()
+    public void AcceptInvitation_MissingQueryParameters_ShowsInvalidLink()
     {
         // Arrange / Act
         var cut = Render(userId: null, code: null);
@@ -81,7 +81,7 @@ public class AcceptInvitationTests : BunitContext
     }
 
     [Fact]
-    public void UnknownUser_ShowsInvalidLink()
+    public void AcceptInvitation_UnknownUser_ShowsInvalidLink()
     {
         // Arrange
         // Act — a well-formed link whose user id resolves to nobody.
@@ -97,7 +97,7 @@ public class AcceptInvitationTests : BunitContext
     }
 
     [Fact]
-    public void RejectedToken_ShowsInvalidLink()
+    public void AcceptInvitation_RejectedToken_ShowsInvalidLink()
     {
         // Arrange
         var user = new User { Email = "invitee@example.com" };
@@ -125,7 +125,7 @@ public class AcceptInvitationTests : BunitContext
     }
 
     [Fact]
-    public void ValidToken_ShowsPasswordForm()
+    public void AcceptInvitation_ValidToken_ShowsPasswordForm()
     {
         // Arrange
         var user = new User { Email = "invitee@example.com" };

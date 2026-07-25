@@ -21,8 +21,9 @@ public class PublicPagesAuthorizationTests
         "AndreGoepel.Marten.Identity.Blazor.Components.Account.Pages";
 
     [Fact]
-    public void EveryRoutablePublicPage_AllowsAnonymous()
+    public void PublicPages_EveryRoutablePage_AllowsAnonymous()
     {
+        // Act
         var publicPages = typeof(Login)
             .Assembly.GetTypes()
             .Where(t =>
@@ -32,6 +33,7 @@ public class PublicPagesAuthorizationTests
             )
             .ToList();
 
+        // Assert
         // Sanity: we actually discovered the public pages.
         Assert.NotEmpty(publicPages);
 

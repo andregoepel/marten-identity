@@ -16,10 +16,13 @@ public class ChangePasswordLocalizationTests : BunitContext
     [Fact]
     public void GermanCulture_RendersGermanLabelsAndButton_WithoutLocalizationRegistered()
     {
+        // Arrange
         using var _ = new CultureScope("de");
 
+        // Act
         var cut = Render();
 
+        // Assert
         Assert.Contains("Passwort ändern", cut.Markup);
         Assert.Contains("Aktuelles Passwort", cut.Markup);
         Assert.Contains("Neues Passwort", cut.Markup);
@@ -29,15 +32,17 @@ public class ChangePasswordLocalizationTests : BunitContext
     [Fact]
     public async Task GermanCulture_MismatchedConfirmation_ShowsGermanCompareMessage()
     {
+        // Arrange
         using var _ = new CultureScope("de");
-
         var cut = Render();
 
+        // Act
         await cut.Find("input[name=OldPassword]").ChangeAsync("old");
         await cut.Find("input[name=NewPassword]").ChangeAsync("Br@ndNewPw123");
         await cut.Find("input[name=ConfirmPassword]").ChangeAsync("TotallyDifferent999");
         await cut.Find("form").SubmitAsync();
 
+        // Assert
         Assert.Contains("Die Passwörter stimmen nicht überein", cut.Markup);
     }
 

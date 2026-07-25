@@ -18,12 +18,15 @@ namespace AndreGoepel.Marten.Identity.Blazor.Tests.Account.Pages;
 public class ResetPasswordLocalizationTests : BunitContext
 {
     [Fact]
-    public void GermanCulture_RendersGermanLabelsAndButton_WithoutLocalizationRegistered()
+    public void ResetPassword_GermanCulture_ShowsGermanLabelsAndButtonWithoutLocalizationRegistered()
     {
+        // Arrange
         using var _ = new CultureScope("de");
 
+        // Act
         var cut = Render(BuildUserManager(), code: "valid-reset-token");
 
+        // Assert
         Assert.Equal("Setzen Sie Ihr Passwort zurück", cut.Find("h1").TextContent);
         Assert.Contains("Wählen Sie ein neues Passwort für Ihr Konto.", cut.Markup);
         Assert.Equal("E-Mail", cut.Find("label[for=Email]").TextContent.Trim());
@@ -36,28 +39,33 @@ public class ResetPasswordLocalizationTests : BunitContext
     }
 
     [Fact]
-    public void GermanCulture_MissingCode_ShowsGermanInvalidLinkMessage()
+    public void ResetPassword_GermanCultureWithMissingCode_ShowsGermanInvalidLinkMessage()
     {
+        // Arrange
         using var _ = new CultureScope("de");
 
+        // Act
         var cut = Render(BuildUserManager(), code: null);
 
+        // Assert
         Assert.Contains("Dieser Link zum Zurücksetzen des Passworts ist ungültig", cut.Markup);
         Assert.Contains("Neuen Link anfordern", cut.Markup);
     }
 
     [Fact]
-    public async Task GermanCulture_TooShortPassword_ShowsTheGermanLengthMessage()
+    public async Task ResetPassword_GermanCultureWithTooShortPassword_ShowsGermanLengthMessage()
     {
+        // Arrange
         using var _ = new CultureScope("de");
-
         var cut = Render(BuildUserManager(), code: "valid-reset-token");
 
+        // Act
         await cut.Find("input[name=Email]").ChangeAsync("alice@example.com");
         await cut.Find("input[name=Password]").ChangeAsync("short");
         await cut.Find("input[name=ConfirmPassword]").ChangeAsync("short");
         await cut.Find("form").SubmitAsync();
 
+        // Assert
         // Default IdentityOptions.Password.RequiredLength is 6.
         Assert.Contains("Das Passwort muss zwischen 6 und 100 Zeichen lang sein", cut.Markup);
     }

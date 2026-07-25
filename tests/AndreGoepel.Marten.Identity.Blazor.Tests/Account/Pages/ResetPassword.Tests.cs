@@ -54,7 +54,7 @@ public class ResetPasswordTests : BunitContext
     #region Missing code
 
     [Fact]
-    public void MissingCode_ShowsInvalidLinkAlert()
+    public void ResetPassword_MissingCode_ShowsInvalidLinkAlert()
     {
         // Arrange / Act
         var cut = Render(BuildUserManager(), code: null);
@@ -64,7 +64,7 @@ public class ResetPasswordTests : BunitContext
     }
 
     [Fact]
-    public void MissingCode_ShowsRequestNewLinkButton()
+    public void ResetPassword_MissingCode_ShowsRequestNewLinkButton()
     {
         // Arrange / Act
         var cut = Render(BuildUserManager(), code: null);
@@ -74,7 +74,7 @@ public class ResetPasswordTests : BunitContext
     }
 
     [Fact]
-    public void MissingCode_RequestNewLinkButton_NavigatesToForgotPassword()
+    public void ResetPassword_MissingCodeRequestNewLinkButtonClick_NavigatesToForgotPassword()
     {
         // Arrange
         var cut = Render(BuildUserManager(), code: null);
@@ -92,7 +92,7 @@ public class ResetPasswordTests : BunitContext
     #region Valid code
 
     [Fact]
-    public void ValidCode_ShowsForm()
+    public void ResetPassword_ValidCode_ShowsForm()
     {
         // Arrange / Act
         var cut = Render(BuildUserManager(), code: "valid-reset-token");

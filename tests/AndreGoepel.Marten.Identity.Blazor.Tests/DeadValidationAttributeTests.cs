@@ -8,8 +8,9 @@ namespace AndreGoepel.Marten.Identity.Blazor.Tests;
 public partial class DeadValidationAttributeTests
 {
     [Fact]
-    public void PagesValidatedByRadzenCarryNoDataAnnotationMessages()
+    public void RadzenValidatedPages_ErrorMessageAttributes_AreNeverPresent()
     {
+        // Arrange
         // A page validates either via <DataAnnotationsValidator /> (EditForm + form post) or via
         // Radzen validator components (RadzenTemplateForm / CardForm) — never both. On the
         // Radzen ones, DataAnnotations are never evaluated, so an ErrorMessage there is text a
@@ -17,6 +18,7 @@ public partial class DeadValidationAttributeTests
         // tightening a rule would edit the attribute and see no effect.
         var offenders = new List<string>();
 
+        // Act
         foreach (
             var file in Directory.EnumerateFiles(
                 PagesRoot(),
@@ -43,6 +45,7 @@ public partial class DeadValidationAttributeTests
             }
         }
 
+        // Assert
         Assert.True(
             offenders.Count == 0,
             "DataAnnotation ErrorMessage on a form that does not run DataAnnotations "

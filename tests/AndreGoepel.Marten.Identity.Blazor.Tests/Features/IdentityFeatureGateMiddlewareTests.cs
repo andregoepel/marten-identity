@@ -9,23 +9,29 @@ public class IdentityFeatureGateMiddlewareTests
     [InlineData("/Account/Register")]
     [InlineData("/Account/RegisterConfirmation")]
     [InlineData("/Account/ResendEmailConfirmation")]
-    public async Task Registration_Disabled_PageNavigation_RedirectsToLogin(string path)
+    public async Task RegistrationDisabled_PageNavigation_RedirectsToLogin(string path)
     {
+        // Arrange
         var (mw, ctx, called) = Build(path, secFetchDest: "document");
 
+        // Act
         await mw.Invoke(ctx, Provider(new() { UserRegistration = false }));
 
+        // Assert
         Assert.Equal("/Account/Login", ctx.Response.Headers.Location.ToString());
         Assert.False(called.Value);
     }
 
     [Fact]
-    public async Task Registration_Disabled_Fetch_Returns404()
+    public async Task RegistrationDisabled_FetchRequest_Returns404()
     {
+        // Arrange
         var (mw, ctx, called) = Build("/Account/Register", secFetchDest: "empty");
 
+        // Act
         await mw.Invoke(ctx, Provider(new() { UserRegistration = false }));
 
+        // Assert
         Assert.Equal(StatusCodes.Status404NotFound, ctx.Response.StatusCode);
         Assert.False(called.Value);
     }
@@ -33,10 +39,13 @@ public class IdentityFeatureGateMiddlewareTests
     [Fact]
     public async Task Registration_Enabled_PassesThrough()
     {
+        // Arrange
         var (mw, ctx, called) = Build("/Account/Register", secFetchDest: "document");
 
+        // Act
         await mw.Invoke(ctx, Provider(new() { UserRegistration = true }));
 
+        // Assert
         Assert.True(called.Value);
     }
 
@@ -49,10 +58,13 @@ public class IdentityFeatureGateMiddlewareTests
     [InlineData("/Account/Manage/ResetAuthenticator/ConfirmReset")]
     public async Task TwoFactorSetup_Disabled_IsBlocked(string path)
     {
+        // Arrange
         var (mw, ctx, called) = Build(path, secFetchDest: "empty");
 
+        // Act
         await mw.Invoke(ctx, Provider(new() { TwoFactor = false }));
 
+        // Assert
         Assert.Equal(StatusCodes.Status404NotFound, ctx.Response.StatusCode);
         Assert.False(called.Value);
     }
@@ -62,12 +74,15 @@ public class IdentityFeatureGateMiddlewareTests
     [InlineData("/Account/LoginWithRecoveryCode")]
     public async Task TwoFactorLoginChallenge_NotGated_EvenWhenDisabled(string path)
     {
+        // Arrange
         // Graceful gating (#66): a user who already enrolled must still be able to complete
         // the login-time 2FA challenge even after the feature is turned off.
         var (mw, ctx, called) = Build(path, secFetchDest: "document");
 
+        // Act
         await mw.Invoke(ctx, Provider(new() { TwoFactor = false }));
 
+        // Assert
         Assert.True(called.Value);
     }
 
@@ -81,10 +96,13 @@ public class IdentityFeatureGateMiddlewareTests
     [InlineData("/Account/PasskeyAssertion")]
     public async Task Passkey_Disabled_IsBlocked(string path)
     {
+        // Arrange
         var (mw, ctx, called) = Build(path, secFetchDest: "empty");
 
+        // Act
         await mw.Invoke(ctx, Provider(new() { Passkey = false }));
 
+        // Assert
         Assert.Equal(StatusCodes.Status404NotFound, ctx.Response.StatusCode);
         Assert.False(called.Value);
     }
@@ -98,10 +116,12 @@ public class IdentityFeatureGateMiddlewareTests
     // precisely when registration is off, or disabling self-service signup would also
     // disable the only supported way to add a user (#100).
     [InlineData("/Account/AcceptInvitation")]
-    public async Task UngatedPaths_AlwaysPassThrough(string path)
+    public async Task UngatedPaths_AllFeaturesDisabled_AlwaysPassThrough(string path)
     {
+        // Arrange
         var (mw, ctx, called) = Build(path, secFetchDest: "document");
 
+        // Act
         // Everything off, but these paths are not feature-gated.
         await mw.Invoke(
             ctx,
@@ -115,6 +135,7 @@ public class IdentityFeatureGateMiddlewareTests
             )
         );
 
+        // Assert
         Assert.True(called.Value);
     }
 

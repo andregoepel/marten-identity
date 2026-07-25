@@ -84,7 +84,7 @@ public class RegisterTests : BunitContext
     #endregion
 
     [Fact]
-    public void RendersEmailPasswordConfirmFields()
+    public void Register_OnRender_ShowsEmailPasswordConfirmFields()
     {
         // Arrange / Act
         var (cut, _) = Render();
@@ -96,7 +96,7 @@ public class RegisterTests : BunitContext
     }
 
     [Fact]
-    public async Task Submit_SuccessfulCreate_WithRequireConfirmed_SendsEmailAndNavigatesToConfirmation()
+    public async Task Submit_SuccessfulCreateWithRequireConfirmed_SendsEmailAndNavigatesToConfirmation()
     {
         // Arrange
         var (cut, email) = Render(um =>

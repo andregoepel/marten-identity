@@ -8,7 +8,7 @@ public class ShowRecoveryCodesTests : BunitContext
     #region Rendering
 
     [Fact]
-    public void RendersEachRecoveryCode()
+    public void ShowRecoveryCodes_MultipleCodes_RendersEachCode()
     {
         // Arrange
         JSInterop.Mode = JSRuntimeMode.Loose;
@@ -25,7 +25,7 @@ public class ShowRecoveryCodesTests : BunitContext
     }
 
     [Fact]
-    public void RendersWarningAlert()
+    public void ShowRecoveryCodes_SingleCode_RendersWarningAlert()
     {
         // Arrange
         JSInterop.Mode = JSRuntimeMode.Loose;
@@ -38,7 +38,7 @@ public class ShowRecoveryCodesTests : BunitContext
     }
 
     [Fact]
-    public void EmptyCodes_RendersNoCodes()
+    public void ShowRecoveryCodes_EmptyCodes_StillRendersWarningAlert()
     {
         // Arrange
         JSInterop.Mode = JSRuntimeMode.Loose;

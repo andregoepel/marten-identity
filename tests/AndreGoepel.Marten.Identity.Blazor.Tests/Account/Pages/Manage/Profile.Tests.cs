@@ -41,7 +41,7 @@ public class ProfileTests : BunitContext
     #endregion
 
     [Fact]
-    public void RendersUserNameAndPhoneNumberInputs()
+    public void Render_Default_ShowsUsernameAndPhoneNumberInputs()
     {
         // Arrange / Act
         var (cut, _, _) = Render();
@@ -66,7 +66,7 @@ public class ProfileTests : BunitContext
     }
 
     [Fact]
-    public async Task Submit_PhoneChanged_CallsSetPhoneNumber_AndNotifiesSuccess()
+    public async Task Submit_PhoneChanged_CallsSetPhoneNumberAndNotifiesSuccess()
     {
         // Arrange
         var (cut, um, user) = Render(

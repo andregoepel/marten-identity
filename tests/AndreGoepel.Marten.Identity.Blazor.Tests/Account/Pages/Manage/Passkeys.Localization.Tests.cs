@@ -19,10 +19,13 @@ public class PasskeysLocalizationTests : BunitContext
     [Fact]
     public void GermanCulture_EmptyState_RendersGermanTitleAndText()
     {
+        // Arrange
         using var _ = new CultureScope("de");
 
+        // Act
         var cut = Render();
 
+        // Assert
         Assert.Contains("Passkeys verwalten", cut.Markup);
         Assert.Contains("Noch keine Passkeys registriert", cut.Markup);
         Assert.Contains(
@@ -35,6 +38,7 @@ public class PasskeysLocalizationTests : BunitContext
     [Fact]
     public async Task GermanCulture_Delete_PassesTheLocalizedNameAndTitleToTheConfirmDialog()
     {
+        // Arrange
         using var _ = new CultureScope("de");
         var credentialId = new byte[] { 1, 2, 3 };
         var passkey = new UserPasskeyInfo(
@@ -57,8 +61,10 @@ public class PasskeysLocalizationTests : BunitContext
         um.RemovePasskeyAsync(Arg.Any<User>(), credentialId)
             .Returns(Microsoft.AspNetCore.Identity.IdentityResult.Success);
 
+        // Act
         await cut.Find("button.rz-danger").ClickAsync();
 
+        // Assert
         // Confirm.ConfirmDeleteAsync builds its message from Passkeys.DeleteConfirmItem, which
         // embeds the passkey's name — this asserts the German template and the argument both
         // made it through, not just that *some* dialog was shown.

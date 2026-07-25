@@ -54,7 +54,7 @@ public class ForgotPasswordTests : BunitContext
     #endregion
 
     [Fact]
-    public void RendersEmailInput()
+    public void ForgotPassword_OnRender_ShowsEmailInput()
     {
         // Arrange / Act
         var (cut, _) = Render();
@@ -64,7 +64,7 @@ public class ForgotPasswordTests : BunitContext
     }
 
     [Fact]
-    public async Task Submit_UnknownEmail_NavigatesToConfirmation_WithoutSendingEmail()
+    public async Task Submit_UnknownEmail_NavigatesToConfirmationWithoutSendingEmail()
     {
         // Arrange
         var (cut, email) = Render(um =>
@@ -82,7 +82,7 @@ public class ForgotPasswordTests : BunitContext
     }
 
     [Fact]
-    public async Task Submit_UnconfirmedEmail_NavigatesToConfirmation_WithoutSendingEmail()
+    public async Task Submit_UnconfirmedEmail_NavigatesToConfirmationWithoutSendingEmail()
     {
         // Arrange
         var user = new User { Email = "alice@example.com" };
@@ -103,7 +103,7 @@ public class ForgotPasswordTests : BunitContext
     }
 
     [Fact]
-    public async Task Submit_ConfirmedUser_SendsResetLink_AndNavigates()
+    public async Task Submit_ConfirmedUser_SendsResetLinkAndNavigates()
     {
         // Arrange
         var user = new User { Email = "alice@example.com" };

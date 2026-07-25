@@ -15,12 +15,15 @@ namespace AndreGoepel.Marten.Identity.Blazor.Tests.Account.Pages;
 public class LoginWith2FaLocalizationTests : BunitContext
 {
     [Fact]
-    public void GermanCulture_RendersGermanLabelsAndButton_WithoutLocalizationRegistered()
+    public void LoginWith2fa_GermanCulture_ShowsGermanLabelsAndButtonWithoutLocalizationRegistered()
     {
+        // Arrange
         using var _ = new CultureScope("de");
 
+        // Act
         var cut = Render();
 
+        // Assert
         Assert.Equal("Zwei-Faktor-Authentifizierung", cut.Find("h1").TextContent);
         Assert.Contains("Geben Sie den Code aus Ihrer Authenticator-App ein.", cut.Markup);
         Assert.Equal("Authenticator-Code", cut.Find("label[for=TwoFactorCode]").TextContent.Trim());
@@ -29,12 +32,15 @@ public class LoginWith2FaLocalizationTests : BunitContext
     }
 
     [Fact]
-    public void GermanCulture_WithErrorInvalid_ShowsGermanNotification()
+    public void LoginWith2fa_GermanCultureWithErrorInvalid_ShowsGermanNotification()
     {
+        // Arrange
         using var _ = new CultureScope("de");
 
+        // Act
         Render(error: "invalid");
 
+        // Assert
         var message = Assert.Single(Notifications.Messages);
         Assert.Equal("2FA-Fehler", message.Summary);
         Assert.Equal("Ungültiger Authenticator-Code.", message.Detail);

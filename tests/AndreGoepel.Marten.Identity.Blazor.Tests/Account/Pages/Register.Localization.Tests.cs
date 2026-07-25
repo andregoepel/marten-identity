@@ -22,8 +22,9 @@ namespace AndreGoepel.Marten.Identity.Blazor.Tests.Account.Pages;
 public class RegisterLocalizationTests : BunitContext
 {
     [Fact]
-    public async Task CreationFailure_ShowsTheActualErrorDescription_NotTheObjectTypeName()
+    public async Task Register_CreationFailure_ShowsActualErrorDescriptionNotObjectTypeName()
     {
+        // Arrange
         // Regression test: this notification used to interpolate the IdentityError objects
         // directly instead of their Description, and IdentityError does not override
         // ToString() — so the notification showed the bare type name. No test asserted on the
@@ -41,30 +42,35 @@ public class RegisterLocalizationTests : BunitContext
                 )
         );
 
+        // Act
         await SubmitAsync(cut);
 
+        // Assert
         var message = Assert.Single(Notifications.Messages);
         Assert.Contains("Email 'alice@example.com' is already taken.", message.Detail);
         Assert.DoesNotContain("IdentityError", message.Detail);
     }
 
     [Fact]
-    public void GermanCulture_RendersGermanLabelsAndButton_WithoutLocalizationRegistered()
+    public void Register_GermanCulture_ShowsGermanLabelsAndButtonWithoutLocalizationRegistered()
     {
+        // Arrange
         using var _ = new CultureScope("de");
 
+        // Act
         var (cut, _) = Render();
 
+        // Assert
         Assert.Equal("Registrieren", cut.Find("h1").TextContent);
         Assert.Contains("Erstellen Sie Ihr Konto", cut.Markup);
         Assert.Contains("Registrieren", cut.Find("button[type=submit]").TextContent);
     }
 
     [Fact]
-    public async Task GermanCulture_CreationFailure_ShowsGermanMessage()
+    public async Task Register_GermanCultureWithCreationFailure_ShowsGermanMessage()
     {
+        // Arrange
         using var _ = new CultureScope("de");
-
         var (cut, _) = Render(um =>
             um.CreateAsync(Arg.Any<User>(), Arg.Any<string>())
                 .Returns(
@@ -74,8 +80,10 @@ public class RegisterLocalizationTests : BunitContext
                 )
         );
 
+        // Act
         await SubmitAsync(cut);
 
+        // Assert
         var message = Assert.Single(Notifications.Messages);
         Assert.Equal("Fehler", message.Summary);
         Assert.Contains("Fehler beim Erstellen des Kontos:", message.Detail);

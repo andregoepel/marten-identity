@@ -12,7 +12,7 @@ public class StaticPagesTests : BunitContext
     #region AccessDenied
 
     [Fact]
-    public void AccessDenied_RedirectsToRoot()
+    public void AccessDenied_OnRender_RedirectsToRoot()
     {
         // Arrange
         JSInterop.Mode = JSRuntimeMode.Loose;
@@ -29,7 +29,7 @@ public class StaticPagesTests : BunitContext
     #region Lockout
 
     [Fact]
-    public void Lockout_RendersLockoutMessage()
+    public void Lockout_OnRender_RendersLockoutMessage()
     {
         // Arrange
         JSInterop.Mode = JSRuntimeMode.Loose;
@@ -60,7 +60,7 @@ public class StaticPagesTests : BunitContext
     #region InvalidUser
 
     [Fact]
-    public void InvalidUser_RendersErrorMessage()
+    public void InvalidUser_OnRender_RendersErrorMessage()
     {
         // Arrange
         JSInterop.Mode = JSRuntimeMode.Loose;
@@ -91,7 +91,7 @@ public class StaticPagesTests : BunitContext
     #region ForgotPasswordConfirmation
 
     [Fact]
-    public void ForgotPasswordConfirmation_RendersCheckEmailMessage()
+    public void ForgotPasswordConfirmation_OnRender_RendersCheckEmailMessage()
     {
         // Arrange
         JSInterop.Mode = JSRuntimeMode.Loose;
@@ -122,7 +122,7 @@ public class StaticPagesTests : BunitContext
     #region ResetPasswordConfirmation
 
     [Fact]
-    public void ResetPasswordConfirmation_RendersSuccessMessage()
+    public void ResetPasswordConfirmation_OnRender_RendersSuccessMessage()
     {
         // Arrange
         JSInterop.Mode = JSRuntimeMode.Loose;

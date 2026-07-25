@@ -50,7 +50,7 @@ public class ChangePasswordTests : BunitContext
     #endregion
 
     [Fact]
-    public void RendersThreePasswordInputs()
+    public void OnInit_HasPassword_RendersThreePasswordInputs()
     {
         // Arrange / Act
         var cut = Render();

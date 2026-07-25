@@ -62,7 +62,7 @@ public class ConfirmEmailTests : BunitContext
     #region Missing parameters
 
     [Fact]
-    public void MissingParameters_RedirectsToRoot()
+    public void ConfirmEmail_MissingParameters_RedirectsToRoot()
     {
         // Arrange / Act
         Render(BuildUserManager(), new DefaultHttpContext());
@@ -77,7 +77,7 @@ public class ConfirmEmailTests : BunitContext
     #region User not found
 
     [Fact]
-    public void UserNotFound_Sets404StatusCode()
+    public void ConfirmEmail_UserNotFound_Sets404StatusCode()
     {
         // Arrange
         var userManager = BuildUserManager();
@@ -92,7 +92,7 @@ public class ConfirmEmailTests : BunitContext
     }
 
     [Fact]
-    public void UserNotFound_ShowsGenericError_DoesNotReflectUserId()
+    public void ConfirmEmail_UserNotFound_ShowsGenericErrorWithoutReflectingUserId()
     {
         // Regression for #13: the supplied UserId must not be reflected back to the
         // client (information disclosure, CWE-204).
@@ -113,7 +113,7 @@ public class ConfirmEmailTests : BunitContext
     #region Confirmation fails
 
     [Fact]
-    public void ConfirmationFailed_ShowsErrorMessage()
+    public void ConfirmEmail_ConfirmationFailed_ShowsErrorMessage()
     {
         // Arrange
         var user = new User { UserId = UserId.New() };
@@ -135,7 +135,7 @@ public class ConfirmEmailTests : BunitContext
     #region Confirmation succeeds
 
     [Fact]
-    public void ConfirmationSucceeded_ShowsSuccessMessage()
+    public void ConfirmEmail_ConfirmationSucceeded_ShowsSuccessMessage()
     {
         // Arrange
         var user = new User { UserId = UserId.New() };
@@ -153,7 +153,7 @@ public class ConfirmEmailTests : BunitContext
     }
 
     [Fact]
-    public void ConfirmationSucceeded_ShowsLoginButton()
+    public void ConfirmEmail_ConfirmationSucceeded_ShowsLoginButton()
     {
         // Arrange
         var user = new User { UserId = UserId.New() };

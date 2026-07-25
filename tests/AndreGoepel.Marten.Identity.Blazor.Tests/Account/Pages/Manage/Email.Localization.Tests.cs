@@ -20,10 +20,13 @@ public class EmailLocalizationTests : BunitContext
     [Fact]
     public void GermanCulture_RendersGermanLabelsAndButton_WithoutLocalizationRegistered()
     {
+        // Arrange
         using var _ = new CultureScope("de");
 
+        // Act
         var cut = Render();
 
+        // Assert
         Assert.Contains("E-Mail verwalten", cut.Markup);
         Assert.Contains("Aktuelle E-Mail", cut.Markup);
         Assert.Contains("Neue E-Mail-Adresse", cut.Markup);
@@ -33,10 +36,11 @@ public class EmailLocalizationTests : BunitContext
     [Fact]
     public async Task GermanCulture_ChangedEmailSubmitted_ShowsGermanSuccessNotification()
     {
+        // Arrange
         using var _ = new CultureScope("de");
-
         var cut = Render();
 
+        // Act
         // Model.NewEmail starts pre-filled with the current address (OnInitializedAsync), and
         // NewEmailSameAsCurrent's RadzenCompareValidator (Operator=NotEqual) blocks submission
         // while it's unchanged — so a real value change is required to reach OnValidSubmit at
@@ -45,6 +49,7 @@ public class EmailLocalizationTests : BunitContext
         await cut.Find("input[name=NewEmail]").ChangeAsync("new@example.com");
         await cut.Find("form").SubmitAsync();
 
+        // Assert
         var message = Assert.Single(Notifications.Messages);
         Assert.Equal("Erfolg", message.Summary);
         Assert.Equal(
