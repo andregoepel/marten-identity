@@ -628,13 +628,6 @@
           "xunit.v3.runner.common": "[3.2.2]"
         }
       },
-      "andregoepel.marten.configuration": {
-        "type": "Project",
-        "dependencies": {
-          "Marten": "[9.18.0, )",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.0, )"
-        }
-      },
       "andregoepel.marten.identity": {
         "type": "Project",
         "dependencies": {
@@ -647,6 +640,16 @@
       },
       "andregoepel.marten.identity.abstractions": {
         "type": "Project"
+      },
+      "AndreGoepel.Marten.Configuration": {
+        "type": "CentralTransitive",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "Zdtm/17OtwW/GtPJgYXWZbEFN832Je3j3hgAQehnONMupi4hjcU4QkYP2enYFs+ni45RyjjvKFuPWzy5858DMA==",
+        "dependencies": {
+          "Marten": "9.18.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.0"
+        }
       },
       "Marten": {
         "type": "CentralTransitive",

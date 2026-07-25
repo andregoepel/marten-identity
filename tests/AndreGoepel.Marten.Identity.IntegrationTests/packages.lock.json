@@ -414,12 +414,6 @@
           "xunit.v3.runner.common": "[3.2.2]"
         }
       },
-      "andregoepel.marten.configuration": {
-        "type": "Project",
-        "dependencies": {
-          "Marten": "[9.18.0, )"
-        }
-      },
       "andregoepel.marten.identity": {
         "type": "Project",
         "dependencies": {
@@ -450,6 +444,15 @@
         "contentHash": "57laKLfocolPOcRbBLP0GccM9k3T+grGAnlv/BpUmH9n1SnbxAqq6YEotTq5E9xThMq9WvuSGv/VUTB1B6Bdww==",
         "dependencies": {
           "Radzen.Blazor": "11.1.7"
+        }
+      },
+      "AndreGoepel.Marten.Configuration": {
+        "type": "CentralTransitive",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "Zdtm/17OtwW/GtPJgYXWZbEFN832Je3j3hgAQehnONMupi4hjcU4QkYP2enYFs+ni45RyjjvKFuPWzy5858DMA==",
+        "dependencies": {
+          "Marten": "9.18.0"
         }
       },
       "Marten": {

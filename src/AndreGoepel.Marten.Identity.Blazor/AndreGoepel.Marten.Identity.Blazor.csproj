@@ -7,7 +7,7 @@
 
   <PropertyGroup>
     <PackageId>AndreGoepel.Marten.Identity.Blazor</PackageId>
-    <Version>1.7.0</Version>
+    <Version>1.8.0</Version>
     <Description>Blazor Server UI components for AndreGoepel.Marten.Identity — login, registration, 2FA, passkeys, and user/role administration pages built with Radzen.</Description>
     <PackageTags>aspnetcore;blazor;identity;marten;radzen</PackageTags>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -26,14 +26,11 @@
     <PackageReference Include="AndreGoepel.Design.Blazor" />
     <PackageReference Include="Marten" />
     <PackageReference Include="Radzen.Blazor" />
+    <PackageReference Include="AndreGoepel.Marten.Configuration" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\AndreGoepel.Marten.Identity\AndreGoepel.Marten.Identity.csproj" />
-    <!-- TODO: switch to a PackageReference once AndreGoepel.Marten.Configuration is
-         published to nuget.org (https://github.com/andregoepel/marten-configuration);
-         a ProjectReference across sibling repo checkouts only works for local development. -->
-    <ProjectReference Include="..\..\..\marten-configuration\src\AndreGoepel.Marten.Configuration\AndreGoepel.Marten.Configuration.csproj" />
   </ItemGroup>
 
   <ItemGroup>
