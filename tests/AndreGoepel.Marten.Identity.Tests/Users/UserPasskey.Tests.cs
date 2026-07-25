@@ -23,7 +23,7 @@ public class UserPasskeyTests
         };
 
     [Fact]
-    public void CredentialId_IsBase64OfBytes()
+    public void CredentialId_Always_ReturnsBase64OfBytes()
     {
         // Arrange
         var bytes = new byte[] { 1, 2, 3, 4 };
@@ -79,7 +79,7 @@ public class UserPasskeyTests
     }
 
     [Fact]
-    public void Equals_Object_SameCredentialId_ReturnsTrue()
+    public void EqualsObject_SameCredentialId_ReturnsTrue()
     {
         // Arrange
         var bytes = new byte[] { 1, 2, 3 };
@@ -94,7 +94,7 @@ public class UserPasskeyTests
     }
 
     [Fact]
-    public void Equals_Object_NonPasskey_ReturnsFalse()
+    public void EqualsObject_NonPasskey_ReturnsFalse()
     {
         // Arrange
         var passkey = MakePasskey([1, 2, 3]);
@@ -139,7 +139,7 @@ public class UserPasskeyTests
     }
 
     [Fact]
-    public void UsableAsHashSetKey()
+    public void HashSetContains_SameOrDifferentCredentialId_MatchesAccordingly()
     {
         // Arrange
         var bytes = new byte[] { 1, 2, 3 };

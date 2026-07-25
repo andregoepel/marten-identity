@@ -64,7 +64,7 @@ public class RoleStoreTests
     #region CreateAsync
 
     [Fact]
-    public async Task CreateAsync_AppendsToStreamMatchingExistingRoleId()
+    public async Task CreateAsync_ValidRole_AppendsToStreamMatchingExistingRoleId()
     {
         // Arrange
         var harness = Build();

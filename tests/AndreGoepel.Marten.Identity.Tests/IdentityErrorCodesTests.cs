@@ -9,13 +9,16 @@ namespace AndreGoepel.Marten.Identity.Tests;
 public partial class IdentityErrorCodesTests
 {
     [Fact]
-    public void EveryStoreErrorCarriesACode()
+    public void IdentityErrorConstructions_InStoreSources_AllHaveCode()
     {
         // A code-less IdentityError leaves the UI nothing to key a translation off, so it can
         // only ever show the English Description. Grepping the sources is crude, but it catches
         // the case a unit test cannot: a new error added later without a code.
+
+        // Arrange
         var offenders = new List<string>();
 
+        // Act
         foreach (var file in StoreSources())
         {
             var text = File.ReadAllText(file);
@@ -30,6 +33,7 @@ public partial class IdentityErrorCodesTests
             }
         }
 
+        // Assert
         Assert.True(
             offenders.Count == 0,
             "IdentityError constructed without a Code at: " + string.Join(", ", offenders)
@@ -37,22 +41,26 @@ public partial class IdentityErrorCodesTests
     }
 
     [Fact]
-    public void CodesAreUniqueAndNonEmpty()
+    public void Codes_Always_AreUniqueAndNonEmpty()
     {
+        // Act
         var codes = Codes();
 
+        // Assert
         Assert.NotEmpty(codes);
         Assert.All(codes, c => Assert.False(string.IsNullOrWhiteSpace(c)));
         Assert.Equal(codes.Length, codes.Distinct(StringComparer.Ordinal).Count());
     }
 
     [Fact]
-    public void CodesDoNotCollideWithTheFrameworksOwnDescriberCodes()
+    public void Codes_ComparedToIdentityErrorDescriberCodes_DoNotCollide()
     {
         // ASP.NET Core's IdentityErrorDescriber emits codes like "DuplicateEmail" and
         // "ConcurrencyFailure" too. Where we reuse a name, the meaning must match, because a UI
         // maps code -> message without knowing which layer raised it. These two are deliberate
         // overlaps; anything new colliding by accident would silently mistranslate.
+
+        // Arrange
         var deliberateOverlaps = new[]
         {
             IdentityErrorCodes.DuplicateEmail,
@@ -64,10 +72,12 @@ public partial class IdentityErrorCodesTests
             .Select(m => m.Name)
             .ToHashSet(StringComparer.Ordinal);
 
+        // Act
         var accidental = Codes()
             .Where(c => frameworkCodes.Contains(c) && !deliberateOverlaps.Contains(c))
             .ToArray();
 
+        // Assert
         Assert.True(
             accidental.Length == 0,
             "Codes collide with IdentityErrorDescriber: " + string.Join(", ", accidental)
