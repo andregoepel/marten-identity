@@ -370,6 +370,7 @@
       "andregoepel.marten.identity": {
         "type": "Project",
         "dependencies": {
+          "AndreGoepel.Marten.Configuration": "[1.0.0, )",
           "AndreGoepel.Marten.Identity.Abstractions": "[1.7.0, )",
           "Marten": "[9.18.0, )",
           "Marten.AspNetCore": "[9.18.0, )",
@@ -383,6 +384,7 @@
         "type": "Project",
         "dependencies": {
           "AndreGoepel.Design.Blazor": "[1.4.2, )",
+          "AndreGoepel.Marten.Configuration": "[1.0.0, )",
           "AndreGoepel.Marten.Identity": "[1.7.0, )",
           "Marten": "[9.18.0, )",
           "Radzen.Blazor": "[11.1.7, )"
@@ -395,6 +397,15 @@
         "contentHash": "57laKLfocolPOcRbBLP0GccM9k3T+grGAnlv/BpUmH9n1SnbxAqq6YEotTq5E9xThMq9WvuSGv/VUTB1B6Bdww==",
         "dependencies": {
           "Radzen.Blazor": "11.1.7"
+        }
+      },
+      "AndreGoepel.Marten.Configuration": {
+        "type": "CentralTransitive",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "Zdtm/17OtwW/GtPJgYXWZbEFN832Je3j3hgAQehnONMupi4hjcU4QkYP2enYFs+ni45RyjjvKFuPWzy5858DMA==",
+        "dependencies": {
+          "Marten": "9.18.0"
         }
       },
       "AngleSharp": {

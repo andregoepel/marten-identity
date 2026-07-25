@@ -1,11 +1,11 @@
-using Marten;
+using AndreGoepel.Marten.Configuration;
 using Microsoft.Extensions.Options;
 using Quartz;
 
 namespace AndreGoepel.Marten.Identity;
 
 public sealed class CleanupSettingsService(
-    IDocumentStore documentStore,
+    ISettingsStore settingsStore,
     IOptions<DeletedUserCleanupOptions> defaultOptions,
     ISchedulerFactory schedulerFactory
 )
@@ -56,8 +56,7 @@ public sealed class CleanupSettingsService(
 
     public async Task<CleanupSettings> GetAsync(CancellationToken ct = default)
     {
-        using var session = documentStore.QuerySession();
-        return await session.LoadAsync<CleanupSettings>(CleanupSettings.DocumentId, ct)
+        return await settingsStore.LoadAsync<CleanupSettings>(ct)
             ?? new CleanupSettings
             {
                 RetentionDays = defaultOptions.Value.RetentionDays,
@@ -76,9 +75,7 @@ public sealed class CleanupSettingsService(
     {
         Validate(settings);
 
-        using var session = documentStore.LightweightSession();
-        session.Store(settings);
-        await session.SaveChangesAsync(ct);
+        await settingsStore.SaveAsync(settings, ct);
 
         var newTrigger = TriggerBuilder
             .Create()

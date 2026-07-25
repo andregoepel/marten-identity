@@ -103,7 +103,7 @@ public class DeletedUserCleanupJobTests(MartenFixture fixture) : IAsyncLifetime
     private DeletedUserCleanupJob BuildJob(int retentionDays)
     {
         var settings = new CleanupSettingsService(
-            fixture.Store,
+            fixture.SettingsStore,
             Options.Create(new DeletedUserCleanupOptions { RetentionDays = retentionDays }),
             Substitute.For<ISchedulerFactory>()
         );

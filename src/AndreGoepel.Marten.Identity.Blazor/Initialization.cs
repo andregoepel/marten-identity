@@ -1,4 +1,5 @@
 using AndreGoepel.Design.Blazor;
+using AndreGoepel.Marten.Configuration;
 using AndreGoepel.Marten.Identity.Blazor.Components.Account;
 using AndreGoepel.Marten.Identity.Blazor.Email;
 using AndreGoepel.Marten.Identity.Blazor.Features;
@@ -56,9 +57,14 @@ public static class Initialization
         // identity UI needs localization whether or not the design system happens to.
         services.AddLocalization();
 
-        // Default feature-flag provider reads the options baseline (#66). TryAdd lets a host
-        // register a persistence-backed provider that takes precedence.
-        services.TryAddScoped<IIdentityFeatureProvider, OptionsIdentityFeatureProvider>();
+        // Default feature-flag provider persists to Postgres via ISettingsStore, falling back
+        // to the options baseline when nothing has been saved yet (#66). TryAdd lets a host
+        // register its own provider that takes precedence. Registered here (not just by
+        // AddMartenIdentity) so this package doesn't implicitly depend on the core package's
+        // registration having already run.
+        services.AddMartenConfiguration();
+        services.TryAddScoped<IIdentityFeatureSettingsStore, MartenIdentityFeatureSettingsStore>();
+        services.TryAddScoped<IIdentityFeatureProvider, MartenIdentityFeatureProvider>();
 
         // Invitation mail falls back to the host's existing password-reset path, so hosts
         // that register nothing keep working on upgrade. TryAdd lets one that wants proper

@@ -11,6 +11,15 @@
           "Radzen.Blazor": "11.1.7"
         }
       },
+      "AndreGoepel.Marten.Configuration": {
+        "type": "Direct",
+        "requested": "[1.0.0, )",
+        "resolved": "1.0.0",
+        "contentHash": "Zdtm/17OtwW/GtPJgYXWZbEFN832Je3j3hgAQehnONMupi4hjcU4QkYP2enYFs+ni45RyjjvKFuPWzy5858DMA==",
+        "dependencies": {
+          "Marten": "9.18.0"
+        }
+      },
       "Marten": {
         "type": "Direct",
         "requested": "[9.18.0, )",
@@ -175,6 +184,7 @@
       "andregoepel.marten.identity": {
         "type": "Project",
         "dependencies": {
+          "AndreGoepel.Marten.Configuration": "[1.0.0, )",
           "AndreGoepel.Marten.Identity.Abstractions": "[1.7.0, )",
           "Marten": "[9.18.0, )",
           "Marten.AspNetCore": "[9.18.0, )",

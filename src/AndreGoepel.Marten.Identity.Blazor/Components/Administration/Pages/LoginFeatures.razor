@@ -1,0 +1,93 @@
+@page "/Administration/LoginFeatures"
+@rendermode InteractiveServer
+@inherits IdentityLocalizedComponentBase
+
+@using AndreGoepel.Marten.Identity.Blazor.Features
+
+@inject IIdentityFeatureSettingsStore SettingsStore
+@inject NotificationService NotificationService
+
+@attribute [Authorize(Roles = "Administrator")]
+
+<AppPageTitle Title="@T("LoginFeatures.PageTitle")" Breadcrumb="@T("LoginFeatures.Breadcrumb")" />
+
+<div class="rz-p-4 rz-p-md-6">
+    <RadzenStack Gap="1.5rem">
+
+        <PageHeader Title="@T("LoginFeatures.PageTitle")" Subtitle="@T("LoginFeatures.Subtitle")" />
+
+        @if (_fromConfiguration)
+        {
+            <RadzenAlert AlertStyle="AlertStyle.Info" ShowIcon="true" AllowClose="false">
+                @T("LoginFeatures.ConfigFromCodeAlert")
+            </RadzenAlert>
+        }
+
+        <CardForm TItem="InputModel" Data="_input" Submit="SaveAsync" IsBusy="_saving">
+            <SettingToggleRow Label="@T("LoginFeatures.SelfServiceRegistrationLabel")"
+                               Description="@T("LoginFeatures.SelfServiceRegistrationDescription")"
+                               @bind-Value="_input.EnableUserRegistration" />
+
+            <SettingToggleRow Label="@T("LoginFeatures.TwoFactorLabel")"
+                               Description="@T("LoginFeatures.TwoFactorDescription")"
+                               @bind-Value="_input.EnableTwoFactor" />
+
+            <SettingToggleRow Label="@T("LoginFeatures.PasskeysLabel")"
+                               Description="@T("LoginFeatures.PasskeysDescription")"
+                               @bind-Value="_input.EnablePasskey" />
+        </CardForm>
+
+    </RadzenStack>
+</div>
+
+@code {
+    private InputModel _input = new();
+    private bool _fromConfiguration;
+    private bool _saving;
+
+    protected override async Task OnInitializedAsync()
+    {
+        var settings = await SettingsStore.LoadAsync();
+        _fromConfiguration = settings.FromConfiguration;
+        _input = new InputModel
+        {
+            EnableUserRegistration = settings.EnableUserRegistration,
+            EnableTwoFactor = settings.EnableTwoFactor,
+            EnablePasskey = settings.EnablePasskey,
+        };
+    }
+
+    private async Task SaveAsync()
+    {
+        _saving = true;
+
+        try
+        {
+            var settings = new IdentityFeatureSettings
+            {
+                EnableUserRegistration = _input.EnableUserRegistration,
+                EnableTwoFactor = _input.EnableTwoFactor,
+                EnablePasskey = _input.EnablePasskey,
+            };
+
+            await SettingsStore.SaveAsync(settings);
+            _fromConfiguration = false;
+            NotificationService.Notify(NotificationSeverity.Success, T("LoginFeatures.SavedNotificationTitle"), T("LoginFeatures.SavedNotificationMessage"));
+        }
+        catch (Exception ex)
+        {
+            NotificationService.Notify(NotificationSeverity.Error, T("LoginFeatures.ErrorSavingSettingsTitle"), ex.Message);
+        }
+        finally
+        {
+            _saving = false;
+        }
+    }
+
+    private sealed class InputModel
+    {
+        public bool EnableUserRegistration { get; set; } = true;
+        public bool EnableTwoFactor { get; set; } = true;
+        public bool EnablePasskey { get; set; } = true;
+    }
+}

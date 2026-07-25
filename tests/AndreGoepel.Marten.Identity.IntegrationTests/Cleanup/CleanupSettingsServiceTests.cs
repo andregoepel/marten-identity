@@ -32,11 +32,10 @@ public class CleanupSettingsServiceTests(MartenFixture fixture) : IAsyncLifetime
     public async Task GetAsync_WithStoredSettings_ReturnsStored()
     {
         // Arrange
-        await using (var seed = fixture.Store.LightweightSession())
-        {
-            seed.Store(new CleanupSettings { RetentionDays = 90, CronSchedule = "0 0 3 * * ?" });
-            await seed.SaveChangesAsync(Ct);
-        }
+        await fixture.SettingsStore.SaveAsync(
+            new CleanupSettings { RetentionDays = 90, CronSchedule = "0 0 3 * * ?" },
+            Ct
+        );
         var service = BuildService(defaultRetention: 14, defaultCron: "0 0 1 * * ?");
 
         // Act
@@ -55,7 +54,7 @@ public class CleanupSettingsServiceTests(MartenFixture fixture) : IAsyncLifetime
         var schedulerFactory = Substitute.For<ISchedulerFactory>();
         schedulerFactory.GetScheduler(Arg.Any<CancellationToken>()).Returns(scheduler);
         var service = new CleanupSettingsService(
-            fixture.Store,
+            fixture.SettingsStore,
             Options.Create(new DeletedUserCleanupOptions()),
             schedulerFactory
         );
@@ -82,7 +81,7 @@ public class CleanupSettingsServiceTests(MartenFixture fixture) : IAsyncLifetime
 
     private CleanupSettingsService BuildService(int defaultRetention, string defaultCron) =>
         new(
-            fixture.Store,
+            fixture.SettingsStore,
             Options.Create(
                 new DeletedUserCleanupOptions
                 {
