@@ -42,7 +42,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task UpdateAsync_AppliesPhoneNumber()
+    public async Task UpdateAsync_PhoneNumberChanged_PersistsValue()
     {
         // Arrange
         var store = UserStoreTestHelpers.BuildStore(fixture.Store);
@@ -257,7 +257,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task CreateAsync_RespectsAllowedForNewUsersFalse()
+    public async Task CreateAsync_AllowedForNewUsersFalse_DisablesLockout()
     {
         // Arrange
         var options = new IdentityOptions();
@@ -309,7 +309,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task ResetAccessFailedCount_PersistsZero()
+    public async Task ResetAccessFailedCount_AfterFailedAttempts_PersistsZero()
     {
         // Arrange
         var store = UserStoreTestHelpers.BuildStore(fixture.Store);
@@ -329,7 +329,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task SetLockoutEndDate_PersistsAndPreservesCounter()
+    public async Task SetLockoutEndDate_AfterFailedAttempt_PersistsEndDateAndPreservesCounter()
     {
         // Arrange
         var store = UserStoreTestHelpers.BuildStore(fixture.Store);
@@ -353,7 +353,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task UpdateAsync_DoesNotRegressConcurrentlyChangedLockoutState()
+    public async Task UpdateAsync_StaleSnapshotWithConcurrentIncrements_PreservesLockoutState()
     {
         // Regression for #22: a stale snapshot flowing through the generic update
         // path must not clobber lockout state that advanced in the meantime.
@@ -540,14 +540,17 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     #region Security stamp (session invalidation)
 
     [Fact]
-    public void Store_ImplementsSecurityStampStore()
+    public void UserStore_Always_ImplementsSecurityStampStore()
     {
+        // Arrange
         var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+
+        // Assert
         Assert.IsAssignableFrom<IUserSecurityStampStore<User>>(store);
     }
 
     [Fact]
-    public async Task CreateAsync_PersistsSecurityStamp()
+    public async Task CreateAsync_WithSecurityStamp_PersistsStamp()
     {
         // Arrange
         var store = UserStoreTestHelpers.BuildStore(fixture.Store);
@@ -563,7 +566,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task UpdateAsync_PersistsChangedSecurityStamp()
+    public async Task UpdateAsync_SecurityStampRotated_PersistsNewStamp()
     {
         // A changed stamp is what invalidates previously issued auth cookies;
         // it must survive a round-trip through the event store.
@@ -586,7 +589,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task RestoreAsync_PreservesSecurityStamp()
+    public async Task RestoreAsync_AfterDelete_PreservesSecurityStamp()
     {
         // Arrange
         var store = UserStoreTestHelpers.BuildStore(fixture.Store);
@@ -639,7 +642,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     #region DeleteAsync / RestoreAsync
 
     [Fact]
-    public async Task DeleteAsync_SoftDeletes()
+    public async Task DeleteAsync_DeletableUser_SoftDeletes()
     {
         // Arrange
         var store = UserStoreTestHelpers.BuildStore(fixture.Store);
@@ -702,7 +705,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     #region Authenticator key / recovery codes (data protection)
 
     [Fact]
-    public async Task AuthenticatorKey_RoundTripsThroughDataProtection()
+    public async Task AuthenticatorKey_SetThenGet_RoundTripsThroughDataProtection()
     {
         // Arrange
         var store = UserStoreTestHelpers.BuildStore(fixture.Store);
@@ -818,7 +821,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     #region Roles
 
     [Fact]
-    public async Task AddToRole_PopulatesGetRoles()
+    public async Task AddToRole_ExistingRole_PopulatesGetRoles()
     {
         // Arrange
         var store = UserStoreTestHelpers.BuildStore(fixture.Store);
@@ -837,7 +840,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task RemoveFromRole_RemovesFromGetRoles()
+    public async Task RemoveFromRole_AssignedRole_RemovesFromGetRoles()
     {
         // Arrange
         var store = UserStoreTestHelpers.BuildStore(fixture.Store);
@@ -900,7 +903,7 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task GetUsersInRole_ReturnsAssignedUsers()
+    public async Task GetUsersInRole_MixedMembership_ReturnsOnlyAssignedUsers()
     {
         // Arrange
         var store = UserStoreTestHelpers.BuildStore(fixture.Store);

@@ -38,7 +38,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task UpdateAsync_PreservesDeletableFalseEndToEnd()
+    public async Task UpdateAsync_NonDeletableRole_PreservesDeletableFalse()
     {
         // Arrange
         var store = Build();
@@ -79,7 +79,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task RestoreAsync_ClearsDeleted()
+    public async Task RestoreAsync_AfterDelete_ClearsDeletedState()
     {
         // Arrange
         var store = Build();
@@ -100,7 +100,7 @@ public class RoleStoreTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task FindByName_ReturnsRoleByNormalizedName()
+    public async Task FindByNameAsync_NormalizedName_ReturnsRole()
     {
         // Arrange
         var store = Build();
