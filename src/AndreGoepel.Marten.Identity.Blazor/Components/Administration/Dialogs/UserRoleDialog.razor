@@ -1,6 +1,7 @@
 ﻿@inherits IdentityLocalizedComponentBase
 @inject DialogService DialogService
 @inject UserManager<User> UserManager
+@inject UserStore<User> UserStore
 @inject RoleManager<Role> RoleManager
 
 <RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween">
@@ -47,14 +48,30 @@
             join role in _roles on value equals role.RoleId
             select role.Name;
 
-        await UserManager.AddToRolesAsync(_user, newRoles);
+        foreach (var role in newRoles)
+        {
+            var result = await UserStore.AddToRoleAsync(_user, role!, CancellationToken.None);
+            if (!result.Succeeded)
+            {
+                await DialogService.Alert(T("UserRoleDialog.RolesCouldNotBeSaved"), T("UserRoleDialog.ErrorTitle"));
+                return;
+            }
+        }
 
         var removedRoles =
             from value in _user.Roles.Except(_values)
             join role in _roles on value equals role.RoleId
             select role.Name;
 
-        await UserManager.RemoveFromRolesAsync(_user, removedRoles);
+        foreach (var role in removedRoles)
+        {
+            var result = await UserStore.RemoveFromRoleAsync(_user, role!, CancellationToken.None);
+            if (!result.Succeeded)
+            {
+                await DialogService.Alert(T("UserRoleDialog.RolesCouldNotBeSaved"), T("UserRoleDialog.ErrorTitle"));
+                return;
+            }
+        }
 
         DialogService.Close(true);
     }

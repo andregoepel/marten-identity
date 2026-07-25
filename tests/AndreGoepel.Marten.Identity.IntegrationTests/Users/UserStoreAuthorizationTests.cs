@@ -22,32 +22,34 @@ public class UserStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
 
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
-    // --- Role assignment (throws IdentityAuthorizationException) ---
+    // --- Role assignment (returns IdentityResult) ---
 
     [Fact]
-    public async Task AddToRoleAsync_NonAdminActor_Throws()
+    public async Task AddToRoleAsync_NonAdminActor_ReturnsNotAuthorized()
     {
         var target = await SeedUserAsync("target@example.com");
         await SeedRoleAsync("Member");
         var (store, _) = BuildEnforcing(UserId.New());
         var user = await store.FindByIdAsync(target.ToString(), Ct);
 
-        await Assert.ThrowsAsync<IdentityAuthorizationException>(() =>
-            store.AddToRoleAsync(user!, "MEMBER", Ct)
-        );
+        var result = await store.AddToRoleAsync(user!, "MEMBER", Ct);
+
+        Assert.False(result.Succeeded);
+        Assert.Contains(result.Errors, e => e.Code == "NotAuthorized");
     }
 
     [Fact]
-    public async Task AddToRoleAsync_AnonymousActor_Throws()
+    public async Task AddToRoleAsync_AnonymousActor_ReturnsNotAuthorized()
     {
         var target = await SeedUserAsync("target@example.com");
         await SeedRoleAsync("Member");
         var (store, _) = BuildEnforcing(default); // Guid.Empty — fails closed
         var user = await store.FindByIdAsync(target.ToString(), Ct);
 
-        await Assert.ThrowsAsync<IdentityAuthorizationException>(() =>
-            store.AddToRoleAsync(user!, "MEMBER", Ct)
-        );
+        var result = await store.AddToRoleAsync(user!, "MEMBER", Ct);
+
+        Assert.False(result.Succeeded);
+        Assert.Contains(result.Errors, e => e.Code == "NotAuthorized");
     }
 
     [Fact]
@@ -66,7 +68,7 @@ public class UserStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task RemoveFromRoleAsync_NonAdminActor_Throws()
+    public async Task RemoveFromRoleAsync_NonAdminActor_ReturnsNotAuthorized()
     {
         var target = await SeedUserAsync("target@example.com");
         await SeedRoleAsync("Member");
@@ -74,9 +76,10 @@ public class UserStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
         var (store, _) = BuildEnforcing(UserId.New());
         var user = await store.FindByIdAsync(target.ToString(), Ct);
 
-        await Assert.ThrowsAsync<IdentityAuthorizationException>(() =>
-            store.RemoveFromRoleAsync(user!, "MEMBER", Ct)
-        );
+        var result = await store.RemoveFromRoleAsync(user!, "MEMBER", Ct);
+
+        Assert.False(result.Succeeded);
+        Assert.Contains(result.Errors, e => e.Code == "NotAuthorized");
     }
 
     // --- Delete (self-or-admin; returns IdentityResult) ---
