@@ -15,9 +15,9 @@
   </ItemGroup>
 
   <ItemGroup Label="Marten">
-    <PackageVersion Include="Marten" Version="9.18.0" />
-    <PackageVersion Include="Marten.AspNetCore" Version="9.18.0" />
-    <PackageVersion Include="AndreGoepel.Marten.Configuration" Version="1.0.0" />
+    <PackageVersion Include="Marten" Version="9.19.0" />
+    <PackageVersion Include="Marten.AspNetCore" Version="9.19.0" />
+    <PackageVersion Include="AndreGoepel.Marten.Configuration" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup Label="Scheduling">
