@@ -34,7 +34,6 @@
         if (_module is null) return;
 
         _isBusy = true;
-        StateHasChanged();
 
         try
         {
@@ -56,7 +55,6 @@
         finally
         {
             _isBusy = false;
-            StateHasChanged();
         }
     }
 

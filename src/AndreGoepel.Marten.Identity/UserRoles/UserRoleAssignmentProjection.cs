@@ -5,7 +5,7 @@ using Marten.Events.Projections;
 
 namespace AndreGoepel.Marten.Identity.UserRoles;
 
-internal class UserRoleAssignmentProjection : IProjection
+internal sealed class UserRoleAssignmentProjection : IProjection
 {
     public static void Apply(IDocumentOperations operations, RoleAssigned @event)
     {

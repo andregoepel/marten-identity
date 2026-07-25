@@ -492,7 +492,7 @@ public class UserStore<TUser>(
         GC.SuppressFinalize(this);
     }
 
-    // IUserPasswordStore
+    #region IUserPasswordStore
 
     public Task SetPasswordHashAsync(
         TUser user,
@@ -513,7 +513,9 @@ public class UserStore<TUser>(
         return Task.FromResult(hasPassword);
     }
 
-    // IUserSecurityStampStore
+    #endregion IUserPasswordStore
+
+    #region IUserSecurityStampStore
 
     public Task SetSecurityStampAsync(TUser user, string stamp, CancellationToken cancellationToken)
     {
@@ -528,7 +530,9 @@ public class UserStore<TUser>(
         return Task.FromResult(user.SecurityStamp);
     }
 
-    // IUserEmailStore
+    #endregion IUserSecurityStampStore
+
+    #region IUserEmailStore
 
     public Task SetEmailAsync(TUser user, string? email, CancellationToken cancellationToken)
     {
@@ -573,7 +577,9 @@ public class UserStore<TUser>(
         return Task.CompletedTask;
     }
 
-    // IUserPhoneNumberStore
+    #endregion IUserEmailStore
+
+    #region IUserPhoneNumberStore
 
     public Task SetPhoneNumberAsync(
         TUser user,
@@ -603,7 +609,9 @@ public class UserStore<TUser>(
         return Task.CompletedTask;
     }
 
-    // IUserTwoFactorStore
+    #endregion IUserPhoneNumberStore
+
+    #region IUserTwoFactorStore
 
     public Task SetTwoFactorEnabledAsync(
         TUser user,
@@ -620,7 +628,9 @@ public class UserStore<TUser>(
         return Task.FromResult(user.TwoFactorEnabled);
     }
 
-    // IUserAuthenticatorKeyStore
+    #endregion IUserTwoFactorStore
+
+    #region IUserAuthenticatorKeyStore
 
     public Task SetAuthenticatorKeyAsync(
         TUser user,
@@ -642,7 +652,9 @@ public class UserStore<TUser>(
         );
     }
 
-    // IUserTwoFactorRecoveryCodeStore
+    #endregion IUserAuthenticatorKeyStore
+
+    #region IUserTwoFactorRecoveryCodeStore
 
     public Task ReplaceCodesAsync(
         TUser user,
@@ -698,6 +710,8 @@ public class UserStore<TUser>(
         return Task.FromResult(count);
     }
 
+    #endregion IUserTwoFactorRecoveryCodeStore
+
     public async Task AddOrUpdatePasskeyAsync(
         TUser user,
         UserPasskeyInfo passkey,
@@ -711,7 +725,7 @@ public class UserStore<TUser>(
             await querySession
                 .Query<TUser>()
                 .FirstOrDefaultAsync(x => x.Id == user.Id, cancellationToken)
-            ?? throw new Exception("User not found");
+            ?? throw new InvalidOperationException("User not found");
 
         var isUpdate = userEntity.Passkeys.ContainsKey(credentialId);
 
@@ -747,7 +761,7 @@ public class UserStore<TUser>(
             await querySession
                 .Query<TUser>()
                 .FirstOrDefaultAsync(x => x.Id == user.Id, cancellationToken)
-            ?? throw new Exception("User not found");
+            ?? throw new InvalidOperationException("User not found");
 
         return [.. userEntity.Passkeys.Select(kvp => kvp.Value.PasskeyInfo)];
     }
@@ -773,7 +787,7 @@ public class UserStore<TUser>(
             await querySession
                 .Query<TUser>()
                 .FirstOrDefaultAsync(x => x.Id == user.Id, cancellationToken)
-            ?? throw new Exception("User not found");
+            ?? throw new InvalidOperationException("User not found");
 
         return userEntity.Passkeys.TryGetValue(
             Convert.ToBase64String(credentialId),
@@ -794,7 +808,16 @@ public class UserStore<TUser>(
         await session.SaveChangesAsync(cancellationToken);
     }
 
-    public async Task AddToRoleAsync(
+    /// <summary>
+    /// Assigns a role, returning a failed <see cref="IdentityResult"/> (matching the
+    /// CreateAsync/DeleteAsync/RestoreAsync contract) rather than throwing when the caller
+    /// lacks authority. This is the overload our own call sites use; the
+    /// <see cref="IUserRoleStore{TUser}"/> explicit implementation below adapts a failure
+    /// back into a throw only for hosts driving role assignment through
+    /// <c>UserManager</c>, which has no channel to surface an <see cref="IdentityResult"/>
+    /// from this operation.
+    /// </summary>
+    public async Task<IdentityResult> AddToRoleAsync(
         TUser user,
         string roleName,
         CancellationToken cancellationToken
@@ -810,7 +833,7 @@ public class UserStore<TUser>(
         // (self-assigning Administrator), so it is refused for any non-admin caller —
         // including one reaching the store directly.
         if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
-            throw new IdentityAuthorizationException(
+            return NotAuthorized(
                 await AdminRequiredMessageAsync(
                     "Assigning a role requires administrator authority.",
                     cancellationToken
@@ -836,9 +859,28 @@ public class UserStore<TUser>(
             )
         );
         await session.SaveChangesAsync(cancellationToken);
+        return IdentityResult.Success;
     }
 
-    public async Task RemoveFromRoleAsync(
+    // IUserRoleStore<TUser> can only return Task, so a Failed result from the overload
+    // above is adapted back into a throw here — the only channel UserManager understands.
+    async Task IUserRoleStore<TUser>.AddToRoleAsync(
+        TUser user,
+        string roleName,
+        CancellationToken cancellationToken
+    )
+    {
+        var result = await AddToRoleAsync(user, roleName, cancellationToken);
+        if (!result.Succeeded)
+            throw new IdentityAuthorizationException(result.Errors.First().Description);
+    }
+
+    /// <summary>
+    /// Removes a role assignment; see <see cref="AddToRoleAsync"/> for why this overload
+    /// returns <see cref="IdentityResult"/> while the <see cref="IUserRoleStore{TUser}"/>
+    /// explicit implementation below still throws.
+    /// </summary>
+    public async Task<IdentityResult> RemoveFromRoleAsync(
         TUser user,
         string roleName,
         CancellationToken cancellationToken
@@ -852,7 +894,7 @@ public class UserStore<TUser>(
         // Defence in depth (#69/#41): removing a role is an administrator-only operation,
         // independent of any UI [Authorize] guard.
         if (!await authorizer.IsCurrentUserAdministratorAsync(cancellationToken))
-            throw new IdentityAuthorizationException(
+            return NotAuthorized(
                 await AdminRequiredMessageAsync(
                     "Removing a role requires administrator authority.",
                     cancellationToken
@@ -892,6 +934,20 @@ public class UserStore<TUser>(
             )
         );
         await session.SaveChangesAsync(cancellationToken);
+        return IdentityResult.Success;
+    }
+
+    // IUserRoleStore<TUser> can only return Task, so a Failed result from the overload
+    // above is adapted back into a throw here — the only channel UserManager understands.
+    async Task IUserRoleStore<TUser>.RemoveFromRoleAsync(
+        TUser user,
+        string roleName,
+        CancellationToken cancellationToken
+    )
+    {
+        var result = await RemoveFromRoleAsync(user, roleName, cancellationToken);
+        if (!result.Succeeded)
+            throw new IdentityAuthorizationException(result.Errors.First().Description);
     }
 
     public async Task<IList<string>> GetRolesAsync(TUser user, CancellationToken cancellationToken)
@@ -926,7 +982,7 @@ public class UserStore<TUser>(
         return user.Roles.Any(r => r == role.RoleId);
     }
 
-    // IUserLockoutStore
+    #region IUserLockoutStore
 
     public Task<DateTimeOffset?> GetLockoutEndDateAsync(
         TUser user,
@@ -983,7 +1039,6 @@ public class UserStore<TUser>(
 
         using var session = documentStore.LightweightSession();
 
-        // Acquire the exclusive stream lock before reading current state.
         await session.Events.AppendExclusive(userId.Value);
 
         var current = await session.LoadAsync<User>(userId.Value, cancellationToken) ?? user;
@@ -1031,6 +1086,8 @@ public class UserStore<TUser>(
         user.LockoutEnabled = enabled;
         return Task.CompletedTask;
     }
+
+    #endregion IUserLockoutStore
 
     public async Task<IList<TUser>> GetUsersInRoleAsync(
         string roleName,

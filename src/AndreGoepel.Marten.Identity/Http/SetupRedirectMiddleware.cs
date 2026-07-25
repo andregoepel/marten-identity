@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace AndreGoepel.Marten.Identity.Http;
 
-public class SetupRedirectMiddleware(RequestDelegate next)
+public sealed class SetupRedirectMiddleware(RequestDelegate next)
 {
     private static volatile bool _isConfigured;
 

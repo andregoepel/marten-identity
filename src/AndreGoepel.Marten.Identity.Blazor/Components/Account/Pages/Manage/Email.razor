@@ -105,7 +105,6 @@
         }
 
         _isChangingEmail = true;
-        StateHasChanged();
 
         try
         {
@@ -132,9 +131,6 @@
                 T("Email.SuccessTitle"),
                 T("Email.ConfirmationSentDetail")
             );
-
-            // Optional: zurück zur Profile-Seite
-            // NavigationManager.NavigateTo("/Account/Manage/Profile");
         }
         catch (Exception)
         {
@@ -147,7 +143,6 @@
         finally
         {
             _isChangingEmail = false;
-            StateHasChanged();
         }
     }
 
@@ -157,7 +152,6 @@
             return;
 
         _isSendingVerification = true;
-        StateHasChanged();
 
         try
         {
@@ -195,14 +189,10 @@
         finally
         {
             _isSendingVerification = false;
-            StateHasChanged();
         }
     }
 
-    // Validation lives in the markup as Radzen validator components. RadzenTemplateForm
-    // (wrapped by CardForm) does not evaluate DataAnnotations and no DataAnnotationsValidator
-    // is present, so attributes here would never run — they were removed rather than
-    // translated into a second, silently-dead set of messages (#114).
+    // Validation lives in the markup as Radzen validators — RadzenTemplateForm/CardForm don't run DataAnnotations (#114).
     private sealed class ChangeEmailModel
     {
         public string? NewEmail { get; set; }

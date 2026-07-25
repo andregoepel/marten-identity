@@ -31,7 +31,6 @@ public class User : IdentityUser
     public string? AuthenticatorKey { get; set; }
     public string? RecoveryCodes { get; set; }
 
-    // Todo: Use Hashset
     public Dictionary<string, UserPasskey> Passkeys { get; set; } = [];
 
     public HashSet<RoleId> Roles { get; set; } = [];

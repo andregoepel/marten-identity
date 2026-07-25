@@ -70,7 +70,6 @@
         }
 
         _isSaving = true;
-        StateHasChanged();
 
         try
         {
@@ -119,14 +118,10 @@
         finally
         {
             _isSaving = false;
-            StateHasChanged();
         }
     }
 
-    // Validation lives in the markup as Radzen validator components. RadzenTemplateForm
-    // (wrapped by CardForm) does not evaluate DataAnnotations and no DataAnnotationsValidator
-    // is present, so attributes here would never run — they were removed rather than
-    // translated into a second, silently-dead set of messages (#114).
+    // Validation lives in the markup as Radzen validators — RadzenTemplateForm/CardForm don't run DataAnnotations (#114).
     private sealed class ProfileModel
     {
         // UserName is rendered read-only, so it cannot be emptied from the UI.

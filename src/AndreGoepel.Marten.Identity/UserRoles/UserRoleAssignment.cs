@@ -3,11 +3,11 @@ using AndreGoepel.Marten.Identity.Users;
 
 namespace AndreGoepel.Marten.Identity.UserRoles;
 
-public class UserRoleAssignment
+public sealed record UserRoleAssignment
 {
     public string Id => $"{UserId}:{RoleId}";
     public Guid UserGuid => UserId;
-    public UserId UserId { get; set; }
+    public UserId UserId { get; init; }
     public Guid RoleGuid => RoleId;
-    public RoleId RoleId { get; set; }
+    public RoleId RoleId { get; init; }
 }

@@ -23,6 +23,7 @@ namespace AndreGoepel.Marten.Identity.Users;
 /// </summary>
 public sealed class UserInvitationService(
     UserManager<User> userManager,
+    UserStore<User> userStore,
     IIdentityAuthorizer authorizer
 )
 {
@@ -71,24 +72,11 @@ public sealed class UserInvitationService(
             return UserInvitationResult.Failed(createResult);
 
         var roleList = roles?.ToArray() ?? [];
-        if (roleList.Length > 0)
+        foreach (var role in roleList)
         {
-            try
-            {
-                var roleResult = await userManager.AddToRolesAsync(user, roleList);
-                if (!roleResult.Succeeded)
-                    return UserInvitationResult.Failed(roleResult);
-            }
-            catch (IdentityAuthorizationException ex)
-            {
-                // The role-assignment store methods signal an authorization failure by
-                // throwing rather than returning a result (#69/#41). Reaching this after
-                // the check above would mean authority was lost mid-operation; surface it
-                // as a normal failure rather than letting it escape as an exception.
-                return UserInvitationResult.Failed(
-                    Failure(IdentityErrorCodes.NotAuthorized, ex.Message)
-                );
-            }
+            var roleResult = await userStore.AddToRoleAsync(user, role, cancellationToken);
+            if (!roleResult.Succeeded)
+                return UserInvitationResult.Failed(roleResult);
         }
 
         return UserInvitationResult.Success(user, await GenerateTokenAsync(user));
