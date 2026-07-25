@@ -1,5 +1,7 @@
+using AndreGoepel.Marten.Configuration;
 using JasperFx;
 using Marten;
+using Microsoft.Extensions.DependencyInjection;
 using Testcontainers.PostgreSql;
 
 namespace AndreGoepel.Marten.Identity.IntegrationTests.Infrastructure;
@@ -15,6 +17,10 @@ public sealed class MartenFixture : IAsyncLifetime
     private PostgreSqlContainer _container = null!;
 
     public IDocumentStore Store { get; private set; } = null!;
+
+    /// <summary>An <see cref="ISettingsStore"/> backed by <see cref="Store"/>, resolved
+    /// through the public DI registration rather than the package's internal type.</summary>
+    public ISettingsStore SettingsStore { get; private set; } = null!;
 
     // Pin the Postgres image by digest (not a mutable tag) so the test/CI
     // environment can't be fed a different image behind the same tag (#37).
@@ -33,6 +39,11 @@ public sealed class MartenFixture : IAsyncLifetime
             opts.InitializeIdentity();
             opts.AutoCreateSchemaObjects = AutoCreate.All;
         });
+
+        var services = new ServiceCollection();
+        services.AddSingleton(Store);
+        services.AddMartenConfiguration();
+        SettingsStore = services.BuildServiceProvider().GetRequiredService<ISettingsStore>();
     }
 
     public async ValueTask DisposeAsync()

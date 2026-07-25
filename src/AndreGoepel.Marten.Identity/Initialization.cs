@@ -1,6 +1,8 @@
+using AndreGoepel.Marten.Configuration;
 using AndreGoepel.Marten.Identity.Http;
 using AndreGoepel.Marten.Identity.Roles;
 using AndreGoepel.Marten.Identity.Services;
+using AndreGoepel.Marten.Identity.Settings;
 using AndreGoepel.Marten.Identity.UserRoles;
 using AndreGoepel.Marten.Identity.Users;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -83,6 +85,7 @@ public static class Initialization
         services.AddScoped<RoleStore<Role>>();
         services.AddScoped<UserInvitationService>();
         services.AddSingleton<LoginTokenProtector>();
+        services.AddMartenConfiguration();
 
         return services;
     }
@@ -129,6 +132,7 @@ public static class Initialization
         options.InitializeUsersStore();
         options.InitializeRolesStore();
         options.InitializeUserRolesStore();
-        options.Schema.For<CleanupSettings>();
+        options.AddSettingsDocument<CleanupSettings>();
+        options.AddSettingsDocument<IdentityFeatureSettingsDocument>();
     }
 }

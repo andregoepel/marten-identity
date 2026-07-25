@@ -172,9 +172,16 @@
           "Weasel.Core": "9.17.0"
         }
       },
+      "andregoepel.marten.configuration": {
+        "type": "Project",
+        "dependencies": {
+          "Marten": "[9.18.0, )"
+        }
+      },
       "andregoepel.marten.identity": {
         "type": "Project",
         "dependencies": {
+          "AndreGoepel.Marten.Configuration": "[1.0.0, )",
           "AndreGoepel.Marten.Identity.Abstractions": "[1.7.0, )",
           "Marten": "[9.18.0, )",
           "Marten.AspNetCore": "[9.18.0, )",
