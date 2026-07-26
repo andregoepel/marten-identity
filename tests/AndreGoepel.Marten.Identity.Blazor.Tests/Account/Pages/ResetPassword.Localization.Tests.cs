@@ -96,14 +96,14 @@ public class ResetPasswordLocalizationTests : BunitContext
         var store = Substitute.For<IUserStore<User>>();
         return Substitute.For<UserManager<User>>(
             store,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!
         );
     }
 

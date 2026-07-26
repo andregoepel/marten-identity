@@ -112,14 +112,14 @@ public class LoginLocalizationTests : BunitContext
 
         var um = Substitute.For<UserManager<User>>(
             Substitute.For<IUserStore<User>>(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!
         );
         var sm = Substitute.For<SignInManager<User>>(
             um,

@@ -71,7 +71,7 @@ public class PasskeysLocalizationTests : BunitContext
         await dialog
             .Received(1)
             .Confirm(
-                Arg.Is<string>(m => m.Contains("Passkey **My iPhone**")),
+                Arg.Is<string>(m => m != null && m.Contains("Passkey **My iPhone**")),
                 "Passkey löschen",
                 Arg.Any<ConfirmOptions>()
             );

@@ -26,7 +26,11 @@ public sealed class InvitationTests(E2EAppFixture fixture) : E2ETestBase(fixture
 
         // The invitation link is captured from the outgoing mail (the sample's default
         // sender routes invitations through the password-reset path).
-        var link = await Fixture.Email.WaitForLinkAsync(invitee, "Account/AcceptInvitation");
+        var link = await Fixture.Email.WaitForLinkAsync(
+            invitee,
+            "Account/AcceptInvitation",
+            ct: TestContext.Current.CancellationToken
+        );
 
         // The invitee opens the link in their own fresh session, not the admin's.
         await using var inviteeContext = await Fixture.NewContextAsync();
@@ -71,7 +75,11 @@ public sealed class InvitationTests(E2EAppFixture fixture) : E2ETestBase(fixture
         await Page.ClickButtonAsync("Invite user");
         await Page.FillFieldAsync("Email", invitee);
         await Page.ClickButtonAsync("Send invitation");
-        var link = await Fixture.Email.WaitForLinkAsync(invitee, "Account/AcceptInvitation");
+        var link = await Fixture.Email.WaitForLinkAsync(
+            invitee,
+            "Account/AcceptInvitation",
+            ct: TestContext.Current.CancellationToken
+        );
 
         await using (var firstContext = await Fixture.NewContextAsync())
         {
