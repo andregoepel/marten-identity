@@ -46,8 +46,8 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
         var result = await invitations.InviteAsync("new@example.com", cancellationToken: Ct);
 
         // Assert
-        Assert.False(result.Succeeded);
-        Assert.Contains(result.Result.Errors, e => e.Code == "NotAuthorized");
+        Assert.False(result.IsSuccess);
+        Assert.Contains("administrator authority", result.Error);
     }
 
     [Fact]
@@ -60,8 +60,8 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
         var result = await invitations.InviteAsync("new@example.com", cancellationToken: Ct);
 
         // Assert
-        Assert.False(result.Succeeded);
-        Assert.Contains(result.Result.Errors, e => e.Code == "NotAuthorized");
+        Assert.False(result.IsSuccess);
+        Assert.Contains("administrator authority", result.Error);
         Assert.Null(await FindAsync("new@example.com"));
     }
 
@@ -76,8 +76,8 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
         var result = await invitations.InviteAsync("new@example.com", cancellationToken: Ct);
 
         // Assert
-        Assert.True(result.Succeeded);
-        Assert.False(string.IsNullOrEmpty(result.Token));
+        Assert.True(result.IsSuccess);
+        Assert.False(string.IsNullOrEmpty(result.Value!.Token));
 
         var created = await FindAsync("new@example.com");
         Assert.NotNull(created);
@@ -102,7 +102,7 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
         );
 
         // Assert
-        Assert.True(result.Succeeded);
+        Assert.True(result.IsSuccess);
         var created = await users.FindByEmailAsync("new@example.com");
         Assert.Contains("Member", await users.GetRolesAsync(created!));
     }
@@ -119,8 +119,8 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
         var again = await invitations.InviteAsync("dupe@example.com", cancellationToken: Ct);
 
         // Assert
-        Assert.False(again.Succeeded);
-        Assert.Contains(again.Result.Errors, e => e.Code == "DuplicateEmail");
+        Assert.False(again.IsSuccess);
+        Assert.Contains("dupe@example.com", again.Error);
     }
 
     [Fact]
@@ -136,8 +136,8 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
         var resend = await invitations.ResendAsync(user!, Ct);
 
         // Assert
-        Assert.True(resend.Succeeded);
-        Assert.False(string.IsNullOrEmpty(resend.Token));
+        Assert.True(resend.IsSuccess);
+        Assert.False(string.IsNullOrEmpty(resend.Value!.Token));
     }
 
     [Fact]
@@ -158,8 +158,8 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
         var resend = await invitations.ResendAsync(claimed!, Ct);
 
         // Assert
-        Assert.False(resend.Succeeded);
-        Assert.Contains(resend.Result.Errors, e => e.Code == "InvitationAlreadyAccepted");
+        Assert.False(resend.IsSuccess);
+        Assert.Contains("already been set up", resend.Error);
     }
 
     #region Harness
