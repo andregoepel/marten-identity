@@ -19,7 +19,7 @@ if (!isE2E)
 var identityDb = postgres.AddDatabase("identitydb");
 
 var web = builder
-    .AddProject<Projects.MartenIdentity_Aspire_Web>("web")
+    .AddProject<Projects.AndreGoepel_Marten_Identity_Sample>("web")
     .WithReference(identityDb)
     .WaitFor(identityDb)
     .WithExternalHttpEndpoints();

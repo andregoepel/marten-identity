@@ -12,7 +12,8 @@ into queryable documents — no relational migrations.
   stores (event-sourced), cookie login middleware, cleanup scheduling
 - `AndreGoepel.Marten.Identity.Blazor` — packable NuGet: Blazor Server UI
   for login, registration, 2FA, passkeys, and user/role administration
-- `samples/MartenIdentity.Aspire.*` — .NET Aspire sample host
+- `samples/AndreGoepel.Marten.Identity.AppHost` / `.ServiceDefaults` / `.Sample` —
+  .NET Aspire sample host
 
 Consumed by `AndreGoepel.AppFoundation` and other hosts. Depends on
 `AndreGoepel.Marten.Configuration` for admin-editable settings persistence

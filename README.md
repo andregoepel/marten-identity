@@ -82,7 +82,7 @@ the domain layer independently of any UI `[Authorize]` guard. This bites during 
 bootstrap**, where there is no administrator yet to authorize seeding the default roles and
 the first admin. Wrap that trusted server-side code in
 `IIdentityAuthorizer.BeginSystemScope()`, which bypasses the check for the duration of the
-scope. See [`samples/MartenIdentity.Aspire.Web/Components/Pages/Setup.razor`](samples/MartenIdentity.Aspire.Web/Components/Pages/Setup.razor)
+scope. See [`samples/AndreGoepel.Marten.Identity.Sample/Components/Pages/Setup.razor`](samples/AndreGoepel.Marten.Identity.Sample/Components/Pages/Setup.razor)
 for a worked example. If you skip the hatch, the rejection message on an unauthenticated
 caller names it explicitly.
 

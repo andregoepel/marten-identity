@@ -14,9 +14,9 @@
     <File Path="samples/Directory.Build.props" />
     <File Path="samples/Directory.Packages.props" />
     <File Path="samples/README.md" />
-    <Project Path="samples/MartenIdentity.Aspire.AppHost/MartenIdentity.Aspire.AppHost.csproj" />
-    <Project Path="samples/MartenIdentity.Aspire.ServiceDefaults/MartenIdentity.Aspire.ServiceDefaults.csproj" />
-    <Project Path="samples/MartenIdentity.Aspire.Web/MartenIdentity.Aspire.Web.csproj" />
+    <Project Path="samples/AndreGoepel.Marten.Identity.AppHost/AndreGoepel.Marten.Identity.AppHost.csproj" />
+    <Project Path="samples/AndreGoepel.Marten.Identity.ServiceDefaults/AndreGoepel.Marten.Identity.ServiceDefaults.csproj" />
+    <Project Path="samples/AndreGoepel.Marten.Identity.Sample/AndreGoepel.Marten.Identity.Sample.csproj" />
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/AndreGoepel.Marten.Identity.Tests/AndreGoepel.Marten.Identity.Tests.csproj" />

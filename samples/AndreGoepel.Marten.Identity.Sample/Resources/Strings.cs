@@ -1,4 +1,4 @@
-namespace MartenIdentity.Aspire.Web.Resources;
+namespace AndreGoepel.Marten.Identity.Sample.Resources;
 
 /// <summary>
 /// Marker type for the sample app's own UI strings — the generic argument of

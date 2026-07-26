@@ -15,7 +15,7 @@ namespace AndreGoepel.Marten.Identity.E2ETests.Infrastructure;
 /// </summary>
 public sealed class E2EAppFixture : IAsyncLifetime
 {
-    // Resource name as declared in samples/MartenIdentity.Aspire.AppHost/AppHost.cs.
+    // Resource name as declared in samples/AndreGoepel.Marten.Identity.AppHost/AppHost.cs.
     private const string WebResource = "web";
 
     private DistributedApplication? _app;
@@ -40,7 +40,7 @@ public sealed class E2EAppFixture : IAsyncLifetime
         // E2E=true tells the AppHost to run Postgres without its persistent volume, so every
         // suite run starts from an empty database instead of the developer's local data.
         var appHostBuilder =
-            await DistributedApplicationTestingBuilder.CreateAsync<Projects.MartenIdentity_Aspire_AppHost>([
+            await DistributedApplicationTestingBuilder.CreateAsync<Projects.AndreGoepel_Marten_Identity_AppHost>([
                 "E2E=true",
             ]);
 

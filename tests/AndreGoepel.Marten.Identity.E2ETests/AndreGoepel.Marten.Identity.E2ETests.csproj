@@ -24,6 +24,6 @@
 
   <ItemGroup>
     <!-- The sample AppHost boots the real app graph (Postgres + the sample web app). -->
-    <ProjectReference Include="..\..\samples\MartenIdentity.Aspire.AppHost\MartenIdentity.Aspire.AppHost.csproj" />
+    <ProjectReference Include="..\..\samples\AndreGoepel.Marten.Identity.AppHost\AndreGoepel.Marten.Identity.AppHost.csproj" />
   </ItemGroup>
 </Project>
