@@ -1,7 +1,10 @@
 @page "/Account/AccessDenied"
 @attribute [AllowAnonymous]
+@inherits IdentityLocalizedComponentBase
 
 @inject NavigationManager NavigationManager
+
+<AppPageTitle Title="@T("AccessDenied.PageTitle")" />
 
 @code {
     protected override void OnInitialized()

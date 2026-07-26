@@ -4,7 +4,7 @@ using Marten.Events.Aggregation;
 
 namespace AndreGoepel.Marten.Identity.Roles;
 
-internal partial class RoleProjection : SingleStreamProjection<Role, Guid>
+internal sealed partial class RoleProjection : SingleStreamProjection<Role, Guid>
 {
     [SuppressMessage(
         "Performance",

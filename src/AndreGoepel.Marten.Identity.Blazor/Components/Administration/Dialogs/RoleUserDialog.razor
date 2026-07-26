@@ -2,6 +2,7 @@
 @inject DialogService DialogService
 @inject ConfirmService Confirm
 @inject UserManager<User> UserManager
+@inject UserStore<User> UserStore
 @inject RoleManager<Role> RoleManager
 
 <RadzenStack Gap="1rem" Orientation="Orientation.Vertical" JustifyContent="JustifyContent.SpaceBetween">
@@ -56,7 +57,7 @@
                 return;
             }
 
-            var deleteResult = await UserManager.RemoveFromRoleAsync(user, _role.Name);
+            var deleteResult = await UserStore.RemoveFromRoleAsync(user, _role.Name, CancellationToken.None);
             if (deleteResult.Succeeded)
             {
                 _users = _users.Where(u => u.Id != user.Id).ToList();

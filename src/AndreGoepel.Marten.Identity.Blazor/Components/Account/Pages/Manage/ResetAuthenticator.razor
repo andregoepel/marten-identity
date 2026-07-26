@@ -17,7 +17,6 @@
         <RadzenCard>
             <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
 
-            <!-- Warning (prominent, danger style) -->
             <RadzenAlert AlertStyle="AlertStyle.Danger" Icon="warning" AllowClose="false">
                 <div class="font-medium">
                     @T("ResetAuthenticator.AlertLine1")
@@ -28,7 +27,6 @@
                 </div>
             </RadzenAlert>
 
-            <!-- Action area -->
             <RadzenStack Gap="1.5rem" AlignItems="AlignItems.Center">
 
                 <form method="post" action="/Account/Manage/ResetAuthenticator/ConfirmReset">

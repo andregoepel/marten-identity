@@ -34,7 +34,7 @@ public sealed record RecoveryCodeLoginInfo(string Code, string? ReturnUrl);
 /// session fixation). The handle itself is opaque and strictly single-use.
 /// </para>
 /// </summary>
-public class CookieLoginMiddleware(RequestDelegate next)
+public sealed class CookieLoginMiddleware(RequestDelegate next)
 {
     private const string DefaultRedirect = "/dashboard";
 

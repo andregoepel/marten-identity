@@ -20,7 +20,6 @@
         <RadzenCard>
             <RadzenStack Orientation="Orientation.Vertical" Gap="2rem" AlignItems="AlignItems.Stretch">
 
-            <!-- Starke Warnung -->
             <RadzenAlert AlertStyle="AlertStyle.Danger"
                          AllowClose="false"
                          Icon="warning"
@@ -96,7 +95,6 @@
             return;
         }
 
-        // Zweifache Absicherung über Dialog
         var confirm = await Confirm.ConfirmAsync(
             T("DeletePersonalData.ConfirmMessage"),
             T("DeletePersonalData.ConfirmTitle"),
@@ -114,7 +112,6 @@
 
         try
         {
-            // Passwort prüfen
             if (!await UserManager.CheckPasswordAsync(_currentUser, model.Password))
             {
                 NotificationService.Notify(NotificationSeverity.Error, T("DeletePersonalData.ErrorTitle"), T("DeletePersonalData.WrongPasswordDetail"));
@@ -149,14 +146,10 @@
         finally
         {
             _isDeleting = false;
-            StateHasChanged();
         }
     }
 
-    // Validation lives in the markup as Radzen validator components. RadzenTemplateForm
-    // (wrapped by CardForm) does not evaluate DataAnnotations and no DataAnnotationsValidator
-    // is present, so attributes here would never run — they were removed rather than
-    // translated into a second, silently-dead set of messages (#114).
+    // Validation lives in the markup as Radzen validators — RadzenTemplateForm/CardForm don't run DataAnnotations (#114).
     private sealed class InputModel
     {
         [DataType(DataType.Password)]

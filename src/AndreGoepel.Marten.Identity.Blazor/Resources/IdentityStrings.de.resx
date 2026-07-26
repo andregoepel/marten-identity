@@ -162,6 +162,9 @@
   <data name="InvalidPasswordReset.Detail" xml:space="preserve"><value><![CDATA[Der Link zum Zurücksetzen des Passworts ist ungültig.]]></value></data>
   <data name="InvalidPasswordReset.RequestNewLink" xml:space="preserve"><value><![CDATA[Neuen Link anfordern]]></value></data>
 
+  <!-- AccessDenied.razor -->
+  <data name="AccessDenied.PageTitle" xml:space="preserve"><value><![CDATA[Zugriff verweigert]]></value></data>
+
   <!-- InvalidUser.razor -->
   <data name="InvalidUser.PageTitle" xml:space="preserve"><value><![CDATA[Ungültiger Benutzer]]></value></data>
   <data name="InvalidUser.Heading" xml:space="preserve"><value><![CDATA[Ungültiger Benutzer]]></value></data>
@@ -684,4 +687,6 @@
     <comment>{0} is the Administrator role name (data, not translated).</comment>
   </data>
   <data name="UserRoleDialog.WarningTitle" xml:space="preserve"><value><![CDATA[Warnung]]></value></data>
+  <data name="UserRoleDialog.ErrorTitle" xml:space="preserve"><value><![CDATA[Fehler]]></value></data>
+  <data name="UserRoleDialog.RolesCouldNotBeSaved" xml:space="preserve"><value><![CDATA[Rollen konnten nicht gespeichert werden]]></value></data>
 </root>
