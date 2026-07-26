@@ -1,64 +1,38 @@
 using AndreGoepel.Marten.Configuration;
-using JasperFx;
 using Marten;
 using Microsoft.Extensions.DependencyInjection;
-using Testcontainers.PostgreSql;
 
 namespace AndreGoepel.Marten.Identity.IntegrationTests.Infrastructure;
 
 /// <summary>
-/// Spins up a Postgres container and a Marten <see cref="IDocumentStore"/>
-/// configured the way the production host configures it (projections,
-/// schemas, identity wiring). Lives for the whole test collection so we
-/// pay the container start-up cost once.
+/// Configures the shared <see cref="AndreGoepel.Marten.Testing.MartenFixture"/> the way the
+/// production host configures Marten (identity projections/schemas) via the package's documented
+/// <c>ConfigureStore</c>/<c>OnStoreInitializedAsync</c> extension hooks, instead of re-implementing
+/// the Postgres container lifecycle.
 /// </summary>
-public sealed class MartenFixture : IAsyncLifetime
+public sealed class MartenFixture : AndreGoepel.Marten.Testing.MartenFixture
 {
-    private PostgreSqlContainer _container = null!;
-
-    public IDocumentStore Store { get; private set; } = null!;
-
-    /// <summary>An <see cref="ISettingsStore"/> backed by <see cref="Store"/>, resolved
-    /// through the public DI registration rather than the package's internal type.</summary>
+    /// <summary>An <see cref="ISettingsStore"/> backed by <see cref="AndreGoepel.Marten.Testing.MartenFixture.Store"/>,
+    /// resolved through the public DI registration rather than the package's internal type.</summary>
     public ISettingsStore SettingsStore { get; private set; } = null!;
 
-    // Pin the Postgres image by digest (not a mutable tag) so the test/CI
-    // environment can't be fed a different image behind the same tag (#37).
-    // Update via Dependabot/manual bump together with the digest.
-    private const string PostgresImage =
-        "postgres:16-alpine@sha256:e013e867e712fec275706a6c51c966f0bb0c93cfa8f51000f85a15f9865a28cb";
+    protected override void ConfigureStore(StoreOptions options) => options.InitializeIdentity();
 
-    public async ValueTask InitializeAsync()
+    protected override async ValueTask OnStoreInitializedAsync()
     {
-        _container = new PostgreSqlBuilder(PostgresImage).Build();
-        await _container.StartAsync();
-
-        Store = DocumentStore.For(opts =>
-        {
-            opts.Connection(_container.GetConnectionString());
-            opts.InitializeIdentity();
-            opts.AutoCreateSchemaObjects = AutoCreate.All;
-        });
-
         var services = new ServiceCollection();
         services.AddSingleton(Store);
         services.AddMartenConfiguration();
         SettingsStore = services.BuildServiceProvider().GetRequiredService<ISettingsStore>();
     }
 
-    public async ValueTask DisposeAsync()
-    {
-        await Store.DisposeAsync();
-        await _container.DisposeAsync();
-    }
-
     /// <summary>
-    /// Wipes documents and event streams between tests without dropping
-    /// the schema (the schema rebuild is the slow part).
+    /// Wipes documents and event streams between tests without dropping the schema (the schema
+    /// rebuild is the slow part).
     /// </summary>
-    public async Task ResetAsync(CancellationToken cancellationToken = default)
+    public override async Task ResetAsync(CancellationToken cancellationToken = default)
     {
-        await Store.Advanced.Clean.DeleteAllDocumentsAsync(cancellationToken);
+        await base.ResetAsync(cancellationToken);
         await Store.Advanced.Clean.DeleteAllEventDataAsync(cancellationToken);
     }
 }
