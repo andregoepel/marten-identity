@@ -370,6 +370,7 @@
       "andregoepel.marten.identity": {
         "type": "Project",
         "dependencies": {
+          "AndreGoepel.Core": "[1.0.1, )",
           "AndreGoepel.Marten.Configuration": "[1.0.1, )",
           "AndreGoepel.Marten.Identity.Abstractions": "[1.8.0, )",
           "Marten": "[9.19.0, )",
@@ -389,6 +390,12 @@
           "Marten": "[9.19.0, )",
           "Radzen.Blazor": "[11.1.7, )"
         }
+      },
+      "AndreGoepel.Core": {
+        "type": "CentralTransitive",
+        "requested": "[1.0.1, )",
+        "resolved": "1.0.1",
+        "contentHash": "jA27iMianyxUdrCtz5b6KxZOYxXlhZqkxDVKD6sed1sDCHF1upfV28CnczJ6kYPcrqJNj9+cDaxMWPlNvDkjcA=="
       },
       "AndreGoepel.Design.Blazor": {
         "type": "CentralTransitive",

@@ -27,6 +27,7 @@
     <PackageReference Include="Marten.AspNetCore" />
     <PackageReference Include="Quartz.Extensions.Hosting" />
     <PackageReference Include="AndreGoepel.Marten.Configuration" />
+    <PackageReference Include="AndreGoepel.Core" />
   </ItemGroup>
 
   <ItemGroup>

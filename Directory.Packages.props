@@ -14,6 +14,10 @@
     <PackageVersion Include="AngleSharp" Version="1.5.2" />
   </ItemGroup>
 
+  <ItemGroup Label="Core">
+    <PackageVersion Include="AndreGoepel.Core" Version="1.0.1" />
+  </ItemGroup>
+
   <ItemGroup Label="Marten">
     <PackageVersion Include="Marten" Version="9.19.0" />
     <PackageVersion Include="Marten.AspNetCore" Version="9.19.0" />
