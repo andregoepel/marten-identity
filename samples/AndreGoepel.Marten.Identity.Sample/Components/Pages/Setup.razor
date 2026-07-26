@@ -6,12 +6,14 @@
 @using AndreGoepel.Marten.Identity
 @using AndreGoepel.Marten.Identity.Blazor.Components.Layout
 @using AndreGoepel.Marten.Identity.Services
-@using Marten
 @using Microsoft.AspNetCore.Identity
 
 @inject UserManager<User> UserManager
 @inject IIdentityAuthorizer Authorizer
-@inject IQuerySession QuerySession
+@* This project's own namespace starts with "AndreGoepel.Marten...", which shadows the
+   Marten package's top-level namespace for unqualified/"@using Marten" lookups here, so
+   IQuerySession needs the global:: qualifier. *@
+@inject global::Marten.IQuerySession QuerySession
 @inject NavigationManager Nav
 @inject IStringLocalizer<Strings> L
 

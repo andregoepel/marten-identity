@@ -3,11 +3,11 @@ using AndreGoepel.Marten.Identity;
 using AndreGoepel.Marten.Identity.Blazor;
 using AndreGoepel.Marten.Identity.Blazor.Components.Account;
 using AndreGoepel.Marten.Identity.Blazor.Features;
+using AndreGoepel.Marten.Identity.Sample.Components;
+using AndreGoepel.Marten.Identity.Sample.Services;
 using AndreGoepel.Marten.Identity.Users;
 using JasperFx;
 using Marten;
-using MartenIdentity.Aspire.Web.Components;
-using MartenIdentity.Aspire.Web.Services;
 using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Identity;
 using Radzen;
@@ -22,7 +22,7 @@ var connectionString =
     builder.Configuration.GetConnectionString("identitydb")
     ?? throw new InvalidOperationException(
         "Connection string 'identitydb' was not found. Run the sample through the "
-            + "MartenIdentity.Aspire.AppHost project so Aspire can provision PostgreSQL."
+            + "AndreGoepel.Marten.Identity.AppHost project so Aspire can provision PostgreSQL."
     );
 
 // Blazor Server with interactive server components (the Identity UI opts in per-page).

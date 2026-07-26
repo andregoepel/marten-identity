@@ -8,6 +8,6 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\AndreGoepel.Marten.Identity\AndreGoepel.Marten.Identity.csproj" />
     <ProjectReference Include="..\..\src\AndreGoepel.Marten.Identity.Blazor\AndreGoepel.Marten.Identity.Blazor.csproj" />
-    <ProjectReference Include="..\MartenIdentity.Aspire.ServiceDefaults\MartenIdentity.Aspire.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\AndreGoepel.Marten.Identity.ServiceDefaults\AndreGoepel.Marten.Identity.ServiceDefaults.csproj" />
   </ItemGroup>
 </Project>

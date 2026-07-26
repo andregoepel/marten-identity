@@ -1,7 +1,7 @@
 using AndreGoepel.Marten.Identity.Users;
 using Microsoft.AspNetCore.Identity;
 
-namespace MartenIdentity.Aspire.Web.Services;
+namespace AndreGoepel.Marten.Identity.Sample.Services;
 
 /// <summary>
 /// A development <see cref="IEmailSender{TUser}"/> that logs the messages the Identity UI

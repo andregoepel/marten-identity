@@ -2,7 +2,7 @@
 
 Browser-driven end-to-end tests for the Identity UI shipped by
 `AndreGoepel.Marten.Identity.Blazor`. The suite boots the sample Aspire graph
-(`samples/MartenIdentity.Aspire.AppHost` → PostgreSQL + the sample web app) via
+(`samples/AndreGoepel.Marten.Identity.AppHost` → PostgreSQL + the sample web app) via
 **Aspire.Hosting.Testing** and drives it with **Playwright** (Chromium).
 
 ## What it covers

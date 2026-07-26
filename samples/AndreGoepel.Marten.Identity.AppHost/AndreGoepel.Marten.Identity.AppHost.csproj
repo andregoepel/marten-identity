@@ -13,6 +13,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MartenIdentity.Aspire.Web\MartenIdentity.Aspire.Web.csproj" />
+    <ProjectReference Include="..\AndreGoepel.Marten.Identity.Sample\AndreGoepel.Marten.Identity.Sample.csproj" />
   </ItemGroup>
 </Project>

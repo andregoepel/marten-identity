@@ -10,9 +10,9 @@ you login, registration, 2FA, passkeys, and user/role administration out of the 
 
 | Project | Role |
 |---|---|
-| [`MartenIdentity.Aspire.AppHost`](MartenIdentity.Aspire.AppHost) | Aspire orchestrator — provisions PostgreSQL + pgAdmin and launches the web app. Set it as the startup project. |
-| [`MartenIdentity.Aspire.ServiceDefaults`](MartenIdentity.Aspire.ServiceDefaults) | Shared Aspire defaults — OpenTelemetry, health checks, service discovery, resilience. |
-| [`MartenIdentity.Aspire.Web`](MartenIdentity.Aspire.Web) | Blazor Server app consuming the Identity libraries (referenced from `../src` as project references). |
+| [`AndreGoepel.Marten.Identity.AppHost`](AndreGoepel.Marten.Identity.AppHost) | Aspire orchestrator — provisions PostgreSQL + pgAdmin and launches the web app. Set it as the startup project. |
+| [`AndreGoepel.Marten.Identity.ServiceDefaults`](AndreGoepel.Marten.Identity.ServiceDefaults) | Shared Aspire defaults — OpenTelemetry, health checks, service discovery, resilience. |
+| [`AndreGoepel.Marten.Identity.Sample`](AndreGoepel.Marten.Identity.Sample) | Blazor Server app consuming the Identity libraries (referenced from `../src` as project references). |
 
 ## Prerequisites
 
@@ -27,7 +27,7 @@ Radzen 11.1.0, OpenTelemetry 1.16.0).
 ## Run it
 
 ```bash
-dotnet run --project samples/MartenIdentity.Aspire.AppHost
+dotnet run --project samples/AndreGoepel.Marten.Identity.AppHost
 ```
 
 The Aspire dashboard opens in your browser. From there:
@@ -43,14 +43,14 @@ The Aspire dashboard opens in your browser. From there:
 ### Email links (confirmation / password reset)
 
 This sample has no real email provider. The
-[`LoggingEmailSender`](MartenIdentity.Aspire.Web/Services/LoggingEmailSender.cs) writes the
+[`LoggingEmailSender`](AndreGoepel.Marten.Identity.Sample/Services/LoggingEmailSender.cs) writes the
 confirmation and password-reset links to the logs instead — read them from the **web**
 resource's **Console logs** in the Aspire dashboard. Replace it with a real
 `IEmailSender<User>` before deploying.
 
 ## How the wiring works
 
-[`Program.cs`](MartenIdentity.Aspire.Web/Program.cs) follows the libraries' documented setup:
+[`Program.cs`](AndreGoepel.Marten.Identity.Sample/Program.cs) follows the libraries' documented setup:
 
 - `builder.AddServiceDefaults()` — Aspire telemetry/health/service-discovery.
 - The PostgreSQL connection string arrives from the AppHost as the **`identitydb`**
@@ -64,7 +64,7 @@ resource's **Console logs** in the Aspire dashboard. Replace it with a real
   are discoverable.
 
 The host also supplies the pieces the library expects from its host: a `/Setup` page
-([`Setup.razor`](MartenIdentity.Aspire.Web/Components/Pages/Setup.razor), which bootstraps the
+([`Setup.razor`](AndreGoepel.Marten.Identity.Sample/Components/Pages/Setup.razor), which bootstraps the
 first admin inside `IIdentityAuthorizer.BeginSystemScope()`), an `IEmailSender<User>`, and a
 `MainLayout` that hosts the Radzen overlay components. DataProtection keys are persisted to a
 local `keys/` folder so cookies survive restarts.

@@ -2,7 +2,7 @@ using System.Collections.Concurrent;
 using AndreGoepel.Marten.Identity.Users;
 using Microsoft.AspNetCore.Identity;
 
-namespace MartenIdentity.Aspire.Web.Services;
+namespace AndreGoepel.Marten.Identity.Sample.Services;
 
 /// <summary>
 /// A drop-in <see cref="IEmailSender{TUser}"/> used only when the app runs under the E2E harness
