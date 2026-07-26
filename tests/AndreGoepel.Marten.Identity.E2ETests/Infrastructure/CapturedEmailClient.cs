@@ -1,14 +1,17 @@
 using System.Net;
 using System.Text.Json;
+using AndreGoepel.Testing.E2E;
 
 namespace AndreGoepel.Marten.Identity.E2ETests.Infrastructure;
 
 /// <summary>
 /// Reads the confirmation/reset links the sample captured, via its E2E-only <c>/e2e/emails</c>
 /// endpoint (enabled by <c>E2E=true</c>). The sample sends no real email, so this stands in for the
-/// mail-server client a MailHog/SMTP setup would use — but without an extra container.
+/// mail-server client a MailHog/SMTP setup would use — but without an extra container. Implements
+/// <see cref="IEmailLinkSource"/> so it can be wired in as the shared fixture's mail source via
+/// <see cref="E2EAppFixtureOptions.MailSourceFactory"/>.
 /// </summary>
-public sealed class CapturedEmailClient(string appBaseUrl) : IDisposable
+public sealed class CapturedEmailClient(string appBaseUrl) : IEmailLinkSource, IDisposable
 {
     private readonly HttpClient _http = new(
         new HttpClientHandler

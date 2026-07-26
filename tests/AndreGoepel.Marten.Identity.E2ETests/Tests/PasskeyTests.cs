@@ -6,7 +6,7 @@ namespace AndreGoepel.Marten.Identity.E2ETests.Tests;
 /// Covers the WebAuthn/passkey journeys using a Chromium CDP virtual authenticator that
 /// auto-satisfies user presence/verification, so create/get ceremonies complete headlessly.
 /// </summary>
-public sealed class PasskeyTests(E2EAppFixture fixture) : E2ETestBase(fixture)
+public sealed class PasskeyTests(E2EAppFixture fixture) : E2ETestBase<E2EAppFixture>(fixture)
 {
     [Fact]
     public async Task RegisterPasskey_ThenRename_AppearsInList()
@@ -62,7 +62,6 @@ public sealed class PasskeyTests(E2EAppFixture fixture) : E2ETestBase(fixture)
     private async Task<string> CreateConfirmedUserAndLoginAsync()
     {
         await Fixture.ProvisionAdminAsync();
-        await Fixture.Email.ClearAsync();
         var email = await RegisterAsync();
         await Page.WaitForURLAsync(url =>
             url.Contains("RegisterConfirmation", StringComparison.OrdinalIgnoreCase)

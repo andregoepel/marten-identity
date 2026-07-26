@@ -3,14 +3,13 @@ using AndreGoepel.Marten.Identity.E2ETests.Infrastructure;
 namespace AndreGoepel.Marten.Identity.E2ETests.Tests;
 
 /// <summary>Covers the self-service registration path and its email-confirmation gate.</summary>
-public sealed class RegistrationTests(E2EAppFixture fixture) : E2ETestBase(fixture)
+public sealed class RegistrationTests(E2EAppFixture fixture) : E2ETestBase<E2EAppFixture>(fixture)
 {
     [Fact]
     public async Task Register_ThenConfirmEmail_AllowsLogin()
     {
         // Arrange — the setup gate must be past so /Account/Register is reachable.
         await Fixture.ProvisionAdminAsync();
-        await Fixture.Email.ClearAsync();
 
         // Act
         var email = await RegisterAsync();

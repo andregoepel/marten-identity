@@ -8,7 +8,7 @@ namespace AndreGoepel.Marten.Identity.E2ETests.Tests;
 /// registration untouched (#100). This is the flow that closes the "no way to add a user
 /// when registration is disabled" gap.
 /// </summary>
-public sealed class InvitationTests(E2EAppFixture fixture) : E2ETestBase(fixture)
+public sealed class InvitationTests(E2EAppFixture fixture) : E2ETestBase<E2EAppFixture>(fixture)
 {
     [Fact]
     public async Task Admin_InvitesUser_InviteeSetsPassword_AndIsSignedIn()
@@ -26,7 +26,7 @@ public sealed class InvitationTests(E2EAppFixture fixture) : E2ETestBase(fixture
 
         // The invitation link is captured from the outgoing mail (the sample's default
         // sender routes invitations through the password-reset path).
-        var link = await Fixture.Email.WaitForLinkAsync(
+        var link = await Fixture.Mail!.WaitForLinkAsync(
             invitee,
             "Account/AcceptInvitation",
             ct: TestContext.Current.CancellationToken
@@ -75,7 +75,7 @@ public sealed class InvitationTests(E2EAppFixture fixture) : E2ETestBase(fixture
         await Page.ClickButtonAsync("Invite user");
         await Page.FillFieldAsync("Email", invitee);
         await Page.ClickButtonAsync("Send invitation");
-        var link = await Fixture.Email.WaitForLinkAsync(
+        var link = await Fixture.Mail!.WaitForLinkAsync(
             invitee,
             "Account/AcceptInvitation",
             ct: TestContext.Current.CancellationToken

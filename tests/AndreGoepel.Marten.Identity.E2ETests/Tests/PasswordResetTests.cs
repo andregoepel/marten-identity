@@ -3,14 +3,13 @@ using AndreGoepel.Marten.Identity.E2ETests.Infrastructure;
 namespace AndreGoepel.Marten.Identity.E2ETests.Tests;
 
 /// <summary>Covers the forgot-password / reset-password / resend-confirmation flows end to end.</summary>
-public sealed class PasswordResetTests(E2EAppFixture fixture) : E2ETestBase(fixture)
+public sealed class PasswordResetTests(E2EAppFixture fixture) : E2ETestBase<E2EAppFixture>(fixture)
 {
     [Fact]
     public async Task ForgotPassword_ResetLink_AllowsLoginWithNewPassword()
     {
         // Arrange — a confirmed user we can safely change (never the shared admin).
         await Fixture.ProvisionAdminAsync();
-        await Fixture.Email.ClearAsync();
         var email = await RegisterAsync();
         await Page.WaitForURLAsync(url =>
             url.Contains("RegisterConfirmation", StringComparison.OrdinalIgnoreCase)
@@ -18,14 +17,13 @@ public sealed class PasswordResetTests(E2EAppFixture fixture) : E2ETestBase(fixt
         await ConfirmEmailAsync(email);
 
         // Act — request the reset, follow the emailed link, set a new password.
-        await Fixture.Email.ClearAsync();
         await Page.GotoAsync("/Account/ForgotPassword");
         await Page.WaitForBlazorAsync();
         await Page.FillFieldAsync("Email", email);
         await Page.ClickButtonAsync("Reset password");
         await Page.AssertOnPathAsync("Account/ForgotPasswordConfirmation");
 
-        var resetLink = await Fixture.Email.WaitForLinkAsync(
+        var resetLink = await Fixture.Mail!.WaitForLinkAsync(
             email,
             "Account/ResetPassword",
             ct: TestContext.Current.CancellationToken
