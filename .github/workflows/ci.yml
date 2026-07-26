@@ -7,82 +7,19 @@ on:
   pull_request:
     branches: ["main"]
 
-# Actions are pinned to commit SHAs (not mutable tags) so a retagged or
-# compromised action version cannot silently enter the pipeline (#35). The
-# trailing comment records the human-readable version each SHA corresponds to.
 jobs:
-  build-and-test:
-    runs-on: ubuntu-latest
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
-        with:
-          dotnet-version: "10.0.x"
-
-      # --locked-mode fails the build if the committed packages.lock.json files
-      # would change, making restores reproducible and tamper-evident (#36).
-      - name: Restore
-        run: dotnet restore --locked-mode
-
-      - name: Restore tools
-        run: dotnet tool restore
-
-      - name: Format check
-        run: dotnet csharpier check .
-
-      - name: Build
-        run: dotnet build --no-restore -c Release
-
+  ci:
+    uses: andregoepel/workflows/.github/workflows/ci-library.yml@main
+    with:
       # The E2E suite (Aspire + Playwright) needs Docker and browser binaries, so it runs
       # in its own workflow (e2e.yml) and is excluded from the fast main pipeline here.
-      - name: Test
-        run: dotnet test --no-build -c Release --filter "FullyQualifiedName!~E2ETests"
-
-      # Fail the build on any known-vulnerable package (direct or transitive) (#39).
-      - name: Vulnerability scan
-        run: |
-          dotnet list package --vulnerable --include-transitive 2>&1 | tee vulnerable.txt
-          if grep -qiE '\b(Critical|High|Moderate|Low)\b' vulnerable.txt; then
-            echo "::error::Vulnerable NuGet packages detected (see log above)."
-            exit 1
-          fi
-
-  pack-and-publish:
-    needs: build-and-test
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/v')
-
+      test-filter: "FullyQualifiedName!~E2ETests"
+      pack-projects: |
+        src/AndreGoepel.Marten.Identity.Abstractions/AndreGoepel.Marten.Identity.Abstractions.csproj
+        src/AndreGoepel.Marten.Identity/AndreGoepel.Marten.Identity.csproj
+        src/AndreGoepel.Marten.Identity.Blazor/AndreGoepel.Marten.Identity.Blazor.csproj
+    secrets:
+      NUGET_USER: ${{ secrets.NUGET_USER }}
     permissions:
-      id-token: write # request the OIDC token for NuGet trusted publishing
+      id-token: write # NuGet OIDC trusted publishing
       contents: read
-
-    steps:
-      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
-
-      - uses: actions/setup-dotnet@a98b56852c35b8e3190ac28c8c2271da59106c68 # v6.0.0
-        with:
-          dotnet-version: "10.0.x"
-
-      - name: Pack
-        run: |
-          VERSION="${GITHUB_REF_NAME#v}"
-          dotnet pack src/AndreGoepel.Marten.Identity.Abstractions/AndreGoepel.Marten.Identity.Abstractions.csproj \
-            -c Release -p:Version=$VERSION -p:RestoreLockedMode=true -o nupkgs
-          dotnet pack src/AndreGoepel.Marten.Identity/AndreGoepel.Marten.Identity.csproj \
-            -c Release -p:Version=$VERSION -p:RestoreLockedMode=true -o nupkgs
-          dotnet pack src/AndreGoepel.Marten.Identity.Blazor/AndreGoepel.Marten.Identity.Blazor.csproj \
-            -c Release -p:Version=$VERSION -p:RestoreLockedMode=true -o nupkgs
-
-      # Trusted publishing: exchange the GitHub OIDC token for a short-lived
-      # nuget.org API key. Requires a trusted publishing policy on nuget.org
-      # (owner: andregoepel, repository: marten-identity, workflow: ci.yml).
-      - name: NuGet login (OIDC → temporary API key)
-        uses: NuGet/login@8d196754b4036150537f80ac539e15c2f1028841 # v1
-        id: login
-        with:
-          user: ${{ secrets.NUGET_USER }}
-
-      - name: Push to NuGet
-        run: dotnet nuget push "nupkgs/*.nupkg" --api-key ${{ steps.login.outputs.NUGET_API_KEY }} --source https://api.nuget.org/v3/index.json
