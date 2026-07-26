@@ -25,14 +25,14 @@ public class CookieLoginMiddlewareTests
         var store = Substitute.For<IUserStore<User>>();
         var userManager = Substitute.For<UserManager<User>>(
             store,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!
         );
         return Substitute.For<SignInManager<User>>(
             userManager,

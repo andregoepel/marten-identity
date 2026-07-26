@@ -73,14 +73,14 @@ public class ChangePasswordValidationTests : BunitContext
         // Arrange
         var um = Substitute.For<UserManager<User>>(
             Substitute.For<IUserStore<User>>(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!
         );
         var cut = Render(um);
 

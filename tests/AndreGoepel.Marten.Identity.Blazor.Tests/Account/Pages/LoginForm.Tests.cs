@@ -22,14 +22,14 @@ public class LoginFormTests : BunitContext
     private static UserManager<User> BuildUserManager() =>
         Substitute.For<UserManager<User>>(
             Substitute.For<IUserStore<User>>(),
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null,
-            null
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!,
+            null!
         );
 
     private static SignInManager<User> BuildSignInManager(UserManager<User> userManager) =>
