@@ -6,7 +6,7 @@ namespace AndreGoepel.Marten.Identity.E2ETests.Tests;
 public sealed class AppPagesTests(E2EAppFixture fixture) : E2ETestBase(fixture)
 {
     [Fact]
-    public async Task SampleHome_Renders()
+    public async Task SampleHome_Navigated_RendersExpectedTitle()
     {
         // Arrange
         await Fixture.ProvisionAdminAsync();
@@ -20,7 +20,7 @@ public sealed class AppPagesTests(E2EAppFixture fixture) : E2ETestBase(fixture)
     }
 
     [Fact]
-    public async Task UserCleanup_LoadsForAdministrator()
+    public async Task UserCleanup_AdminNavigates_PageLoads()
     {
         // Arrange
         await LoginAsAdminAsync();

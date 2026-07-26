@@ -33,18 +33,21 @@ public class LoginFormLocalizationTests : BunitContext
     [Theory]
     [InlineData("en", "Invalid login attempt.", "Login error")]
     [InlineData("de", "Ungültiger Anmeldeversuch.", "Anmeldefehler")]
-    public async Task UnknownEmail_ShowsTheAntiEnumerationMessage(
+    public async Task LoginForm_UnknownEmail_ShowsAntiEnumerationMessage(
         string culture,
         string expectedDetail,
         string expectedSummary
     )
     {
+        // Arrange
         using var _ = new CultureScope(culture);
 
+        // Act
         var message = await CaptureNotification(
             (um, _) => um.FindByEmailAsync(Arg.Any<string>()).Returns((User?)null)
         );
 
+        // Assert
         Assert.Equal(expectedDetail, message.Detail);
         Assert.Equal(expectedSummary, message.Summary);
     }
@@ -52,14 +55,16 @@ public class LoginFormLocalizationTests : BunitContext
     [Theory]
     [InlineData("en", "Invalid login attempt.", "Login error")]
     [InlineData("de", "Ungültiger Anmeldeversuch.", "Anmeldefehler")]
-    public async Task WrongPassword_ShowsTheIdenticalAntiEnumerationMessage(
+    public async Task LoginForm_WrongPassword_ShowsIdenticalAntiEnumerationMessage(
         string culture,
         string expectedDetail,
         string expectedSummary
     )
     {
+        // Arrange
         using var _ = new CultureScope(culture);
 
+        // Act
         var message = await CaptureNotification(
             (um, sm) =>
             {
@@ -71,6 +76,7 @@ public class LoginFormLocalizationTests : BunitContext
             }
         );
 
+        // Assert
         // Same expected text as the unknown-email case above — that identity is the whole
         // point of the anti-enumeration invariant.
         Assert.Equal(expectedDetail, message.Detail);
@@ -78,12 +84,15 @@ public class LoginFormLocalizationTests : BunitContext
     }
 
     [Fact]
-    public void GermanCulture_RendersGermanLabels_WithoutLocalizationRegistered()
+    public void LoginForm_GermanCulture_RendersGermanLabelsWithoutLocalizationRegistered()
     {
+        // Arrange
         using var _ = new CultureScope("de");
 
+        // Act
         var (cut, _) = Render();
 
+        // Assert
         Assert.Equal("E-Mail", cut.Find("label[for=Email]").TextContent.Trim());
         Assert.Equal("Passwort", cut.Find("label[for=Password]").TextContent.Trim());
     }

@@ -10,13 +10,16 @@ public class InitializationTests
     // from DesignBlazorOptions.BrandName. AddMartenIdentityBlazor must feed the configured
     // ApplicationName into it, or every page title silently loses its brand suffix (#113).
     [Fact]
-    public void AddMartenIdentityBlazor_FeedsApplicationNameIntoDesignBrandName()
+    public void AddMartenIdentityBlazor_ApplicationNameConfigured_FeedsIntoDesignBrandName()
     {
+        // Arrange
         var services = new ServiceCollection();
         services.AddLogging();
 
+        // Act
         services.AddMartenIdentityBlazor(o => o.ApplicationName = "Acme Identity");
 
+        // Assert
         using var provider = services.BuildServiceProvider();
         var brandName = provider
             .GetRequiredService<IOptions<DesignBlazorOptions>>()
@@ -31,13 +34,16 @@ public class InitializationTests
     // than resolution so DialogService's ctor (which needs an initialised
     // NavigationManager) doesn't have to run.
     [Fact]
-    public void AddMartenIdentityBlazor_RegistersConfirmService()
+    public void AddMartenIdentityBlazor_Default_RegistersConfirmService()
     {
+        // Arrange
         var services = new ServiceCollection();
         services.AddLogging();
 
+        // Act
         services.AddMartenIdentityBlazor();
 
+        // Assert
         Assert.Contains(services, s => s.ServiceType == typeof(ConfirmService));
     }
 }

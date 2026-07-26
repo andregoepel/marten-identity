@@ -82,7 +82,7 @@ public class ConfirmEmailChangeTests : BunitContext
     #region Missing parameters
 
     [Fact]
-    public void MissingParameters_ShowsInvalidLinkError()
+    public void ConfirmEmailChange_MissingParameters_ShowsInvalidLinkError()
     {
         // Arrange
         var userManager = BuildUserManager();
@@ -99,7 +99,7 @@ public class ConfirmEmailChangeTests : BunitContext
     #region User not found
 
     [Fact]
-    public void UserNotFound_ShowsGenericError_DoesNotReflectUserId()
+    public void ConfirmEmailChange_UserNotFound_ShowsGenericErrorWithoutReflectingUserId()
     {
         // Regression for #13: the supplied UserId must not be reflected back to the
         // client (information disclosure, CWE-204).
@@ -126,7 +126,7 @@ public class ConfirmEmailChangeTests : BunitContext
     #region Change email fails
 
     [Fact]
-    public void ChangeEmailFailed_ShowsErrorMessage()
+    public void ConfirmEmailChange_ChangeEmailFailed_ShowsErrorMessage()
     {
         // Arrange
         var user = new User { UserId = UserId.New() };
@@ -154,7 +154,7 @@ public class ConfirmEmailChangeTests : BunitContext
     #region Change email succeeds
 
     [Fact]
-    public void ChangeEmailSucceeded_ShowsSuccessMessage()
+    public void ConfirmEmailChange_ChangeEmailSucceeded_ShowsSuccessMessage()
     {
         // Arrange
         var user = new User { UserId = UserId.New() };
@@ -181,7 +181,7 @@ public class ConfirmEmailChangeTests : BunitContext
     }
 
     [Fact]
-    public void ChangeEmailSucceeded_ShowsGoToProfileButton()
+    public void ConfirmEmailChange_ChangeEmailSucceeded_ShowsGoToProfileButton()
     {
         // Arrange
         var user = new User { UserId = UserId.New() };

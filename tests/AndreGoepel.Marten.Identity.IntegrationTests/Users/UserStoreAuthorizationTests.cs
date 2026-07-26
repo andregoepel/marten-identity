@@ -27,13 +27,16 @@ public class UserStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task AddToRoleAsync_NonAdminActor_ReturnsNotAuthorized()
     {
+        // Arrange
         var target = await SeedUserAsync("target@example.com");
         await SeedRoleAsync("Member");
         var (store, _) = BuildEnforcing(UserId.New());
         var user = await store.FindByIdAsync(target.ToString(), Ct);
 
+        // Act
         var result = await store.AddToRoleAsync(user!, "MEMBER", Ct);
 
+        // Assert
         Assert.False(result.Succeeded);
         Assert.Contains(result.Errors, e => e.Code == "NotAuthorized");
     }
@@ -41,13 +44,16 @@ public class UserStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task AddToRoleAsync_AnonymousActor_ReturnsNotAuthorized()
     {
+        // Arrange
         var target = await SeedUserAsync("target@example.com");
         await SeedRoleAsync("Member");
         var (store, _) = BuildEnforcing(default); // Guid.Empty — fails closed
         var user = await store.FindByIdAsync(target.ToString(), Ct);
 
+        // Act
         var result = await store.AddToRoleAsync(user!, "MEMBER", Ct);
 
+        // Assert
         Assert.False(result.Succeeded);
         Assert.Contains(result.Errors, e => e.Code == "NotAuthorized");
     }
@@ -55,14 +61,17 @@ public class UserStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task AddToRoleAsync_AdminActor_Succeeds()
     {
+        // Arrange
         var admin = await SeedAdminAsync();
         var target = await SeedUserAsync("target@example.com");
         await SeedRoleAsync("Member");
         var (store, _) = BuildEnforcing(admin);
         var user = await store.FindByIdAsync(target.ToString(), Ct);
 
+        // Act
         await store.AddToRoleAsync(user!, "MEMBER", Ct);
 
+        // Assert
         var after = await store.FindByIdAsync(target.ToString(), Ct);
         Assert.Contains("Member", await store.GetRolesAsync(after!, Ct));
     }
@@ -70,14 +79,17 @@ public class UserStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task RemoveFromRoleAsync_NonAdminActor_ReturnsNotAuthorized()
     {
+        // Arrange
         var target = await SeedUserAsync("target@example.com");
         await SeedRoleAsync("Member");
         await AssignRoleAsSystemAsync(target, "MEMBER");
         var (store, _) = BuildEnforcing(UserId.New());
         var user = await store.FindByIdAsync(target.ToString(), Ct);
 
+        // Act
         var result = await store.RemoveFromRoleAsync(user!, "MEMBER", Ct);
 
+        // Assert
         Assert.False(result.Succeeded);
         Assert.Contains(result.Errors, e => e.Code == "NotAuthorized");
     }
@@ -87,12 +99,15 @@ public class UserStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task DeleteAsync_NonOwnerNonAdmin_ReturnsNotAuthorized()
     {
+        // Arrange
         var target = await SeedUserAsync("victim@example.com");
         var (store, _) = BuildEnforcing(UserId.New());
         var user = await store.FindByIdAsync(target.ToString(), Ct);
 
+        // Act
         var result = await store.DeleteAsync(user!, Ct);
 
+        // Assert
         Assert.False(result.Succeeded);
         Assert.Contains(result.Errors, e => e.Code == "NotAuthorized");
         var persisted = await store.FindByIdAsync(target.ToString(), Ct);
@@ -102,25 +117,31 @@ public class UserStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task DeleteAsync_Owner_Succeeds()
     {
+        // Arrange
         var target = await SeedUserAsync("self@example.com");
         var (store, _) = BuildEnforcing(target); // actor == target
         var user = await store.FindByIdAsync(target.ToString(), Ct);
 
+        // Act
         var result = await store.DeleteAsync(user!, Ct);
 
+        // Assert
         Assert.True(result.Succeeded);
     }
 
     [Fact]
     public async Task DeleteAsync_AdminActor_Succeeds()
     {
+        // Arrange
         var admin = await SeedAdminAsync();
         var target = await SeedUserAsync("victim@example.com");
         var (store, _) = BuildEnforcing(admin);
         var user = await store.FindByIdAsync(target.ToString(), Ct);
 
+        // Act
         var result = await store.DeleteAsync(user!, Ct);
 
+        // Assert
         Assert.True(result.Succeeded);
     }
 
@@ -129,6 +150,7 @@ public class UserStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task RestoreAsync_NonAdminActor_ReturnsNotAuthorized()
     {
+        // Arrange
         var admin = await SeedAdminAsync();
         var target = await SeedUserAsync("victim@example.com");
         var (adminStore, _) = BuildEnforcing(admin);
@@ -138,8 +160,10 @@ public class UserStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
         var (store, _) = BuildEnforcing(UserId.New());
         var user = await store.FindByIdAsync(target.ToString(), Ct);
 
+        // Act
         var result = await store.RestoreAsync(user!, Ct);
 
+        // Assert
         Assert.False(result.Succeeded);
         Assert.Contains(result.Errors, e => e.Code == "NotAuthorized");
     }
@@ -149,16 +173,19 @@ public class UserStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task SystemScope_BypassesAuthorization()
     {
+        // Arrange
         var target = await SeedUserAsync("target@example.com");
         await SeedRoleAsync("Member");
         var (store, authorizer) = BuildEnforcing(UserId.New()); // non-admin actor
         var user = await store.FindByIdAsync(target.ToString(), Ct);
 
+        // Act
         using (authorizer.BeginSystemScope())
         {
             await store.AddToRoleAsync(user!, "MEMBER", Ct);
         }
 
+        // Assert
         var after = await store.FindByIdAsync(target.ToString(), Ct);
         Assert.Contains("Member", await store.GetRolesAsync(after!, Ct));
     }

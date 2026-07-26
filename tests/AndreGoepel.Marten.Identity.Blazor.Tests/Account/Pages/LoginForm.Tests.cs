@@ -79,7 +79,7 @@ public class LoginFormTests : BunitContext
     #endregion
 
     [Fact]
-    public void RendersEmailPasswordRememberMeAndSubmit()
+    public void LoginForm_OnRender_ShowsEmailPasswordRememberMeAndSubmitFields()
     {
         // Arrange / Act
         var (cut, _) = Render();
@@ -91,7 +91,7 @@ public class LoginFormTests : BunitContext
     }
 
     [Fact]
-    public async Task Submit_UnknownEmail_ShowsErrorNotification_AndDoesNotNavigate()
+    public async Task Submit_UnknownEmail_ShowsErrorNotificationWithoutNavigating()
     {
         // Arrange
         var startUri = "http://localhost/";
@@ -152,7 +152,7 @@ public class LoginFormTests : BunitContext
     }
 
     [Fact]
-    public async Task Submit_ValidCreds_PostsHandoffToLogin_NotInUrl()
+    public async Task Submit_ValidCreds_PostsHandoffTokenWithoutExposingItInUrl()
     {
         // Arrange
         var user = new User { Email = "alice@example.com" };

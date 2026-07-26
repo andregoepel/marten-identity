@@ -28,12 +28,15 @@ public class RoleStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
     public ValueTask DisposeAsync() => ValueTask.CompletedTask;
 
     [Fact]
-    public async Task CreateAsync_NonAdminActor_ReturnsNotAuthorized_WithoutBootstrapHint()
+    public async Task CreateAsync_NonAdminActor_ReturnsNotAuthorizedWithoutBootstrapHint()
     {
+        // Arrange
         var (store, _) = BuildEnforcing(UserId.New()); // identified, but not an admin
 
+        // Act
         var result = await store.CreateAsync(new Role { Name = "Member" }, Ct);
 
+        // Assert
         Assert.False(result.Succeeded);
         var error = Assert.Single(result.Errors, e => e.Code == "NotAuthorized");
         Assert.Contains("administrator authority", error.Description);
@@ -41,12 +44,15 @@ public class RoleStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task CreateAsync_AnonymousActor_ReturnsNotAuthorized_NamingBeginSystemScope()
+    public async Task CreateAsync_AnonymousActor_ReturnsNotAuthorizedNamingBeginSystemScope()
     {
+        // Arrange
         var (store, _) = BuildEnforcing(default); // Guid.Empty — the first-run bootstrap trap
 
+        // Act
         var result = await store.CreateAsync(new Role { Name = "Member" }, Ct);
 
+        // Assert
         Assert.False(result.Succeeded);
         var error = Assert.Single(result.Errors, e => e.Code == "NotAuthorized");
         Assert.Contains("No user is authenticated", error.Description);
@@ -56,34 +62,41 @@ public class RoleStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task CreateAsync_AdminActor_Succeeds()
     {
+        // Arrange
         var admin = await SeedAdminAsync();
         var (store, _) = BuildEnforcing(admin);
 
+        // Act
         var result = await store.CreateAsync(new Role { Name = "Member" }, Ct);
 
+        // Assert
         Assert.True(result.Succeeded);
     }
 
     [Fact]
     public async Task CreateAsync_WithinSystemScope_Succeeds()
     {
+        // Arrange
         var (store, authorizer) = BuildEnforcing(default); // no authenticated caller
 
+        // Act
         IdentityResult result;
         using (authorizer.BeginSystemScope())
         {
             result = await store.CreateAsync(new Role { Name = "Member" }, Ct);
         }
 
+        // Assert
         Assert.True(result.Succeeded);
     }
 
     [Fact]
-    public async Task CreateAsync_WithinSystemScope_NoRazorCircuit_Succeeds()
+    public async Task CreateAsync_WithinSystemScopeNoRazorCircuit_Succeeds()
     {
         // The headless-seeding case (e.g. a consumer creating default roles at startup): with no
         // Razor circuit the real CurrentUserService cannot resolve a user, so it must not throw.
         // BeginSystemScope grants authority; the creator is stamped as the empty (system) UserId.
+        // Arrange
         var currentUserService = new CurrentUserService(new ThrowingAuthStateProvider());
         var authorizer = new IdentityAuthorizer(currentUserService, fixture.Store.QuerySession());
         var store = new RoleStore<Role>(
@@ -93,12 +106,14 @@ public class RoleStoreAuthorizationTests(MartenFixture fixture) : IAsyncLifetime
             NullLogger<RoleStore<Role>>.Instance
         );
 
+        // Act
         IdentityResult result;
         using (authorizer.BeginSystemScope())
         {
             result = await store.CreateAsync(new Role { Name = "Member" }, Ct);
         }
 
+        // Assert
         Assert.True(result.Succeeded);
         var created = await fixture
             .Store.QuerySession()

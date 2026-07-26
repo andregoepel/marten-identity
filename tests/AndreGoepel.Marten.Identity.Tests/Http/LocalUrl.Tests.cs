@@ -12,6 +12,7 @@ public class LocalUrlTests
     [InlineData("/path#fragment")]
     public void IsLocal_RootedPaths_ReturnsTrue(string url)
     {
+        // Act / Assert
         Assert.True(LocalUrl.IsLocal(url));
     }
 
@@ -28,12 +29,14 @@ public class LocalUrlTests
     [InlineData("javascript:alert(1)")]
     public void IsLocal_OffSiteOrMalformed_ReturnsFalse(string? url)
     {
+        // Act / Assert
         Assert.False(LocalUrl.IsLocal(url));
     }
 
     [Fact]
     public void OrDefault_LocalUrl_ReturnsIt()
     {
+        // Act / Assert
         Assert.Equal("/admin", LocalUrl.OrDefault("/admin", "/dashboard"));
     }
 
@@ -44,6 +47,7 @@ public class LocalUrlTests
     [InlineData(null)]
     public void OrDefault_UnsafeUrl_ReturnsFallback(string? url)
     {
+        // Act / Assert
         Assert.Equal("/dashboard", LocalUrl.OrDefault(url, "/dashboard"));
     }
 }

@@ -29,47 +29,59 @@ namespace AndreGoepel.Marten.Identity.Blazor.Tests.Account.Pages;
 public class LoginLocalizationTests : BunitContext
 {
     [Fact]
-    public void DefaultCulture_RendersEnglish()
+    public void Login_DefaultCulture_RendersEnglish()
     {
+        // Arrange
         using var _ = new CultureScope("en");
 
+        // Act
         var cut = Render();
 
+        // Assert
         Assert.Contains("Welcome back", cut.Markup);
         Assert.Contains("Create account", cut.Markup);
     }
 
     [Fact]
-    public void GermanCulture_RendersGerman_WithoutLocalizationRegistered()
+    public void Login_GermanCulture_RendersGermanWithoutLocalizationRegistered()
     {
+        // Arrange
         using var _ = new CultureScope("de");
 
+        // Act
         var cut = Render();
 
+        // Assert
         Assert.Contains("Willkommen zurück", cut.Markup);
         Assert.Contains("Konto erstellen", cut.Markup);
         Assert.DoesNotContain("Welcome back", cut.Markup);
     }
 
     [Fact]
-    public void RegionalCulture_FallsBackToTheSupportedParent()
+    public void Login_RegionalCulture_FallsBackToSupportedParent()
     {
+        // Arrange
         // A de-DE request culture has to resolve the "de" resources, otherwise most German
         // browsers would silently get English.
         using var _ = new CultureScope("de-DE");
 
+        // Act
         var cut = Render();
 
+        // Assert
         Assert.Contains("Willkommen zurück", cut.Markup);
     }
 
     [Fact]
-    public void UnsupportedCulture_FallsBackToEnglish()
+    public void Login_UnsupportedCulture_FallsBackToEnglish()
     {
+        // Arrange
         using var _ = new CultureScope("fr");
 
+        // Act
         var cut = Render();
 
+        // Assert
         Assert.Contains("Welcome back", cut.Markup);
     }
 

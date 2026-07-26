@@ -39,7 +39,7 @@ public class LoginWith2FaTests : BunitContext
     #region Error query param
 
     [Fact]
-    public void WithErrorInvalid_ShowsErrorNotification()
+    public void LoginWith2fa_WithErrorInvalid_ShowsErrorNotification()
     {
         // Arrange / Act
         Render(error: "invalid");
@@ -49,7 +49,7 @@ public class LoginWith2FaTests : BunitContext
     }
 
     [Fact]
-    public void WithErrorInvalid_NotificationHasCorrectSeverity()
+    public void LoginWith2fa_WithErrorInvalid_NotificationHasCorrectSeverity()
     {
         // Arrange / Act
         Render(error: "invalid");
@@ -59,7 +59,7 @@ public class LoginWith2FaTests : BunitContext
     }
 
     [Fact]
-    public void WithoutError_NoNotification()
+    public void LoginWith2fa_WithoutError_NoNotification()
     {
         // Arrange / Act
         Render();
@@ -73,7 +73,7 @@ public class LoginWith2FaTests : BunitContext
     #region Rendering
 
     [Fact]
-    public void RendersAuthenticatorCodeInput()
+    public void LoginWith2fa_OnRender_ShowsAuthenticatorCodeInput()
     {
         // Arrange / Act
         var cut = Render();
@@ -83,7 +83,7 @@ public class LoginWith2FaTests : BunitContext
     }
 
     [Fact]
-    public void RendersRecoveryCodeLink()
+    public void LoginWith2fa_OnRender_ShowsRecoveryCodeLink()
     {
         // Arrange / Act
         var cut = Render();

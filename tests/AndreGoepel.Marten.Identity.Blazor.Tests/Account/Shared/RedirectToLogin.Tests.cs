@@ -10,7 +10,7 @@ public class RedirectToLoginTests : BunitContext
     #region Redirect behaviour
 
     [Fact]
-    public void OnInitialized_RedirectsToLoginPage()
+    public void RedirectToLogin_OnInitialized_RedirectsToLoginPage()
     {
         // Arrange
         var nav = Services.GetRequiredService<NavigationManager>();
@@ -24,7 +24,7 @@ public class RedirectToLoginTests : BunitContext
     }
 
     [Fact]
-    public void OnInitialized_IncludesReturnUrlInRedirect()
+    public void RedirectToLogin_OnInitialized_IncludesReturnUrlInRedirect()
     {
         // Arrange
         var nav = Services.GetRequiredService<NavigationManager>();

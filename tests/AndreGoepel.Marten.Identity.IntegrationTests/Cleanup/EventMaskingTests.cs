@@ -55,7 +55,7 @@ public class EventMaskingTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task ApplyEventDataMasking_ScrubsUserUpdatedPii()
+    public async Task ApplyEventDataMasking_UserUpdatedEvent_ScrubsPii()
     {
         // Arrange
         var userId = UserId.New();
@@ -95,7 +95,7 @@ public class EventMaskingTests(MartenFixture fixture) : IAsyncLifetime
     }
 
     [Fact]
-    public async Task ApplyEventDataMasking_ScrubsPasskeyPii()
+    public async Task ApplyEventDataMasking_PasskeyEvents_ScrubsPii()
     {
         // Arrange — a passkey carries the public key, credential id, and a user-chosen
         // free-text name, all of which must not survive erasure (#67).

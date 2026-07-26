@@ -4,7 +4,7 @@ namespace AndreGoepel.Marten.Identity.IntegrationTests.Infrastructure;
 public class MartenFixtureSmokeTests(MartenFixture fixture)
 {
     [Fact]
-    public async Task Container_Starts_And_Store_Saves()
+    public async Task MartenFixture_ContainerStarted_SavesSessionSuccessfully()
     {
         // Arrange / Act
         await using var session = fixture.Store.LightweightSession();

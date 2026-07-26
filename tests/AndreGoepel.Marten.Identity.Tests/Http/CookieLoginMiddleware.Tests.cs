@@ -75,7 +75,7 @@ public class CookieLoginMiddlewareTests
     #region /login path
 
     [Fact]
-    public async Task Login_Success_NoReturnUrl_RedirectsToDashboard()
+    public async Task Login_SuccessNoReturnUrl_RedirectsToDashboard()
     {
         // Arrange
         var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
@@ -98,7 +98,7 @@ public class CookieLoginMiddlewareTests
     }
 
     [Fact]
-    public async Task Login_Success_WithReturnUrl_RedirectsToReturnUrl()
+    public async Task Login_SuccessWithReturnUrl_RedirectsToReturnUrl()
     {
         // Arrange
         var token = Tokens.Protect(
@@ -126,7 +126,7 @@ public class CookieLoginMiddlewareTests
     [InlineData("https://evil.example/phish")]
     [InlineData("//evil.example")]
     [InlineData("/\\evil.example")]
-    public async Task Login_Success_OffSiteReturnUrl_RedirectsToDashboard(string returnUrl)
+    public async Task Login_SuccessOffSiteReturnUrl_RedirectsToDashboard(string returnUrl)
     {
         // Open-redirect guard (CWE-601): an attacker-supplied off-site ReturnUrl
         // must be discarded in favour of the local default after sign-in.
@@ -151,7 +151,7 @@ public class CookieLoginMiddlewareTests
     }
 
     [Fact]
-    public async Task Login_RequiresTwoFactor_OffSiteReturnUrl_ForwardsDefault()
+    public async Task Login_RequiresTwoFactorOffSiteReturnUrl_ForwardsDefault()
     {
         // Arrange
         var token = Tokens.Protect(
@@ -317,7 +317,7 @@ public class CookieLoginMiddlewareTests
     }
 
     [Fact]
-    public async Task Login2fa_Success_NoReturnUrl_RedirectsToDashboard()
+    public async Task Login2fa_SuccessNoReturnUrl_RedirectsToDashboard()
     {
         // Arrange
         var token = Tokens.Protect(new TwoFactorLoginInfo("123456", false, false, null));
@@ -337,7 +337,7 @@ public class CookieLoginMiddlewareTests
     [Theory]
     [InlineData("https://evil.example")]
     [InlineData("//evil.example")]
-    public async Task Login2fa_Success_OffSiteReturnUrl_RedirectsToDashboard(string returnUrl)
+    public async Task Login2fa_SuccessOffSiteReturnUrl_RedirectsToDashboard(string returnUrl)
     {
         // Arrange
         var token = Tokens.Protect(new TwoFactorLoginInfo("123456", false, false, returnUrl));
@@ -432,7 +432,7 @@ public class CookieLoginMiddlewareTests
     }
 
     [Fact]
-    public async Task LoginRecovery_Success_NoReturnUrl_RedirectsToDashboard()
+    public async Task LoginRecovery_SuccessNoReturnUrl_RedirectsToDashboard()
     {
         // Arrange
         var token = Tokens.Protect(new RecoveryCodeLoginInfo("ABCDE-FGHIJ", null));
@@ -452,7 +452,7 @@ public class CookieLoginMiddlewareTests
     [Theory]
     [InlineData("https://evil.example")]
     [InlineData("//evil.example")]
-    public async Task LoginRecovery_Success_OffSiteReturnUrl_RedirectsToDashboard(string returnUrl)
+    public async Task LoginRecovery_SuccessOffSiteReturnUrl_RedirectsToDashboard(string returnUrl)
     {
         // Arrange
         var token = Tokens.Protect(new RecoveryCodeLoginInfo("ABCDE-FGHIJ", returnUrl));
@@ -699,7 +699,7 @@ public class CookieLoginMiddlewareTests
     }
 
     [Fact]
-    public async Task Login_SetsNoReferrerPolicyHeader()
+    public async Task Login_Success_SetsNoReferrerPolicyHeader()
     {
         // Arrange
         var token = Tokens.Protect(new LoginInfo("alice@example.com", "pw", false));
@@ -726,7 +726,7 @@ public class CookieLoginMiddlewareTests
     #region Other paths
 
     [Fact]
-    public async Task UnmatchedPath_InvokesNextMiddleware()
+    public async Task Invoke_UnmatchedPath_InvokesNextMiddleware()
     {
         // Arrange
         var nextInvoked = false;

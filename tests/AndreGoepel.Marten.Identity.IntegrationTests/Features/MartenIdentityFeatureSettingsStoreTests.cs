@@ -22,6 +22,7 @@ public class MartenIdentityFeatureSettingsStoreTests(MartenFixture fixture) : IA
     [Fact]
     public async Task LoadAsync_NothingSaved_ReturnsConfigurationBaseline()
     {
+        // Arrange
         var (store, _) = Build(o =>
         {
             o.EnableUserRegistration = false;
@@ -29,8 +30,10 @@ public class MartenIdentityFeatureSettingsStoreTests(MartenFixture fixture) : IA
             o.EnablePasskey = false;
         });
 
+        // Act
         var settings = await store.LoadAsync(Ct);
 
+        // Assert
         Assert.True(settings.FromConfiguration);
         Assert.False(settings.EnableUserRegistration);
         Assert.True(settings.EnableTwoFactor);
@@ -40,18 +43,22 @@ public class MartenIdentityFeatureSettingsStoreTests(MartenFixture fixture) : IA
     [Fact]
     public async Task SaveAsync_ThenLoadAsync_PersistedRecordWinsOverConfiguration()
     {
+        // Arrange
         var (store, _) = Build(o => o.EnableUserRegistration = true);
 
+        // Act
         await store.SaveAsync(new IdentityFeatureSettings { EnableUserRegistration = false }, Ct);
         var settings = await store.LoadAsync(Ct);
 
+        // Assert
         Assert.False(settings.FromConfiguration);
         Assert.False(settings.EnableUserRegistration);
     }
 
     [Fact]
-    public async Task IdentityFeatureProvider_ReflectsPersistedSettings()
+    public async Task IdentityFeatureProvider_PersistedSettings_ReflectsThem()
     {
+        // Arrange
         var (store, provider) = Build(configure: null);
         await store.SaveAsync(
             new IdentityFeatureSettings
@@ -63,8 +70,10 @@ public class MartenIdentityFeatureSettingsStoreTests(MartenFixture fixture) : IA
             Ct
         );
 
+        // Act
         var flags = await provider.GetAsync(Ct);
 
+        // Assert
         Assert.False(flags.UserRegistration);
         Assert.False(flags.TwoFactor);
         Assert.True(flags.Passkey);

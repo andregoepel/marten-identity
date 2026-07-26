@@ -43,7 +43,7 @@ public class LoginWithRecoveryCodeTests : BunitContext
     #region Error query param
 
     [Fact]
-    public void WithErrorInvalid_ShowsErrorNotification()
+    public void LoginWithRecoveryCode_WithErrorInvalid_ShowsErrorNotification()
     {
         // Arrange / Act
         Render(error: "invalid");
@@ -53,7 +53,7 @@ public class LoginWithRecoveryCodeTests : BunitContext
     }
 
     [Fact]
-    public void WithErrorInvalid_NotificationHasCorrectSeverity()
+    public void LoginWithRecoveryCode_WithErrorInvalid_NotificationHasCorrectSeverity()
     {
         // Arrange / Act
         Render(error: "invalid");
@@ -63,7 +63,7 @@ public class LoginWithRecoveryCodeTests : BunitContext
     }
 
     [Fact]
-    public void WithoutError_NoNotification()
+    public void LoginWithRecoveryCode_WithoutError_NoNotification()
     {
         // Arrange / Act
         Render();
@@ -77,7 +77,7 @@ public class LoginWithRecoveryCodeTests : BunitContext
     #region Rendering
 
     [Fact]
-    public void RendersRecoveryCodeInput()
+    public void LoginWithRecoveryCode_OnRender_ShowsRecoveryCodeInput()
     {
         // Arrange / Act
         var cut = Render();
@@ -87,7 +87,7 @@ public class LoginWithRecoveryCodeTests : BunitContext
     }
 
     [Fact]
-    public void RendersLinkToAuthenticatorLogin()
+    public void LoginWithRecoveryCode_OnRender_ShowsLinkToAuthenticatorLogin()
     {
         // Arrange / Act
         var cut = Render();

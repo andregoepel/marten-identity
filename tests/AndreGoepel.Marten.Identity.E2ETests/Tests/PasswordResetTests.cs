@@ -58,7 +58,7 @@ public sealed class PasswordResetTests(E2EAppFixture fixture) : E2ETestBase(fixt
     }
 
     [Fact]
-    public async Task ResendEmailConfirmation_ShowsSentMessage()
+    public async Task ResendEmailConfirmation_ForUnknownEmail_ShowsSentMessage()
     {
         // Arrange
         await Fixture.ProvisionAdminAsync();

@@ -21,12 +21,15 @@ namespace AndreGoepel.Marten.Identity.Blazor.Tests.Account.Pages;
 public class AcceptInvitationLocalizationTests : BunitContext
 {
     [Fact]
-    public void GermanCulture_RendersGermanLabelsAndButton_WithoutLocalizationRegistered()
+    public void AcceptInvitation_GermanCulture_ShowsGermanLabelsAndButtonWithoutLocalizationRegistered()
     {
+        // Arrange
         using var _ = new CultureScope("de");
 
+        // Act
         var cut = RenderWithValidToken();
 
+        // Assert
         Assert.Equal("Nehmen Sie Ihre Einladung an", cut.Find("h1").TextContent);
         Assert.Contains("Legen Sie ein Passwort für", cut.Markup);
         Assert.Contains("fest, um die Einrichtung Ihres Kontos abzuschließen.", cut.Markup);
@@ -42,27 +45,32 @@ public class AcceptInvitationLocalizationTests : BunitContext
     }
 
     [Fact]
-    public void GermanCulture_InvalidLink_ShowsGermanMessage()
+    public void AcceptInvitation_GermanCultureWithInvalidLink_ShowsGermanErrorMessage()
     {
+        // Arrange
         using var _ = new CultureScope("de");
 
+        // Act
         var cut = RenderWithInvalidToken();
 
+        // Assert
         Assert.Contains("Dieser Einladungslink ist ungültig oder abgelaufen", cut.Markup);
         Assert.Empty(cut.FindAll("input[name=Password]"));
     }
 
     [Fact]
-    public async Task GermanCulture_TooShortPassword_ShowsTheGermanLengthMessage()
+    public async Task AcceptInvitation_GermanCultureWithTooShortPassword_ShowsGermanLengthMessage()
     {
+        // Arrange
         using var _ = new CultureScope("de");
-
         var cut = RenderWithValidToken();
 
+        // Act
         await cut.Find("input[name=Password]").ChangeAsync("short");
         await cut.Find("input[name=ConfirmPassword]").ChangeAsync("short");
         await cut.Find("form").SubmitAsync();
 
+        // Assert
         // Default IdentityOptions.Password.RequiredLength is 6.
         Assert.Contains("Das Passwort muss zwischen 6 und 100 Zeichen lang sein", cut.Markup);
     }

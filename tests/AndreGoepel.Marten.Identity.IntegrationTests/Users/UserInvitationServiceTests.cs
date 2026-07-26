@@ -39,10 +39,13 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task InviteAsync_AnonymousActor_ReturnsNotAuthorized()
     {
+        // Arrange
         var (invitations, _) = BuildFor(default); // Guid.Empty — fails closed
 
+        // Act
         var result = await invitations.InviteAsync("new@example.com", cancellationToken: Ct);
 
+        // Assert
         Assert.False(result.Succeeded);
         Assert.Contains(result.Result.Errors, e => e.Code == "NotAuthorized");
     }
@@ -50,10 +53,13 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task InviteAsync_NonAdminActor_ReturnsNotAuthorized()
     {
+        // Arrange
         var (invitations, _) = BuildFor(UserId.New()); // identified, but not an admin
 
+        // Act
         var result = await invitations.InviteAsync("new@example.com", cancellationToken: Ct);
 
+        // Assert
         Assert.False(result.Succeeded);
         Assert.Contains(result.Result.Errors, e => e.Code == "NotAuthorized");
         Assert.Null(await FindAsync("new@example.com"));
@@ -62,11 +68,14 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task InviteAsync_AdminActor_CreatesPasswordlessUnconfirmedUserWithToken()
     {
+        // Arrange
         var admin = await SeedAdminAsync();
         var (invitations, _) = BuildFor(admin);
 
+        // Act
         var result = await invitations.InviteAsync("new@example.com", cancellationToken: Ct);
 
+        // Assert
         Assert.True(result.Succeeded);
         Assert.False(string.IsNullOrEmpty(result.Token));
 
@@ -80,16 +89,19 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task InviteAsync_WithRoles_AssignsThem()
     {
+        // Arrange
         var admin = await SeedAdminAsync();
         await SeedRoleAsync("Member");
         var (invitations, users) = BuildFor(admin);
 
+        // Act
         var result = await invitations.InviteAsync(
             "new@example.com",
             ["Member"],
             cancellationToken: Ct
         );
 
+        // Assert
         Assert.True(result.Succeeded);
         var created = await users.FindByEmailAsync("new@example.com");
         Assert.Contains("Member", await users.GetRolesAsync(created!));
@@ -98,12 +110,15 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task InviteAsync_DuplicateEmail_Fails()
     {
+        // Arrange
         var admin = await SeedAdminAsync();
         var (invitations, _) = BuildFor(admin);
         await invitations.InviteAsync("dupe@example.com", cancellationToken: Ct);
 
+        // Act
         var again = await invitations.InviteAsync("dupe@example.com", cancellationToken: Ct);
 
+        // Assert
         Assert.False(again.Succeeded);
         Assert.Contains(again.Result.Errors, e => e.Code == "DuplicateEmail");
     }
@@ -111,13 +126,16 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task ResendAsync_PendingInvitation_IssuesFreshToken()
     {
+        // Arrange
         var admin = await SeedAdminAsync();
         var (invitations, users) = BuildFor(admin);
         await invitations.InviteAsync("pending@example.com", cancellationToken: Ct);
         var user = await users.FindByEmailAsync("pending@example.com");
 
+        // Act
         var resend = await invitations.ResendAsync(user!, Ct);
 
+        // Assert
         Assert.True(resend.Succeeded);
         Assert.False(string.IsNullOrEmpty(resend.Token));
     }
@@ -125,6 +143,7 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
     [Fact]
     public async Task ResendAsync_AlreadyAcceptedAccount_IsRefused()
     {
+        // Arrange
         var admin = await SeedAdminAsync();
         var (invitations, users) = BuildFor(admin);
         await invitations.InviteAsync("claimed@example.com", cancellationToken: Ct);
@@ -135,8 +154,10 @@ public class UserInvitationServiceTests(MartenFixture fixture) : IAsyncLifetime
         await users.AddPasswordAsync(user!, "Accept3d-Passw0rd!");
         var claimed = await users.FindByEmailAsync("claimed@example.com");
 
+        // Act
         var resend = await invitations.ResendAsync(claimed!, Ct);
 
+        // Assert
         Assert.False(resend.Succeeded);
         Assert.Contains(resend.Result.Errors, e => e.Code == "InvitationAlreadyAccepted");
     }

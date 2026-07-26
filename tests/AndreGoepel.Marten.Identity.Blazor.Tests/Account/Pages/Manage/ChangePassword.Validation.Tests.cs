@@ -27,40 +27,50 @@ namespace AndreGoepel.Marten.Identity.Blazor.Tests.Account.Pages.Manage;
 public class ChangePasswordValidationTests : BunitContext
 {
     [Fact]
-    public async Task MismatchedConfirmation_ShowsTheCompareMessage()
+    public async Task ChangePassword_MismatchedConfirmation_ShowsTheCompareMessage()
     {
+        // Arrange
         var cut = Render();
 
+        // Act
         await Fill(cut, old: "old", @new: "Br@ndNewPw123", confirm: "TotallyDifferent999");
 
+        // Assert
         Assert.Contains("The passwords do not match", cut.Markup);
     }
 
     [Fact]
-    public async Task TooShortPassword_ShowsTheLengthMessage()
+    public async Task ChangePassword_TooShortPassword_ShowsTheLengthMessage()
     {
+        // Arrange
         var cut = Render();
 
+        // Act
         await Fill(cut, old: "old", @new: "short", confirm: "short");
 
+        // Assert
         Assert.Contains("Password must be between", cut.Markup);
     }
 
     [Fact]
-    public async Task EmptyFields_ShowTheRequiredMessages()
+    public async Task ChangePassword_EmptyFields_ShowTheRequiredMessages()
     {
+        // Arrange
         var cut = Render();
 
+        // Act
         await Fill(cut, old: "", @new: "", confirm: "");
 
+        // Assert
         Assert.Contains("Current password is required", cut.Markup);
         Assert.Contains("New password is required", cut.Markup);
         Assert.Contains("Please confirm the new password", cut.Markup);
     }
 
     [Fact]
-    public async Task ValidInput_ShowsNoValidationMessages()
+    public async Task ChangePassword_ValidInput_ShowsNoValidationMessages()
     {
+        // Arrange
         var um = Substitute.For<UserManager<User>>(
             Substitute.For<IUserStore<User>>(),
             null,
@@ -74,8 +84,10 @@ public class ChangePasswordValidationTests : BunitContext
         );
         var cut = Render(um);
 
+        // Act
         await Fill(cut, old: "old", @new: "Br@ndNewPw123", confirm: "Br@ndNewPw123");
 
+        // Assert
         Assert.DoesNotContain("The passwords do not match", cut.Markup);
         Assert.DoesNotContain("Password must be between", cut.Markup);
     }

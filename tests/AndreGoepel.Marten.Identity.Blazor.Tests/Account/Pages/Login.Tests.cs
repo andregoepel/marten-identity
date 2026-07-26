@@ -21,28 +21,34 @@ public class LoginTests : BunitContext
     private const string PasskeyButton = "Log in with a passkey";
 
     [Fact]
-    public void AllEnabled_ShowsRegisterLinkAndPasskeyButton()
+    public void Login_AllFeaturesEnabled_ShowsRegisterLinkAndPasskeyButton()
     {
+        // Arrange / Act
         var cut = Render(new IdentityFeatureFlags());
 
+        // Assert
         Assert.Contains(RegisterLink, cut.Markup);
         Assert.Contains(PasskeyButton, cut.Markup);
     }
 
     [Fact]
-    public void RegistrationDisabled_HidesRegisterLink()
+    public void Login_RegistrationDisabled_HidesRegisterLink()
     {
+        // Arrange / Act
         var cut = Render(new IdentityFeatureFlags { UserRegistration = false });
 
+        // Assert
         Assert.DoesNotContain(RegisterLink, cut.Markup);
         Assert.Contains(PasskeyButton, cut.Markup); // unrelated feature untouched
     }
 
     [Fact]
-    public void PasskeyDisabled_HidesPasskeyButton()
+    public void Login_PasskeyDisabled_HidesPasskeyButton()
     {
+        // Arrange / Act
         var cut = Render(new IdentityFeatureFlags { Passkey = false });
 
+        // Assert
         Assert.DoesNotContain(PasskeyButton, cut.Markup);
         Assert.Contains(RegisterLink, cut.Markup);
     }

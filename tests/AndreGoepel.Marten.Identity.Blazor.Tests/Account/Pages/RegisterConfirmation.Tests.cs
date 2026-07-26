@@ -51,7 +51,7 @@ public class RegisterConfirmationTests : BunitContext
     #region Missing email
 
     [Fact]
-    public void MissingEmail_RedirectsToRoot()
+    public void RegisterConfirmation_MissingEmail_RedirectsToRoot()
     {
         // Arrange / Act
         Render(BuildUserManager(), email: null);
@@ -66,7 +66,7 @@ public class RegisterConfirmationTests : BunitContext
     #region User found
 
     [Fact]
-    public void UserFound_ShowsConfirmationMessage()
+    public void RegisterConfirmation_UserFound_ShowsConfirmationMessage()
     {
         // Arrange
         var user = new User { UserId = UserId.New(), UserName = "alice@example.com" };
@@ -85,7 +85,7 @@ public class RegisterConfirmationTests : BunitContext
     #region User not found
 
     [Fact]
-    public void UserNotFound_ShowsErrorMessage()
+    public void RegisterConfirmation_UserNotFound_ShowsErrorMessage()
     {
         // Arrange
         var userManager = BuildUserManager();
@@ -99,7 +99,7 @@ public class RegisterConfirmationTests : BunitContext
     }
 
     [Fact]
-    public void UserNotFound_Sets404StatusCode()
+    public void RegisterConfirmation_UserNotFound_Sets404StatusCode()
     {
         // Arrange
         var userManager = BuildUserManager();
