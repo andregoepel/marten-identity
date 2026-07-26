@@ -3,7 +3,7 @@ using AndreGoepel.Marten.Identity.E2ETests.Infrastructure;
 namespace AndreGoepel.Marten.Identity.E2ETests.Tests;
 
 /// <summary>Covers the Administrator-only management area and its authorization boundary.</summary>
-public sealed class AdministrationTests(E2EAppFixture fixture) : E2ETestBase(fixture)
+public sealed class AdministrationTests(E2EAppFixture fixture) : E2ETestBase<E2EAppFixture>(fixture)
 {
     [Fact]
     public async Task Admin_CanViewUsers_ListingIncludesAdminAccount()
@@ -64,7 +64,6 @@ public sealed class AdministrationTests(E2EAppFixture fixture) : E2ETestBase(fix
     {
         // Arrange — a confirmed non-admin user.
         await Fixture.ProvisionAdminAsync();
-        await Fixture.Email.ClearAsync();
         var email = await RegisterAsync();
         await Page.WaitForURLAsync(url =>
             url.Contains("RegisterConfirmation", StringComparison.OrdinalIgnoreCase)

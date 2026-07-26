@@ -7,7 +7,7 @@ namespace AndreGoepel.Marten.Identity.E2ETests.Tests;
 /// logging in with a recovery code, and disabling. Each test uses its own user so enabling 2FA never
 /// affects the shared admin account.
 /// </summary>
-public sealed class TwoFactorTests(E2EAppFixture fixture) : E2ETestBase(fixture)
+public sealed class TwoFactorTests(E2EAppFixture fixture) : E2ETestBase<E2EAppFixture>(fixture)
 {
     [Fact]
     public async Task Enable2fa_ThenLogin_RequiresAuthenticatorCode()
@@ -87,7 +87,6 @@ public sealed class TwoFactorTests(E2EAppFixture fixture) : E2ETestBase(fixture)
     )> CreateUserWithTwoFactorAsync()
     {
         await Fixture.ProvisionAdminAsync();
-        await Fixture.Email.ClearAsync();
         var email = await RegisterAsync();
         await Page.WaitForURLAsync(url =>
             url.Contains("RegisterConfirmation", StringComparison.OrdinalIgnoreCase)

@@ -3,7 +3,7 @@ using AndreGoepel.Marten.Identity.E2ETests.Infrastructure;
 namespace AndreGoepel.Marten.Identity.E2ETests.Tests;
 
 /// <summary>Covers the host/application pages: the sample home and an Administrator-only screen.</summary>
-public sealed class AppPagesTests(E2EAppFixture fixture) : E2ETestBase(fixture)
+public sealed class AppPagesTests(E2EAppFixture fixture) : E2ETestBase<E2EAppFixture>(fixture)
 {
     [Fact]
     public async Task SampleHome_Navigated_RendersExpectedTitle()

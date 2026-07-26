@@ -21,6 +21,17 @@ Browser-driven end-to-end tests for the Identity UI shipped by
 
 ## How the harness works
 
+The fixture, page helpers, trace-capture-on-failure, `TestData`, `Totp`, and
+`VirtualAuthenticator` come from the shared `AndreGoepel.Testing.E2E` package (this repo is where
+trace-capture-on-failure originated; the package now bakes it in unconditionally). Only what's
+specific to this app stays local, in `Infrastructure/`:
+- `E2EAppFixture` — a parameterless subclass of the package's `E2EAppFixture`, configured via
+  `E2EAppFixtureOptions` for this app's AppHost, web resource name, and Setup button text.
+- `CapturedEmailClient` — implements the package's `IEmailLinkSource` and is wired in via
+  `MailSourceFactory` (see below).
+- `PageExtensions.FilterUsersGridAsync` — an app-specific selector on top of the package's core
+  `PageExtensions`.
+
 - **One app instance per collection.** The AppHost is booted once with `E2E=true`, which runs
   Postgres **without** its persistent data volume, so every run starts from an empty database.
 - **Fresh browser context per test** so cookies never leak between tests.
@@ -28,8 +39,10 @@ Browser-driven end-to-end tests for the Identity UI shipped by
 - **No mail server.** The sample sends no real email. Under `E2E=true` it swaps its
   `LoggingEmailSender` for a `CapturingEmailSender` that also keeps the confirmation/reset links in
   memory and exposes them on an E2E-only `/e2e/emails` endpoint; `CapturedEmailClient` reads that
-  endpoint. Both the capturing sender and the endpoint are inert (never registered) in a normal run.
-- `Otp.NET` computes TOTP codes; a Chromium CDP virtual authenticator satisfies passkey ceremonies.
+  endpoint and is exposed on the fixture as `Mail`. Both the capturing sender and the endpoint are
+  inert (never registered) in a normal run.
+- `Otp.NET` (via the package's `Totp` helper) computes TOTP codes; a Chromium CDP virtual
+  authenticator (via the package's `VirtualAuthenticator`) satisfies passkey ceremonies.
 
 ## Running locally
 

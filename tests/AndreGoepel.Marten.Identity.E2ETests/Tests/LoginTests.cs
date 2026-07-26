@@ -3,7 +3,7 @@ using AndreGoepel.Marten.Identity.E2ETests.Infrastructure;
 namespace AndreGoepel.Marten.Identity.E2ETests.Tests;
 
 /// <summary>Covers login success/failure, account lockout, and logout.</summary>
-public sealed class LoginTests(E2EAppFixture fixture) : E2ETestBase(fixture)
+public sealed class LoginTests(E2EAppFixture fixture) : E2ETestBase<E2EAppFixture>(fixture)
 {
     [Fact]
     public async Task Login_WithWrongPassword_ShowsInvalidAndStaysOnPage()
@@ -29,7 +29,6 @@ public sealed class LoginTests(E2EAppFixture fixture) : E2ETestBase(fixture)
     {
         // Arrange — a confirmed user (lockout only applies once sign-in is otherwise allowed).
         await Fixture.ProvisionAdminAsync();
-        await Fixture.Email.ClearAsync();
         var email = await RegisterAsync();
         await Page.WaitForURLAsync(url =>
             url.Contains("RegisterConfirmation", StringComparison.OrdinalIgnoreCase)
