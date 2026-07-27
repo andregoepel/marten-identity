@@ -14,12 +14,23 @@ jobs:
       # The E2E suite (Aspire + Playwright) needs Docker and browser binaries, so it runs
       # in its own workflow (e2e.yml) and is excluded from the fast main pipeline here.
       test-filter: "FullyQualifiedName!~E2ETests"
-      pack-projects: |
-        src/AndreGoepel.Marten.Identity.Abstractions/AndreGoepel.Marten.Identity.Abstractions.csproj
-        src/AndreGoepel.Marten.Identity/AndreGoepel.Marten.Identity.csproj
-        src/AndreGoepel.Marten.Identity.Blazor/AndreGoepel.Marten.Identity.Blazor.csproj
-    secrets:
-      NUGET_USER: ${{ secrets.NUGET_USER }}
+
+  # Runs as a local job (not inside ci-library.yml) because NuGet.org Trusted
+  # Publishing validates job_workflow_ref against the workflow that defines
+  # the running job - a job inside a called workflow_call workflow would
+  # never match a policy scoped to this repo. See andregoepel/workflows#5.
+  pack-and-publish:
+    needs: ci
+    runs-on: ubuntu-latest
+    if: startsWith(github.ref, 'refs/tags/v')
     permissions:
       id-token: write # NuGet OIDC trusted publishing
       contents: read
+    steps:
+      - uses: andregoepel/workflows/.github/actions/nuget-publish@main
+        with:
+          pack-projects: |
+            src/AndreGoepel.Marten.Identity.Abstractions/AndreGoepel.Marten.Identity.Abstractions.csproj
+            src/AndreGoepel.Marten.Identity/AndreGoepel.Marten.Identity.csproj
+            src/AndreGoepel.Marten.Identity.Blazor/AndreGoepel.Marten.Identity.Blazor.csproj
+          nuget-user: ${{ secrets.NUGET_USER }}
