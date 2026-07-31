@@ -8,19 +8,19 @@
   </ItemGroup>
 
   <ItemGroup Label="Marten">
-    <PackageVersion Include="Marten" Version="9.19.0" />
-    <PackageVersion Include="Marten.AspNetCore" Version="9.19.0" />
-    <PackageVersion Include="AndreGoepel.Marten.Configuration" Version="1.0.1" />
+    <PackageVersion Include="Marten" Version="9.22.0" />
+    <PackageVersion Include="Marten.AspNetCore" Version="9.22.0" />
+    <PackageVersion Include="AndreGoepel.Marten.Configuration" Version="1.1.0" />
     <PackageVersion Include="AndreGoepel.Marten.Testing" Version="1.0.0" />
   </ItemGroup>
 
   <ItemGroup Label="Scheduling">
-    <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.18.2" />
+    <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.19.1" />
   </ItemGroup>
 
   <ItemGroup Label="UI">
     <PackageVersion Include="AndreGoepel.Design.Blazor" Version="1.6.0" />
-    <PackageVersion Include="Radzen.Blazor" Version="11.1.7" />
+    <PackageVersion Include="Radzen.Blazor" Version="11.2.0" />
   </ItemGroup>
 
   <ItemGroup Label="E2E (browser-driven tests)">
