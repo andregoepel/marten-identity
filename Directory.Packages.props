@@ -8,8 +8,8 @@
   </ItemGroup>
 
   <ItemGroup Label="Marten">
-    <PackageVersion Include="Marten" Version="9.22.0" />
-    <PackageVersion Include="Marten.AspNetCore" Version="9.22.0" />
+    <PackageVersion Include="Marten" Version="9.22.5" />
+    <PackageVersion Include="Marten.AspNetCore" Version="9.22.5" />
     <PackageVersion Include="AndreGoepel.Marten.Configuration" Version="1.1.0" />
     <PackageVersion Include="AndreGoepel.Marten.Testing" Version="1.0.0" />
   </ItemGroup>
@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup Label="UI">
-    <PackageVersion Include="AndreGoepel.Design.Blazor" Version="1.6.0" />
-    <PackageVersion Include="Radzen.Blazor" Version="11.2.0" />
+    <PackageVersion Include="AndreGoepel.Design.Blazor" Version="1.6.1" />
+    <PackageVersion Include="Radzen.Blazor" Version="11.2.2" />
   </ItemGroup>
 
   <ItemGroup Label="E2E (browser-driven tests)">
@@ -30,10 +30,10 @@
   </ItemGroup>
 
   <ItemGroup Label="Testing">
-    <PackageVersion Include="bunit" Version="2.8.6" />
+    <PackageVersion Include="bunit" Version="2.9.0" />
     <PackageVersion Include="coverlet.collector" Version="10.0.1" />
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="18.8.1" />
-    <PackageVersion Include="NSubstitute" Version="6.0.0" />
+    <PackageVersion Include="NSubstitute" Version="6.1.0" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.5" />
     <PackageVersion Include="xunit.v3" Version="3.2.2" />
   </ItemGroup>

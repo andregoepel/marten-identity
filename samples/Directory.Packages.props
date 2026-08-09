@@ -19,8 +19,8 @@
   </ItemGroup>
 
   <ItemGroup Label="Web (kept in step with the libraries under /src)">
-    <PackageVersion Include="AndreGoepel.Design.Blazor" Version="1.6.0" />
-    <PackageVersion Include="Marten" Version="9.22.0" />
-    <PackageVersion Include="Radzen.Blazor" Version="11.2.0" />
+    <PackageVersion Include="AndreGoepel.Design.Blazor" Version="1.6.1" />
+    <PackageVersion Include="Marten" Version="9.22.5" />
+    <PackageVersion Include="Radzen.Blazor" Version="11.2.2" />
   </ItemGroup>
 </Project>
