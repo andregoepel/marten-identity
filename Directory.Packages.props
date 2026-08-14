@@ -15,14 +15,14 @@
   </ItemGroup>
 
   <ItemGroup Label="Core">
-    <PackageVersion Include="AndreGoepel.Core" Version="1.0.1" />
+    <PackageVersion Include="AndreGoepel.Core" Version="1.0.2" />
   </ItemGroup>
 
   <ItemGroup Label="Marten">
     <PackageVersion Include="Marten" Version="9.23.0" />
     <PackageVersion Include="Marten.AspNetCore" Version="9.23.0" />
-    <PackageVersion Include="AndreGoepel.Marten.Configuration" Version="1.1.0" />
-    <PackageVersion Include="AndreGoepel.Marten.Testing" Version="1.0.0" />
+    <PackageVersion Include="AndreGoepel.Marten.Configuration" Version="1.2.0" />
+    <PackageVersion Include="AndreGoepel.Marten.Testing" Version="1.0.1" />
   </ItemGroup>
 
   <ItemGroup Label="Scheduling">
@@ -30,12 +30,12 @@
   </ItemGroup>
 
   <ItemGroup Label="UI">
-    <PackageVersion Include="AndreGoepel.Design.Blazor" Version="1.6.2" />
+    <PackageVersion Include="AndreGoepel.Design.Blazor" Version="1.6.3" />
     <PackageVersion Include="Radzen.Blazor" Version="11.2.4" />
   </ItemGroup>
 
   <ItemGroup Label="E2E (browser-driven tests)">
-    <PackageVersion Include="AndreGoepel.Testing.E2E" Version="1.0.0" />
+    <PackageVersion Include="AndreGoepel.Testing.E2E" Version="1.0.1" />
     <PackageVersion Include="Aspire.Hosting.Testing" Version="13.4.6" />
     <PackageVersion Include="Microsoft.Playwright" Version="1.62.0" />
   </ItemGroup>
