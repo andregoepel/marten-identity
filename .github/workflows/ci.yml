@@ -15,6 +15,28 @@ jobs:
       # in its own workflow (e2e.yml) and is excluded from the fast main pipeline here.
       test-filter: "FullyQualifiedName!~E2ETests"
 
+  # samples/AndreGoepel.Marten.Identity.ServiceDefaults is a byte-for-byte mirror of
+  # app-foundation's AndreGoepel.AppFoundation.ServiceDefaults, not a package reference (a
+  # real dependency cycle otherwise - see #158). This is the guard against unnoticed drift
+  # between the two copies.
+  servicedefaults-drift:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          sparse-checkout: samples/AndreGoepel.Marten.Identity.ServiceDefaults/Extensions.cs
+          sparse-checkout-cone-mode: false
+
+      - name: Compare against app-foundation's mirrored copy
+        run: |
+          curl -fsSL -o mirror.cs \
+            https://raw.githubusercontent.com/andregoepel/app-foundation/main/src/AndreGoepel.AppFoundation.ServiceDefaults/Extensions.cs
+
+          if ! diff -u samples/AndreGoepel.Marten.Identity.ServiceDefaults/Extensions.cs mirror.cs; then
+            echo "::error::ServiceDefaults has drifted from app-foundation's mirrored copy (see marten-identity#158). Apply the same change to both files."
+            exit 1
+          fi
+
   # Runs as a local job (not inside ci-library.yml) because NuGet.org Trusted
   # Publishing validates job_workflow_ref against the workflow that defines
   # the running job - a job inside a called workflow_call workflow would
