@@ -1051,23 +1051,28 @@ public class UserStore<TUser>(
         if (accessFailedCount == current.AccessFailedCount && lockoutEnd == current.LockoutEnd)
             return;
 
-        session.Events.Append(
-            userId.Value,
-            new UserUpdated(userId)
-            {
-                // Carry the current scalar state forward: the projection applies these
-                // unconditionally, so omitting them would reset unrelated flags.
-                EmailConfirmed = current.EmailConfirmed,
-                TwoFactorEnabled = current.TwoFactorEnabled,
-                Deletable = current.Deletable,
-                LockoutEnabled = current.LockoutEnabled,
-                LockoutEnd = lockoutEnd,
-                AccessFailedCount = accessFailedCount,
-                // Lockout counting is auto-managed; don't advance the content-version
-                // token, or it would spuriously conflict with a concurrent update (#70).
-                LockoutOnly = true,
-            }
-        );
+        // Fine-grained events since v2.0.0 (#138): no more foreign-field echoing (the old
+        // UserUpdated carried EmailConfirmed/TwoFactorEnabled/Deletable/LockoutEnabled only
+        // because the projection applied them unconditionally) and no ContentVersion bump —
+        // lockout counting is auto-managed, so it must never spuriously conflict with a
+        // concurrent profile update (#70), same guarantee the old LockoutOnly flag gave.
+        var events = new List<object>(2);
+
+        if (accessFailedCount != current.AccessFailedCount)
+            events.Add(
+                new AccessFailedCountChanged(userId, accessFailedCount) { ChangedBy = userId }
+            );
+
+        if (lockoutEnd != current.LockoutEnd)
+        {
+            events.Add(
+                lockoutEnd is { } end
+                    ? new LockedOut(userId, end) { ChangedBy = userId }
+                    : new LockoutCleared(userId) { ChangedBy = userId }
+            );
+        }
+
+        session.Events.Append(userId.Value, events.ToArray());
         await session.SaveChangesAsync(cancellationToken);
     }
 
