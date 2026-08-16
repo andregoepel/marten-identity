@@ -80,6 +80,7 @@ internal sealed partial class UserProjection : SingleStreamProjection<User, Guid
         user.ContentVersion++;
     }
 
+    // Legacy snapshot event — replay only; the store emits fine-grained events since v2.0.0 (#138).
     [SuppressMessage(
         "Performance",
         "CA1822:Mark members as static",
@@ -137,6 +138,181 @@ internal sealed partial class UserProjection : SingleStreamProjection<User, Guid
         if (!@event.LockoutOnly)
             user.ContentVersion++;
     }
+
+    #region Fine-grained events (#138)
+
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "Called by Marten source-generated dispatcher"
+    )]
+    public void Apply(EmailChanged @event, User user)
+    {
+        // null = masked (#67) or unchanged — never overwrite.
+        if (@event.Email is not null)
+        {
+            user.Email = @event.Email;
+            user.NormalizedEmail = @event.Email.ToUpperInvariant();
+        }
+        user.EmailConfirmed = @event.EmailConfirmed;
+        Touch(user, @event);
+        user.ContentVersion++;
+    }
+
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "Called by Marten source-generated dispatcher"
+    )]
+    public void Apply(EmailConfirmationChanged @event, User user)
+    {
+        user.EmailConfirmed = @event.EmailConfirmed;
+        Touch(user, @event);
+        user.ContentVersion++;
+    }
+
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "Called by Marten source-generated dispatcher"
+    )]
+    public void Apply(UserNameChanged @event, User user)
+    {
+        if (@event.UserName is not null)
+        {
+            user.UserName = @event.UserName;
+            user.NormalizedUserName = @event.UserName.ToUpperInvariant();
+        }
+        Touch(user, @event);
+        user.ContentVersion++;
+    }
+
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "Called by Marten source-generated dispatcher"
+    )]
+    public void Apply(PhoneNumberChanged @event, User user)
+    {
+        if (@event.PhoneNumber is not null)
+            user.PhoneNumber = @event.PhoneNumber;
+        Touch(user, @event);
+        user.ContentVersion++;
+    }
+
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "Called by Marten source-generated dispatcher"
+    )]
+    public void Apply(PasswordChanged @event, User user)
+    {
+        if (@event.PasswordHash is not null)
+            user.PasswordHash = @event.PasswordHash;
+        Touch(user, @event);
+        user.ContentVersion++;
+    }
+
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "Called by Marten source-generated dispatcher"
+    )]
+    public void Apply(SecurityStampRotated @event, User user)
+    {
+        if (@event.SecurityStamp is not null)
+            user.SecurityStamp = @event.SecurityStamp;
+        Touch(user, @event);
+        user.ContentVersion++;
+    }
+
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "Called by Marten source-generated dispatcher"
+    )]
+    public void Apply(TwoFactorChanged @event, User user)
+    {
+        if (@event.AuthenticatorKey is not null)
+            user.AuthenticatorKey = @event.AuthenticatorKey;
+        if (@event.RecoveryCodes is not null)
+            user.RecoveryCodes = @event.RecoveryCodes;
+        user.TwoFactorEnabled = @event.TwoFactorEnabled;
+        Touch(user, @event);
+        user.ContentVersion++;
+    }
+
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "Called by Marten source-generated dispatcher"
+    )]
+    public void Apply(DeletabilityChanged @event, User user)
+    {
+        user.Deletable = @event.Deletable;
+        Touch(user, @event);
+        user.ContentVersion++;
+    }
+
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "Called by Marten source-generated dispatcher"
+    )]
+    public void Apply(LockoutEnablementChanged @event, User user)
+    {
+        user.LockoutEnabled = @event.LockoutEnabled;
+        Touch(user, @event);
+        // A deliberate admin/policy decision, not an auto-managed counter — treated as
+        // content, unlike the three lockout events below.
+        user.ContentVersion++;
+    }
+
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "Called by Marten source-generated dispatcher"
+    )]
+    public void Apply(LockedOut @event, User user)
+    {
+        user.LockoutEnd = @event.LockoutEnd;
+        Touch(user, @event);
+        // Auto-managed lockout state must not bump ContentVersion, or concurrent failed-login
+        // counting would spuriously conflict with an unrelated profile update (#70).
+    }
+
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "Called by Marten source-generated dispatcher"
+    )]
+    public void Apply(LockoutCleared @event, User user)
+    {
+        user.LockoutEnd = null;
+        Touch(user, @event);
+        // See Apply(LockedOut, ...) above — no ContentVersion bump.
+    }
+
+    [SuppressMessage(
+        "Performance",
+        "CA1822:Mark members as static",
+        Justification = "Called by Marten source-generated dispatcher"
+    )]
+    public void Apply(AccessFailedCountChanged @event, User user)
+    {
+        user.AccessFailedCount = @event.AccessFailedCount;
+        Touch(user, @event);
+        // See Apply(LockedOut, ...) above — no ContentVersion bump.
+    }
+
+    /// <summary>Shared audit stamp for every fine-grained user event (§2.1, #138).</summary>
+    private static void Touch(User user, IUserAuditedEvent @event)
+    {
+        user.ChangedBy = @event.ChangedBy;
+        user.ChangedAt = @event.ChangedAt;
+    }
+
+    #endregion Fine-grained events (#138)
 
     [SuppressMessage(
         "Performance",
