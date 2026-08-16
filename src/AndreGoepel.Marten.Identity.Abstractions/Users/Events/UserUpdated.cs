@@ -1,5 +1,13 @@
 ﻿namespace AndreGoepel.Marten.Identity.Users.Events;
 
+/// <summary>
+/// Legacy full-state update event. The store stopped writing this in v2.0.0 (#138) in
+/// favor of fine-grained events (<c>EmailChanged</c>, <c>PasswordChanged</c>,
+/// <c>SecurityStampRotated</c>, and others in this namespace) — one per changed field
+/// instead of the whole user snapshot. This type stays public and is still dispatched by
+/// the projection so that streams written before the upgrade keep replaying correctly; it
+/// is never appended by new writes.
+/// </summary>
 public record UserUpdated(UserId UserId)
 {
     public string? UserName { get; init; }
@@ -28,6 +36,9 @@ public record UserUpdated(UserId UserId)
     /// lockout window) and no user-visible content change. The projection skips bumping
     /// <see cref="Users.User.ContentVersion" /> for these, so lockout increments do not
     /// trigger optimistic-concurrency conflicts on the generic update path (#70).
+    /// Legacy: the store no longer writes this — lockout state has its own events
+    /// (<c>LockedOut</c>, <c>LockoutCleared</c>, <c>AccessFailedCountChanged</c>) since
+    /// v2.0.0 (#138), which the projection likewise never bumps ContentVersion for.
     /// </summary>
     public bool LockoutOnly { get; init; }
 }
