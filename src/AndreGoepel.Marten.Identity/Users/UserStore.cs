@@ -289,17 +289,19 @@ public class UserStore<TUser>(
                     user.Deletable = false;
             }
 
+            var changes = user.DiffAgainst(existingUser ?? new User());
+
             // Nothing changed — release the lock without churning the stream. Keep the
             // caller's content version in step with the projection so a follow-up update
             // on this same instance is not spuriously rejected.
-            if (existingUser != null && existingUser.AreEqual(user))
+            if (existingUser != null && !changes.Any)
             {
                 user.ContentVersion = existingUser.ContentVersion;
                 return IdentityResult.Success;
             }
 
             // Optimistic concurrency (#70): the non-lockout content is versioned. If it
-            // advanced since the caller loaded, this full-state write is based on a stale
+            // advanced since the caller loaded, this diff-based write is based on a stale
             // snapshot and would silently revert the concurrent change (e.g. a 2FA toggle
             // overwritten by a stale profile save) — reject so the caller reloads and
             // retries. Lockout increments do not bump ContentVersion, so concurrent
@@ -307,31 +309,67 @@ public class UserStore<TUser>(
             if (existingUser != null && user.ContentVersion != existingUser.ContentVersion)
                 return ConcurrencyFailure();
 
-            session.Events.Append(
-                userId.Value,
-                new UserUpdated(userId)
-                {
-                    UserName = user.UserName,
-                    Email = user.Email,
-                    PasswordHash = user.PasswordHash,
-                    EmailConfirmed = user.EmailConfirmed,
-                    PhoneNumber = user.PhoneNumber,
-                    AuthenticatorKey = user.AuthenticatorKey,
-                    RecoveryCodes = user.RecoveryCodes,
-                    TwoFactorEnabled = user.TwoFactorEnabled,
-                    Deletable = user.Deletable,
-                    LockoutEnabled = user.LockoutEnabled,
-                    LockoutEnd = user.LockoutEnd,
-                    AccessFailedCount = user.AccessFailedCount,
-                    SecurityStamp = user.SecurityStamp,
-                }
-            );
+            // Fine-grained events since v2.0.0 (#138): each changed field gets its own event
+            // instead of a full-state UserUpdated, so an update only ever touches what it
+            // actually changed. LockoutEnd/AccessFailedCount never appear here — the
+            // read-back above (282-283) means they can't diverge from the committed state on
+            // this path; that state is owned exclusively by PersistLockoutStateAsync.
+            var events = new List<object>();
+
+            if (changes.Email)
+                events.Add(
+                    new EmailChanged(userId, user.Email, user.EmailConfirmed) { ChangedBy = userId }
+                );
+            else if (changes.EmailConfirmed)
+                events.Add(
+                    new EmailConfirmationChanged(userId, user.EmailConfirmed) { ChangedBy = userId }
+                );
+
+            if (changes.UserName)
+                events.Add(new UserNameChanged(userId, user.UserName) { ChangedBy = userId });
+
+            if (changes.PhoneNumber)
+                events.Add(new PhoneNumberChanged(userId, user.PhoneNumber) { ChangedBy = userId });
+
+            if (changes.PasswordHash)
+                events.Add(new PasswordChanged(userId, user.PasswordHash) { ChangedBy = userId });
+
+            if (changes.SecurityStamp)
+                events.Add(
+                    new SecurityStampRotated(userId, user.SecurityStamp) { ChangedBy = userId }
+                );
+
+            if (changes.TwoFactorEnabled || changes.AuthenticatorKey || changes.RecoveryCodes)
+            {
+                events.Add(
+                    new TwoFactorChanged(userId, user.TwoFactorEnabled)
+                    {
+                        AuthenticatorKey = user.AuthenticatorKey,
+                        RecoveryCodes = user.RecoveryCodes,
+                        ChangedBy = userId,
+                    }
+                );
+            }
+
+            if (changes.Deletable)
+                events.Add(new DeletabilityChanged(userId, user.Deletable) { ChangedBy = userId });
+
+            if (changes.LockoutEnabled)
+                events.Add(
+                    new LockoutEnablementChanged(userId, user.LockoutEnabled) { ChangedBy = userId }
+                );
+
+            if (events.Count == 0)
+                return IdentityResult.Success;
+
+            session.Events.Append(userId.Value, events.ToArray());
             await session.SaveChangesAsync(cancellationToken);
 
-            // The inline projection just advanced the persisted content version; mirror it
-            // so repeated updates on the same instance (some ASP.NET Identity flows call
-            // UpdateAsync more than once) keep matching instead of self-conflicting.
-            user.ContentVersion = (existingUser?.ContentVersion ?? 0) + 1;
+            // The inline projection just advanced the persisted content version by exactly
+            // one per appended content event; mirror it so repeated updates on the same
+            // instance (some ASP.NET Identity flows call UpdateAsync more than once) keep
+            // matching instead of self-conflicting (§4.3).
+            user.ContentVersion = (existingUser?.ContentVersion ?? 0) + events.Count;
             return IdentityResult.Success;
         }
         catch (Exception ex)
@@ -421,23 +459,60 @@ public class UserStore<TUser>(
 
             var deletionVersion =
                 stream.LastOrDefault(e => e.Data is UserDeleted)?.Version ?? stream.Count;
-            var snapshot = new User();
-            var projection = new UserProjection();
 
-            foreach (var e in stream.Where(e => e.Version < deletionVersion))
+            // Recover just the four fields UserRestored carries by scanning the pre-deletion
+            // stream backwards for the most recent value of each, instead of replaying the
+            // full projection through a hand-maintained switch over every event type that has
+            // ever touched the stream. That switch was a silent-data-loss trap: a new event
+            // type missing from it would restore the user with a stale email/password/stamp
+            // and nothing — no compiler error, no failing test — would say so (#138).
+            string? userName = null;
+            string? email = null;
+            string? passwordHash = null;
+            string? securityStamp = null;
+
+            foreach (var e in stream.Where(e => e.Version < deletionVersion).Reverse())
             {
-                switch (e.Data)
+                userName ??= e.Data switch
                 {
-                    case UserCreated created:
-                        projection.Apply(created, snapshot);
-                        break;
-                    case UserUpdated updated:
-                        projection.Apply(updated, snapshot);
-                        break;
-                    case UserRestored restored:
-                        projection.Apply(restored, snapshot);
-                        break;
-                }
+                    UserCreated ev => ev.UserName,
+                    UserUpdated ev => ev.UserName,
+                    UserNameChanged ev => ev.UserName,
+                    UserRestored ev => ev.UserName,
+                    _ => null,
+                };
+                email ??= e.Data switch
+                {
+                    UserCreated ev => ev.Email,
+                    UserUpdated ev => ev.Email,
+                    EmailChanged ev => ev.Email,
+                    UserRestored ev => ev.Email,
+                    _ => null,
+                };
+                passwordHash ??= e.Data switch
+                {
+                    UserCreated ev => ev.PasswordHash,
+                    UserUpdated ev => ev.PasswordHash,
+                    PasswordChanged ev => ev.PasswordHash,
+                    UserRestored ev => ev.PasswordHash,
+                    _ => null,
+                };
+                securityStamp ??= e.Data switch
+                {
+                    UserCreated ev => ev.SecurityStamp,
+                    UserUpdated ev => ev.SecurityStamp,
+                    SecurityStampRotated ev => ev.SecurityStamp,
+                    UserRestored ev => ev.SecurityStamp,
+                    _ => null,
+                };
+
+                if (
+                    userName is not null
+                    && email is not null
+                    && passwordHash is not null
+                    && securityStamp is not null
+                )
+                    break;
             }
 
             using var session = documentStore.LightweightSession();
@@ -446,10 +521,10 @@ public class UserStore<TUser>(
                 userId.Value,
                 new UserRestored(userId, await currentUserService.GetCurrentUserIdAsync())
                 {
-                    UserName = snapshot.UserName,
-                    Email = snapshot.Email,
-                    PasswordHash = snapshot.PasswordHash,
-                    SecurityStamp = snapshot.SecurityStamp,
+                    UserName = userName,
+                    Email = email,
+                    PasswordHash = passwordHash,
+                    SecurityStamp = securityStamp,
                 }
             );
             await session.SaveChangesAsync(cancellationToken);
