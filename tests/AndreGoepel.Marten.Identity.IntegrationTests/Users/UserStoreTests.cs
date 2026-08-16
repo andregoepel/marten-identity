@@ -58,6 +58,12 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
         await using var session = fixture.Store.QuerySession();
         var persisted = await session.LoadAsync<User>(user.UserId.Value, Ct);
         Assert.Equal("+49 123 4567890", persisted!.PhoneNumber);
+
+        // Fine-grained event since v2.0.0 (#138): a single-field change appends exactly
+        // that field's event, not a full-state UserUpdated.
+        var stream = await session.Events.FetchStreamAsync(user.UserId.Value, token: Ct);
+        var changed = Assert.Single(stream.Select(e => e.Data).OfType<PhoneNumberChanged>());
+        Assert.Equal("+49 123 4567890", changed.PhoneNumber);
     }
 
     [Fact]
@@ -77,6 +83,85 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
         var stream = await session.Events.FetchStreamAsync(user.UserId.Value, token: Ct);
         Assert.Single(stream);
         Assert.IsType<UserCreated>(stream[0].Data);
+        Assert.DoesNotContain(stream, e => e.Data is IUserAuditedEvent);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_EmailChanged_AppendsEmailChangedOnly()
+    {
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+
+        // Act
+        user.Email = "changed@example.com";
+        var result = await store.UpdateAsync(user, Ct);
+
+        // Assert
+        Assert.True(result.Succeeded);
+        await using var session = fixture.Store.QuerySession();
+        var stream = await session.Events.FetchStreamAsync(user.UserId.Value, token: Ct);
+        Assert.Equal(2, stream.Count);
+        var emailChanged = Assert.IsType<EmailChanged>(stream[1].Data);
+        Assert.Equal("changed@example.com", emailChanged.Email);
+    }
+
+    [Fact]
+    public async Task UpdateAsync_PasswordAndStampChanged_AppendsPasswordChangedAndSecurityStampRotated()
+    {
+        // Mirrors what UserManager.ChangePasswordAsync does under the hood: the hash and
+        // the security stamp rotate together in one UpdateAsync call, but each field gets
+        // its own event (#138) rather than one full-state UserUpdated.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+
+        // Act
+        user.PasswordHash = "new-hash";
+        user.SecurityStamp = "new-stamp";
+        var result = await store.UpdateAsync(user, Ct);
+
+        // Assert
+        Assert.True(result.Succeeded);
+        await using var session = fixture.Store.QuerySession();
+        var stream = await session.Events.FetchStreamAsync(user.UserId.Value, token: Ct);
+        var appended = stream.Skip(1).Select(e => e.Data).ToList();
+        Assert.Equal(2, appended.Count);
+        Assert.Contains(appended, e => e is PasswordChanged { PasswordHash: "new-hash" });
+        Assert.Contains(appended, e => e is SecurityStampRotated { SecurityStamp: "new-stamp" });
+    }
+
+    [Fact]
+    public async Task UpdateAsync_NeverAppendsUserUpdated()
+    {
+        // The assurance downstream subscribers rely on (#138): no matter how many fields
+        // an update touches, across however many calls, it never appends UserUpdated.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+
+        // Act
+        user.Email = "changed@example.com";
+        user.UserName = "changed";
+        user.PhoneNumber = "+49 555 0000";
+        user.PasswordHash = "changed-hash";
+        user.SecurityStamp = "changed-stamp";
+        user.TwoFactorEnabled = true;
+        user.AuthenticatorKey = "auth-key";
+        user.RecoveryCodes = "codes";
+        Assert.True((await store.UpdateAsync(user, Ct)).Succeeded);
+
+        user.Deletable = false;
+        user.LockoutEnabled = false;
+        Assert.True((await store.UpdateAsync(user, Ct)).Succeeded);
+
+        // Assert
+        await using var session = fixture.Store.QuerySession();
+        var stream = await session.Events.FetchStreamAsync(user.UserId.Value, token: Ct);
+        Assert.DoesNotContain(stream, e => e.Data is UserUpdated);
     }
 
     #endregion
@@ -621,6 +706,36 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
         Assert.Equal(1, persisted.AccessFailedCount);
     }
 
+    [Fact]
+    public async Task UpdateAsync_MultipleFieldsChanged_ContentVersionMatchesProjection()
+    {
+        // §4.3 guard: ContentVersion must advance by the number of appended content
+        // events, not always by exactly one, or a same-instance follow-up update would
+        // be spuriously rejected as a stale write.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+
+        // Act — three fields change in a single call, appending three events.
+        user.Email = "changed@example.com";
+        user.PhoneNumber = "+49 555 0000";
+        user.PasswordHash = "changed-hash";
+        var result = await store.UpdateAsync(user, Ct);
+
+        // Assert
+        Assert.True(result.Succeeded);
+        var persisted = await store.FindByIdAsync(user.Id, Ct);
+        Assert.Equal(persisted!.ContentVersion, user.ContentVersion);
+
+        // Act — a follow-up update on the same instance must not self-conflict.
+        user.PhoneNumber = "+49 555 1111";
+        var secondResult = await store.UpdateAsync(user, Ct);
+
+        // Assert
+        Assert.True(secondResult.Succeeded);
+    }
+
     #endregion
 
     #region Security stamp (session invalidation)
@@ -784,6 +899,36 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
         Assert.False(persisted!.Deleted);
         Assert.Equal("alice@example.com", persisted.Email);
         Assert.Equal("hash", persisted.PasswordHash);
+    }
+
+    [Fact]
+    public async Task RestoreAsync_AfterFineGrainedEmailAndPasswordChange_RestoresLatestValues()
+    {
+        // §3.4 guard: restore no longer replays through a hand-maintained switch over
+        // event types, so it must still recover the latest values after fine-grained
+        // EmailChanged / PasswordChanged events — not just the legacy UserUpdated the old
+        // switch knew about.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+
+        user.Email = "changed@example.com";
+        user.PasswordHash = "changed-hash";
+        Assert.True((await store.UpdateAsync(user, Ct)).Succeeded);
+
+        await store.DeleteAsync(user, Ct);
+
+        // Act
+        var result = await store.RestoreAsync(user, Ct);
+
+        // Assert
+        Assert.True(result.Succeeded);
+        await using var session = fixture.Store.QuerySession();
+        var persisted = await session.LoadAsync<User>(user.UserId.Value, Ct);
+        Assert.False(persisted!.Deleted);
+        Assert.Equal("changed@example.com", persisted.Email);
+        Assert.Equal("changed-hash", persisted.PasswordHash);
     }
 
     #endregion

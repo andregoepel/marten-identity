@@ -26,35 +26,50 @@ public class UserExtensionTests
             SecurityStamp = "stamp",
         };
 
+    // Reflects over every UserChangeSet flag (excluding the derived Any property) so each
+    // per-field test proves isolation — that changing one User field flags that field alone,
+    // not just that the overall diff is non-empty (#138).
+    private static void AssertOnlyFlagged(UserChangeSet changes, string expectedField)
+    {
+        var flagged = typeof(UserChangeSet)
+            .GetProperties()
+            .Where(p => p.PropertyType == typeof(bool) && p.Name != nameof(UserChangeSet.Any))
+            .Where(p => (bool)p.GetValue(changes)!)
+            .Select(p => p.Name)
+            .ToArray();
+
+        Assert.Equal([expectedField], flagged);
+    }
+
     [Fact]
-    public void AreEqual_IdenticalUsers_ReturnsTrue()
+    public void DiffAgainst_Identical_ReportsNoChange()
     {
         // Arrange
         var a = BaseUser();
         var b = BaseUser();
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.True(result);
+        Assert.False(changes.Any);
     }
 
     [Fact]
-    public void AreEqual_SameInstance_ReturnsTrue()
+    public void DiffAgainst_SameInstance_ReportsNoChange()
     {
         // Arrange
         var user = BaseUser();
 
         // Act
-        var result = user.AreEqual(user);
+        var changes = user.DiffAgainst(user);
 
         // Assert
-        Assert.True(result);
+        Assert.False(changes.Any);
     }
 
     [Fact]
-    public void AreEqual_DifferentEmail_ReturnsFalse()
+    public void DiffAgainst_EmailDiffers_FlagsOnlyThatField()
     {
         // Arrange
         var a = BaseUser();
@@ -62,14 +77,14 @@ public class UserExtensionTests
         b.Email = "bob@example.com";
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.Email));
     }
 
     [Fact]
-    public void AreEqual_DifferentUserName_ReturnsFalse()
+    public void DiffAgainst_UserNameDiffers_FlagsOnlyThatField()
     {
         // Arrange
         var a = BaseUser();
@@ -77,14 +92,14 @@ public class UserExtensionTests
         b.UserName = "bob";
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.UserName));
     }
 
     [Fact]
-    public void AreEqual_DifferentPasswordHash_ReturnsFalse()
+    public void DiffAgainst_PasswordHashDiffers_FlagsOnlyThatField()
     {
         // Arrange
         var a = BaseUser();
@@ -92,14 +107,14 @@ public class UserExtensionTests
         b.PasswordHash = "differentHash";
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.PasswordHash));
     }
 
     [Fact]
-    public void AreEqual_DifferentEmailConfirmed_ReturnsFalse()
+    public void DiffAgainst_EmailConfirmedDiffers_FlagsOnlyThatField()
     {
         // Arrange
         var a = BaseUser();
@@ -107,14 +122,14 @@ public class UserExtensionTests
         b.EmailConfirmed = false;
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.EmailConfirmed));
     }
 
     [Fact]
-    public void AreEqual_DifferentPhoneNumber_ReturnsFalse()
+    public void DiffAgainst_PhoneNumberDiffers_FlagsOnlyThatField()
     {
         // Arrange
         var a = BaseUser();
@@ -122,14 +137,14 @@ public class UserExtensionTests
         b.PhoneNumber = "9999999999";
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.PhoneNumber));
     }
 
     [Fact]
-    public void AreEqual_DifferentAuthenticatorKey_ReturnsFalse()
+    public void DiffAgainst_AuthenticatorKeyDiffers_FlagsOnlyThatField()
     {
         // Arrange
         var a = BaseUser();
@@ -137,14 +152,14 @@ public class UserExtensionTests
         b.AuthenticatorKey = "differentKey";
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.AuthenticatorKey));
     }
 
     [Fact]
-    public void AreEqual_DifferentRecoveryCodes_ReturnsFalse()
+    public void DiffAgainst_RecoveryCodesDiffers_FlagsOnlyThatField()
     {
         // Arrange
         var a = BaseUser();
@@ -152,14 +167,14 @@ public class UserExtensionTests
         b.RecoveryCodes = "newcode";
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.RecoveryCodes));
     }
 
     [Fact]
-    public void AreEqual_DifferentTwoFactorEnabled_ReturnsFalse()
+    public void DiffAgainst_TwoFactorEnabledDiffers_FlagsOnlyThatField()
     {
         // Arrange
         var a = BaseUser();
@@ -167,14 +182,14 @@ public class UserExtensionTests
         b.TwoFactorEnabled = true;
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.TwoFactorEnabled));
     }
 
     [Fact]
-    public void AreEqual_DifferentDeletable_ReturnsFalse()
+    public void DiffAgainst_DeletableDiffers_FlagsOnlyThatField()
     {
         // Arrange
         var a = BaseUser();
@@ -182,14 +197,14 @@ public class UserExtensionTests
         b.Deletable = false;
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.Deletable));
     }
 
     [Fact]
-    public void AreEqual_DifferentLockoutEnabled_ReturnsFalse()
+    public void DiffAgainst_LockoutEnabledDiffers_FlagsOnlyThatField()
     {
         // Arrange
         var a = BaseUser();
@@ -197,14 +212,14 @@ public class UserExtensionTests
         b.LockoutEnabled = false;
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.LockoutEnabled));
     }
 
     [Fact]
-    public void AreEqual_DifferentLockoutEnd_ReturnsFalse()
+    public void DiffAgainst_LockoutEndDiffers_FlagsOnlyThatField()
     {
         // Arrange
         var a = BaseUser();
@@ -212,14 +227,14 @@ public class UserExtensionTests
         b.LockoutEnd = LockoutEnd.AddHours(1);
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.LockoutEnd));
     }
 
     [Fact]
-    public void AreEqual_DifferentAccessFailedCount_ReturnsFalse()
+    public void DiffAgainst_AccessFailedCountDiffers_FlagsOnlyThatField()
     {
         // Arrange
         var a = BaseUser();
@@ -227,14 +242,14 @@ public class UserExtensionTests
         b.AccessFailedCount = 3;
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.AccessFailedCount));
     }
 
     [Fact]
-    public void AreEqual_DifferentSecurityStamp_ReturnsFalse()
+    public void DiffAgainst_SecurityStampDiffers_FlagsOnlyThatField()
     {
         // A changed security stamp must be treated as a real change so the
         // update is persisted and existing sessions are invalidated.
@@ -245,14 +260,14 @@ public class UserExtensionTests
         b.SecurityStamp = "stamp-2";
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.SecurityStamp));
     }
 
     [Fact]
-    public void AreEqual_NullEmailBothSides_ReturnsTrue()
+    public void DiffAgainst_NullEmailBothSides_ReportsNoChange()
     {
         // Arrange
         var a = BaseUser();
@@ -261,14 +276,14 @@ public class UserExtensionTests
         b.Email = null;
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.True(result);
+        Assert.False(changes.Any);
     }
 
     [Fact]
-    public void AreEqual_NullVsNonNull_ReturnsFalse()
+    public void DiffAgainst_NullVsNonNullEmail_FlagsOnlyThatField()
     {
         // Arrange
         var a = BaseUser();
@@ -276,9 +291,9 @@ public class UserExtensionTests
         a.Email = null;
 
         // Act
-        var result = a.AreEqual(b);
+        var changes = a.DiffAgainst(b);
 
         // Assert
-        Assert.False(result);
+        AssertOnlyFlagged(changes, nameof(UserChangeSet.Email));
     }
 }
