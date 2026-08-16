@@ -11,7 +11,7 @@ you login, registration, 2FA, passkeys, and user/role administration out of the 
 | Project | Role |
 |---|---|
 | [`AndreGoepel.Marten.Identity.AppHost`](AndreGoepel.Marten.Identity.AppHost) | Aspire orchestrator — provisions PostgreSQL + pgAdmin and launches the web app. Set it as the startup project. |
-| [`AndreGoepel.Marten.Identity.ServiceDefaults`](AndreGoepel.Marten.Identity.ServiceDefaults) | Shared Aspire defaults — OpenTelemetry, health checks, service discovery, resilience. |
+| [`AndreGoepel.Marten.Identity.ServiceDefaults`](AndreGoepel.Marten.Identity.ServiceDefaults) | Shared Aspire defaults — OpenTelemetry, health checks, service discovery, resilience. A deliberate byte-for-byte mirror of app-foundation's `AndreGoepel.AppFoundation.ServiceDefaults`, not a package reference — that would invert the repo dependency order (see [#158](https://github.com/andregoepel/marten-identity/issues/158)). CI diffs the two files and fails on drift. |
 | [`AndreGoepel.Marten.Identity.Sample`](AndreGoepel.Marten.Identity.Sample) | Blazor Server app consuming the Identity libraries (referenced from `../src` as project references). |
 
 ## Prerequisites
@@ -21,8 +21,8 @@ you login, registration, 2FA, passkeys, and user/role administration out of the 
 
 The sample references the libraries under `../src` directly, so it always builds against the
 current source. All NuGet dependencies are pinned to their latest versions in
-[`Directory.Packages.props`](Directory.Packages.props) (Aspire 13.4.6, Npgsql/Marten 9.12.0,
-Radzen 11.1.0, OpenTelemetry 1.16.0).
+[`Directory.Packages.props`](Directory.Packages.props) (Aspire 13.4.6, Marten 9.23.0,
+Radzen 11.2.4, OpenTelemetry 1.17.0).
 
 ## Run it
 

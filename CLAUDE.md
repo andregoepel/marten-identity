@@ -13,7 +13,10 @@ into queryable documents — no relational migrations.
 - `AndreGoepel.Marten.Identity.Blazor` — packable NuGet: Blazor Server UI
   for login, registration, 2FA, passkeys, and user/role administration
 - `samples/AndreGoepel.Marten.Identity.AppHost` / `.ServiceDefaults` / `.Sample` —
-  .NET Aspire sample host
+  .NET Aspire sample host. `.ServiceDefaults` is a deliberate byte-for-byte mirror of
+  app-foundation's `AndreGoepel.AppFoundation.ServiceDefaults` (a package reference would
+  invert the repo dependency order — see #158); CI diffs the two files and fails on drift.
+  Change both together.
 
 Consumed by `AndreGoepel.AppFoundation` and other hosts. Depends on
 `AndreGoepel.Marten.Configuration` for admin-editable settings persistence
