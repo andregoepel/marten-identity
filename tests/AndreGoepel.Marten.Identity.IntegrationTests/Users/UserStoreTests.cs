@@ -430,6 +430,92 @@ public class UserStoreTests(MartenFixture fixture) : IAsyncLifetime
 
     #endregion
 
+    #region Fine-grained lockout events (#138)
+
+    [Fact]
+    public async Task SetLockoutEndDate_WithValue_AppendsLockedOut()
+    {
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+        var lockoutEnd = DateTimeOffset.UtcNow.AddMinutes(15);
+
+        // Act
+        await store.SetLockoutEndDateAsync(user, lockoutEnd, Ct);
+
+        // Assert
+        await using var session = fixture.Store.QuerySession();
+        var stream = await session.Events.FetchStreamAsync(user.UserId.Value, token: Ct);
+        var locked = Assert.Single(stream.Select(e => e.Data).OfType<LockedOut>());
+        Assert.Equal(lockoutEnd.ToUnixTimeSeconds(), locked.LockoutEnd.ToUnixTimeSeconds());
+    }
+
+    [Fact]
+    public async Task SetLockoutEndDate_WithNull_AppendsLockoutCleared()
+    {
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+        await store.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddMinutes(15), Ct);
+
+        // Act
+        await store.SetLockoutEndDateAsync(user, null, Ct);
+
+        // Assert
+        await using var session = fixture.Store.QuerySession();
+        var stream = await session.Events.FetchStreamAsync(user.UserId.Value, token: Ct);
+        Assert.Single(stream.Select(e => e.Data).OfType<LockoutCleared>());
+    }
+
+    [Fact]
+    public async Task IncrementAccessFailedCount_AppendsAccessFailedCountChanged_NotUserUpdated()
+    {
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+
+        // Act
+        await store.IncrementAccessFailedCountAsync(user, Ct);
+
+        // Assert — the old UserUpdated{LockoutOnly=true} path is gone entirely (#138).
+        await using var session = fixture.Store.QuerySession();
+        var stream = await session.Events.FetchStreamAsync(user.UserId.Value, token: Ct);
+        var changed = Assert.Single(stream.Select(e => e.Data).OfType<AccessFailedCountChanged>());
+        Assert.Equal(1, changed.AccessFailedCount);
+        Assert.DoesNotContain(stream, e => e.Data is UserUpdated);
+    }
+
+    [Fact]
+    public async Task LockoutEvents_DoNotBumpContentVersion_SoConcurrentUpdateStillSucceeds()
+    {
+        // #70 anchor for the fine-grained write path: lockout events must not advance
+        // ContentVersion, or an unrelated profile update racing a failed-login increment
+        // would spuriously conflict.
+        // Arrange
+        var store = UserStoreTestHelpers.BuildStore(fixture.Store);
+        var user = UserStoreTestHelpers.NewUser();
+        await store.CreateAsync(user, Ct);
+
+        await using var before = fixture.Store.QuerySession();
+        var baseline = await before.LoadAsync<User>(user.UserId.Value, Ct);
+        var baselineVersion = baseline!.ContentVersion;
+
+        // Act — lockout writes only, no profile content change.
+        await store.IncrementAccessFailedCountAsync(user, Ct);
+        await store.IncrementAccessFailedCountAsync(user, Ct);
+        await store.SetLockoutEndDateAsync(user, DateTimeOffset.UtcNow.AddMinutes(15), Ct);
+
+        // Assert — ContentVersion unchanged despite three appended lockout events.
+        await using var after = fixture.Store.QuerySession();
+        var persisted = await after.LoadAsync<User>(user.UserId.Value, Ct);
+        Assert.Equal(baselineVersion, persisted!.ContentVersion);
+    }
+
+    #endregion
+
     #region Optimistic concurrency (#70)
 
     [Fact]
