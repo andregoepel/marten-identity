@@ -62,6 +62,48 @@ internal static class InitializationExtension
             }
         );
 
+        // Fine-grained events replacing UserUpdated (#138). EmailConfirmationChanged,
+        // LockedOut, LockoutCleared, AccessFailedCountChanged, LockoutEnablementChanged, and
+        // DeletabilityChanged carry no PII (flags, a counter, timestamps) and deliberately have
+        // no rule here — see EventMaskingTests.AllUserEventTypes_AreEitherMaskedOrExplicitlyPiiFree.
+        options.Events.AddMaskingRuleForProtectedInformation<EmailChanged>(e =>
+            e with
+            {
+                Email = null,
+            }
+        );
+        options.Events.AddMaskingRuleForProtectedInformation<UserNameChanged>(e =>
+            e with
+            {
+                UserName = null,
+            }
+        );
+        options.Events.AddMaskingRuleForProtectedInformation<PhoneNumberChanged>(e =>
+            e with
+            {
+                PhoneNumber = null,
+            }
+        );
+        options.Events.AddMaskingRuleForProtectedInformation<PasswordChanged>(e =>
+            e with
+            {
+                PasswordHash = null,
+            }
+        );
+        options.Events.AddMaskingRuleForProtectedInformation<SecurityStampRotated>(e =>
+            e with
+            {
+                SecurityStamp = null,
+            }
+        );
+        options.Events.AddMaskingRuleForProtectedInformation<TwoFactorChanged>(e =>
+            e with
+            {
+                AuthenticatorKey = null,
+                RecoveryCodes = null,
+            }
+        );
+
         // Passkey events carry the full WebAuthn credential (public key, credential id,
         // the user-chosen free-text name, attestation/client-data). None of it is
         // scrubbed by the User* rules, so without these it would survive erasure forever

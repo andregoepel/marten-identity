@@ -462,6 +462,416 @@ public class UserProjectionTests
 
     #endregion
 
+    #region Fine-grained events (#138)
+
+    [Fact]
+    public void Apply_EmailChanged_UpdatesEmailAndNormalized()
+    {
+        // Arrange
+        var user = new User { Email = "old@example.com" };
+        var @event = new EmailChanged(UserId.New(), "new@example.com", true);
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("new@example.com", user.Email);
+        Assert.Equal("NEW@EXAMPLE.COM", user.NormalizedEmail);
+        Assert.True(user.EmailConfirmed);
+    }
+
+    [Fact]
+    public void Apply_EmailChanged_NullEmail_DoesNotOverwrite()
+    {
+        // Arrange
+        var user = new User { Email = "original@example.com" };
+        var @event = new EmailChanged(UserId.New(), null, true);
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("original@example.com", user.Email);
+    }
+
+    [Fact]
+    public void Apply_EmailChanged_BumpsContentVersionAndSetsAuditFields()
+    {
+        // Arrange
+        var actor = UserId.New();
+        var changedAt = DateTimeOffset.UtcNow;
+        var user = new User { ContentVersion = 5 };
+        var @event = new EmailChanged(UserId.New(), "new@example.com", true)
+        {
+            ChangedBy = actor,
+            ChangedAt = changedAt,
+        };
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal(6, user.ContentVersion);
+        Assert.Equal(actor, user.ChangedBy);
+        Assert.Equal(changedAt, user.ChangedAt);
+    }
+
+    [Fact]
+    public void Apply_EmailConfirmationChanged_UpdatesFlag_BumpsContentVersion()
+    {
+        // Arrange
+        var user = new User { EmailConfirmed = false, ContentVersion = 1 };
+        var @event = new EmailConfirmationChanged(UserId.New(), true);
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.True(user.EmailConfirmed);
+        Assert.Equal(2, user.ContentVersion);
+    }
+
+    [Fact]
+    public void Apply_UserNameChanged_UpdatesUserNameAndNormalized()
+    {
+        // Arrange
+        var user = new User { UserName = "oldname" };
+        var @event = new UserNameChanged(UserId.New(), "newname");
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("newname", user.UserName);
+        Assert.Equal("NEWNAME", user.NormalizedUserName);
+    }
+
+    [Fact]
+    public void Apply_UserNameChanged_NullUserName_DoesNotOverwrite()
+    {
+        // Arrange
+        var user = new User { UserName = "original" };
+        var @event = new UserNameChanged(UserId.New(), null);
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("original", user.UserName);
+    }
+
+    [Fact]
+    public void Apply_PhoneNumberChanged_UpdatesValue()
+    {
+        // Arrange
+        var user = new User();
+        var @event = new PhoneNumberChanged(UserId.New(), "+49 123 456");
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("+49 123 456", user.PhoneNumber);
+    }
+
+    [Fact]
+    public void Apply_PhoneNumberChanged_NullValue_DoesNotOverwrite()
+    {
+        // Arrange
+        var user = new User { PhoneNumber = "original" };
+        var @event = new PhoneNumberChanged(UserId.New(), null);
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("original", user.PhoneNumber);
+    }
+
+    [Fact]
+    public void Apply_PasswordChanged_UpdatesHash()
+    {
+        // Arrange
+        var user = new User { PasswordHash = "old" };
+        var @event = new PasswordChanged(UserId.New(), "newHash");
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("newHash", user.PasswordHash);
+    }
+
+    [Fact]
+    public void Apply_PasswordChanged_NullHash_DoesNotOverwrite()
+    {
+        // Arrange
+        var user = new User { PasswordHash = "original" };
+        var @event = new PasswordChanged(UserId.New(), null);
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("original", user.PasswordHash);
+    }
+
+    [Fact]
+    public void Apply_SecurityStampRotated_UpdatesStamp()
+    {
+        // Arrange
+        var user = new User { SecurityStamp = "old-stamp" };
+        var @event = new SecurityStampRotated(UserId.New(), "new-stamp");
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("new-stamp", user.SecurityStamp);
+    }
+
+    [Fact]
+    public void Apply_SecurityStampRotated_Null_DoesNotOverwrite()
+    {
+        // Arrange
+        var user = new User { SecurityStamp = "existing-stamp" };
+        var @event = new SecurityStampRotated(UserId.New(), null);
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("existing-stamp", user.SecurityStamp);
+    }
+
+    [Fact]
+    public void Apply_TwoFactorChanged_UpdatesFlagAndProtectedFields()
+    {
+        // Arrange
+        var user = new User();
+        var @event = new TwoFactorChanged(UserId.New(), true)
+        {
+            AuthenticatorKey = "key123",
+            RecoveryCodes = "code1;code2",
+        };
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.True(user.TwoFactorEnabled);
+        Assert.Equal("key123", user.AuthenticatorKey);
+        Assert.Equal("code1;code2", user.RecoveryCodes);
+    }
+
+    [Fact]
+    public void Apply_TwoFactorChanged_NullProtectedFields_DoesNotOverwrite()
+    {
+        // Arrange
+        var user = new User { AuthenticatorKey = "existing-key", RecoveryCodes = "existing-codes" };
+        var @event = new TwoFactorChanged(UserId.New(), false);
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal("existing-key", user.AuthenticatorKey);
+        Assert.Equal("existing-codes", user.RecoveryCodes);
+    }
+
+    [Fact]
+    public void Apply_DeletabilityChanged_UpdatesFlag()
+    {
+        // Arrange
+        var user = new User { Deletable = true };
+        var @event = new DeletabilityChanged(UserId.New(), false);
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.False(user.Deletable);
+    }
+
+    [Fact]
+    public void Apply_LockoutEnablementChanged_UpdatesFlag_BumpsContentVersion()
+    {
+        // Arrange — a deliberate admin/policy decision, treated as content unlike the three
+        // auto-managed lockout events below.
+        var user = new User { LockoutEnabled = false, ContentVersion = 1 };
+        var @event = new LockoutEnablementChanged(UserId.New(), true);
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.True(user.LockoutEnabled);
+        Assert.Equal(2, user.ContentVersion);
+    }
+
+    [Fact]
+    public void Apply_LockedOut_SetsLockoutEnd_DoesNotBumpContentVersion()
+    {
+        // Arrange — must not bump, or concurrent failed-login counting would spuriously
+        // conflict with an unrelated profile update (#70).
+        var lockoutEnd = DateTimeOffset.UtcNow.AddMinutes(15);
+        var user = new User { ContentVersion = 3 };
+        var @event = new LockedOut(UserId.New(), lockoutEnd);
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal(lockoutEnd, user.LockoutEnd);
+        Assert.Equal(3, user.ContentVersion);
+    }
+
+    [Fact]
+    public void Apply_LockoutCleared_ClearsLockoutEnd_DoesNotBumpContentVersion()
+    {
+        // Arrange
+        var user = new User
+        {
+            LockoutEnd = DateTimeOffset.UtcNow.AddMinutes(15),
+            ContentVersion = 3,
+        };
+        var @event = new LockoutCleared(UserId.New());
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Null(user.LockoutEnd);
+        Assert.Equal(3, user.ContentVersion);
+    }
+
+    [Fact]
+    public void Apply_AccessFailedCountChanged_SetsCount_DoesNotBumpContentVersion()
+    {
+        // Arrange
+        var user = new User { AccessFailedCount = 0, ContentVersion = 3 };
+        var @event = new AccessFailedCountChanged(UserId.New(), 4);
+
+        // Act
+        _projection.Apply(@event, user);
+
+        // Assert
+        Assert.Equal(4, user.AccessFailedCount);
+        Assert.Equal(3, user.ContentVersion);
+    }
+
+    [Fact]
+    public void Apply_LegacyUserUpdatedSequence_AndEquivalentFineGrainedSequence_ProduceSameUser()
+    {
+        // Arrange — the split must be lossless: an old full-state UserUpdated and the
+        // equivalent fine-grained event sequence must land on the same projected fields.
+        var userId = UserId.New();
+        var actor = UserId.New();
+        var changedAt = DateTimeOffset.UtcNow;
+        var lockoutEnd = changedAt.AddMinutes(30);
+
+        var legacyUser = new User();
+        _projection.Apply(
+            new UserUpdated(userId)
+            {
+                UserName = "alice",
+                Email = "alice@example.com",
+                EmailConfirmed = true,
+                PhoneNumber = "+49 123 456",
+                PasswordHash = "hash",
+                SecurityStamp = "stamp",
+                AuthenticatorKey = "authkey",
+                RecoveryCodes = "codes",
+                TwoFactorEnabled = true,
+                Deletable = false,
+                LockoutEnabled = true,
+                LockoutEnd = lockoutEnd,
+                AccessFailedCount = 2,
+                UpdatedBy = actor,
+                UpdatedAt = changedAt,
+            },
+            legacyUser
+        );
+
+        var fineGrainedUser = new User();
+        _projection.Apply(
+            new EmailChanged(userId, "alice@example.com", true)
+            {
+                ChangedBy = actor,
+                ChangedAt = changedAt,
+            },
+            fineGrainedUser
+        );
+        _projection.Apply(
+            new UserNameChanged(userId, "alice") { ChangedBy = actor, ChangedAt = changedAt },
+            fineGrainedUser
+        );
+        _projection.Apply(
+            new PhoneNumberChanged(userId, "+49 123 456")
+            {
+                ChangedBy = actor,
+                ChangedAt = changedAt,
+            },
+            fineGrainedUser
+        );
+        _projection.Apply(
+            new PasswordChanged(userId, "hash") { ChangedBy = actor, ChangedAt = changedAt },
+            fineGrainedUser
+        );
+        _projection.Apply(
+            new SecurityStampRotated(userId, "stamp") { ChangedBy = actor, ChangedAt = changedAt },
+            fineGrainedUser
+        );
+        _projection.Apply(
+            new TwoFactorChanged(userId, true)
+            {
+                AuthenticatorKey = "authkey",
+                RecoveryCodes = "codes",
+                ChangedBy = actor,
+                ChangedAt = changedAt,
+            },
+            fineGrainedUser
+        );
+        _projection.Apply(
+            new DeletabilityChanged(userId, false) { ChangedBy = actor, ChangedAt = changedAt },
+            fineGrainedUser
+        );
+        _projection.Apply(
+            new LockoutEnablementChanged(userId, true) { ChangedBy = actor, ChangedAt = changedAt },
+            fineGrainedUser
+        );
+        _projection.Apply(
+            new LockedOut(userId, lockoutEnd) { ChangedBy = actor, ChangedAt = changedAt },
+            fineGrainedUser
+        );
+        _projection.Apply(
+            new AccessFailedCountChanged(userId, 2) { ChangedBy = actor, ChangedAt = changedAt },
+            fineGrainedUser
+        );
+
+        // Assert — every projected field matches except ContentVersion, which differs by
+        // construction (one snapshot event vs. nine content events).
+        Assert.Equal(legacyUser.UserName, fineGrainedUser.UserName);
+        Assert.Equal(legacyUser.NormalizedUserName, fineGrainedUser.NormalizedUserName);
+        Assert.Equal(legacyUser.Email, fineGrainedUser.Email);
+        Assert.Equal(legacyUser.NormalizedEmail, fineGrainedUser.NormalizedEmail);
+        Assert.Equal(legacyUser.EmailConfirmed, fineGrainedUser.EmailConfirmed);
+        Assert.Equal(legacyUser.PhoneNumber, fineGrainedUser.PhoneNumber);
+        Assert.Equal(legacyUser.PasswordHash, fineGrainedUser.PasswordHash);
+        Assert.Equal(legacyUser.SecurityStamp, fineGrainedUser.SecurityStamp);
+        Assert.Equal(legacyUser.AuthenticatorKey, fineGrainedUser.AuthenticatorKey);
+        Assert.Equal(legacyUser.RecoveryCodes, fineGrainedUser.RecoveryCodes);
+        Assert.Equal(legacyUser.TwoFactorEnabled, fineGrainedUser.TwoFactorEnabled);
+        Assert.Equal(legacyUser.Deletable, fineGrainedUser.Deletable);
+        Assert.Equal(legacyUser.LockoutEnabled, fineGrainedUser.LockoutEnabled);
+        Assert.Equal(legacyUser.LockoutEnd, fineGrainedUser.LockoutEnd);
+        Assert.Equal(legacyUser.AccessFailedCount, fineGrainedUser.AccessFailedCount);
+        Assert.Equal(legacyUser.ChangedBy, fineGrainedUser.ChangedBy);
+        Assert.Equal(legacyUser.ChangedAt, fineGrainedUser.ChangedAt);
+    }
+
+    #endregion
+
     #region Passkey events
 
     [Fact]
