@@ -16,18 +16,26 @@ privacy policy itself, and it is not legal advice.
 
 | Data | Purpose | Stored where |
 |---|---|---|
-| Email / username (and normalized forms) | Authentication, account identification, notifications | Event store (`UserCreated` / `UserUpdated`) + `User` projection |
-| Password hash | Authentication | Event store + projection |
-| Phone number (optional) | Account/profile | Event store + projection |
-| 2FA authenticator key, recovery codes | Two-factor authentication | Event store + projection, **encrypted** with ASP.NET DataProtection |
+| Email / username (and normalized forms) | Authentication, account identification, notifications | Event store (`UserCreated`, `EmailChanged`, `UserNameChanged`, `EmailConfirmationChanged`; older streams also carry legacy `UserUpdated`) + `User` projection |
+| Password hash | Authentication | Event store (`UserCreated`, `PasswordChanged`; legacy `UserUpdated`) + projection |
+| Phone number (optional) | Account/profile | Event store (`PhoneNumberChanged`; legacy `UserUpdated`) + projection |
+| 2FA authenticator key, recovery codes | Two-factor authentication | Event store (`TwoFactorChanged`; legacy `UserUpdated`) + projection, **encrypted** with ASP.NET DataProtection |
 | Passkeys (WebAuthn credential metadata, public keys, signature counter) | Passwordless authentication | Event store + projection |
-| Security stamp | Session invalidation | Event store + projection |
-| Lockout state (failed-count, lockout end) | Brute-force protection | Event store + projection |
+| Security stamp | Session invalidation | Event store (`UserCreated`, `SecurityStampRotated`; legacy `UserUpdated`) + projection |
+| Lockout state (failed-count, lockout end, enablement) | Brute-force protection | Event store (`LockedOut`, `LockoutCleared`, `AccessFailedCountChanged`, `LockoutEnablementChanged`; legacy `UserUpdated`) + projection |
 | Role assignments | Authorization | Event store + `UserRoleAssignment` projection |
 | Actor + timestamp metadata (`CreatedBy` / `ChangedBy` / `DeletedBy`, `CreatedAt`, …) | Administrative audit trail | Event store + projection |
 
 **No special-category data** is collected by the library itself. Anything your
 application adds (profile fields, etc.) is your responsibility.
+
+> **Since v2.0.0 (#138):** the store writes one fine-grained event per changed
+> field instead of a single full-state `UserUpdated`. This makes the audit trail
+> more specific — "password changed at …" instead of "user changed at …" — which
+> is a genuine (if minor) extension of the processing described in your RoPA;
+> reflect the more specific purpose/field breakdown there. Existing event streams
+> keep replaying through the legacy `UserUpdated` path unchanged — no migration,
+> no rebuild.
 
 ### Actor / audit metadata
 
@@ -65,7 +73,10 @@ Account deletion is a **two-phase** process:
    and the `mt_streams` metadata — now carrying **no personal data**. This is genuine
    erasure of the personal data, not archiving; it is achieved by masking the
    append-only events rather than deleting event rows, so the stream stays internally
-   coherent (and a projection rebuild over an erased stream is safe).
+   coherent (and a projection rebuild over an erased stream is safe). The masking
+   rules are registered **per event type**, and a CI test
+   (`AllUserEventTypes_AreEitherMaskedOrExplicitlyPiiFree`) fails the build if a new
+   event type carrying personal data is ever added without one.
 
 > **Erasure requires the cleanup job.** Phase 2 only runs if you register it with
 > `services.AddMartenIdentityCleanup(...)`. **If you do not enable it, deleted
