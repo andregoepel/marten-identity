@@ -19,12 +19,12 @@
       },
       "Marten": {
         "type": "Direct",
-        "requested": "[9.23.0, )",
-        "resolved": "9.23.0",
-        "contentHash": "iUYefWBjDi+5+ryfTwH82o8lE1UpJbJrWknwgTHj8rRH5HSsg8fDsch96ei4oFhK8r269WFepRac8qU2GqZGRg==",
+        "requested": "[9.28.0, )",
+        "resolved": "9.28.0",
+        "contentHash": "VXlt9UsAKcNDMJWx3YleEQ7DA61FLaRGximwrazvcCGrTFG4Mr1VNr2JTjxPB0mB3qgpwpiSjFH5c0sZWX8pkw==",
         "dependencies": {
-          "JasperFx": "2.47.0",
-          "JasperFx.Events": "2.47.0",
+          "JasperFx": "2.52.0",
+          "JasperFx.Events": "2.52.0",
           "Microsoft.IO.RecyclableMemoryStream": "3.0.1",
           "Weasel.Postgresql": "9.24.0",
           "Weasel.Storage": "9.24.0"
@@ -32,11 +32,11 @@
       },
       "Marten.AspNetCore": {
         "type": "Direct",
-        "requested": "[9.23.0, )",
-        "resolved": "9.23.0",
-        "contentHash": "eYpMY3DQCgbKZeFMSZEaRLSAdRjhEZEPyIVTH2eVRP/rWXJdRMYRbKB8junMD38hdmNLOrcmK3hB0DwcrNIc5A==",
+        "requested": "[9.28.0, )",
+        "resolved": "9.28.0",
+        "contentHash": "m3aNVG/TutZNNnEI0SBDepPVbHsIy2uu5blWO6biYbCGaco/Up9ZgAih9v+SSiP1PMk2CMBIfRDAcIDNbyzbyA==",
         "dependencies": {
-          "Marten": "9.23.0"
+          "Marten": "9.28.0"
         }
       },
       "Quartz.Extensions.Hosting": {
@@ -74,8 +74,8 @@
       },
       "JasperFx": {
         "type": "Transitive",
-        "resolved": "2.47.0",
-        "contentHash": "8auKsW7nrJKABmfuwcA/m+RHpOBkkxVJcTmDnpWbpU4z6fPAaqqDDTqC9zSq0G54zZvwiLvaldNCvPHztl9SaQ==",
+        "resolved": "2.52.0",
+        "contentHash": "XiLkiqot22Frnknv+whrdazxvQQVrwXjz23sHwkzZXxISVpLJdLHjB6Bb40rL3QXNHbMJ8ZDQzrV/CVmNFXM6w==",
         "dependencies": {
           "FastExpressionCompiler": "5.4.1",
           "ImTools": "4.0.0",
@@ -86,10 +86,10 @@
       },
       "JasperFx.Events": {
         "type": "Transitive",
-        "resolved": "2.47.0",
-        "contentHash": "nxm4V85q7YKeb8RtdgbAXr09jFpdm5MzeDPxo49EVt/glupEUw/W11+BxRgS+LLA+dDOGghrLbFV1gc55vbfyQ==",
+        "resolved": "2.52.0",
+        "contentHash": "xj5xKWSUrRSpwXdXI4T4VCdlZlc2qSZpZKUSaiGEUTKiI6iyHC1nuHHDmVuugyA5uigGSfK32zM7Brve1ZqZ+w==",
         "dependencies": {
-          "JasperFx": "2.47.0"
+          "JasperFx": "2.52.0"
         }
       },
       "Microsoft.Bcl.TimeProvider": {
