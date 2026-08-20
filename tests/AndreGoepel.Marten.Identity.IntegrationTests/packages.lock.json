@@ -445,7 +445,7 @@
           "AndreGoepel.Marten.Configuration": "[1.2.0, )",
           "AndreGoepel.Marten.Identity": "[1.8.0, )",
           "Marten": "[9.28.0, )",
-          "Radzen.Blazor": "[11.2.4, )"
+          "Radzen.Blazor": "[11.2.6, )"
         }
       },
       "AndreGoepel.Core": {
@@ -505,9 +505,9 @@
       },
       "Radzen.Blazor": {
         "type": "CentralTransitive",
-        "requested": "[11.2.4, )",
-        "resolved": "11.2.4",
-        "contentHash": "WrAMmcxeNOA+xsmVxjM3b6pONKQNDwBYx13Hp8AR4Hy1gruJgAJYQbVSJ3C0g9gIzOPxFS6sLgAZRoYF6rYw1A=="
+        "requested": "[11.2.6, )",
+        "resolved": "11.2.6",
+        "contentHash": "+Oq/IrCS4mrqSYD1ZFwMRirVdrIaaqNBoyuDO2zhbPn5jVi7Xf7oyIbLj5ktf0QGAslkd97eaXvZ9h/FaJ1T9g=="
       }
     }
   }
