@@ -36,7 +36,7 @@ public class ResetPasswordTests : BunitContext
 
     private IRenderedComponent<ResetPassword> Render(UserManager<User> userManager, string? code)
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         Services.AddSingleton(userManager);
         Services.AddSingleton(new NotificationService());
 

@@ -1,4 +1,3 @@
-using System.Globalization;
 using AndreGoepel.Marten.Identity.Blazor.Tests.TestSupport;
 using AndreGoepel.Marten.Identity.Users;
 using Bunit;
@@ -60,30 +59,12 @@ public class EmailLocalizationTests : BunitContext
 
     #region Helpers
 
-    private sealed class CultureScope : IDisposable
-    {
-        private readonly CultureInfo _culture = CultureInfo.CurrentCulture;
-        private readonly CultureInfo _uiCulture = CultureInfo.CurrentUICulture;
-
-        public CultureScope(string culture)
-        {
-            var info = CultureInfo.GetCultureInfo(culture);
-            CultureInfo.CurrentCulture = info;
-            CultureInfo.CurrentUICulture = info;
-        }
-
-        public void Dispose()
-        {
-            CultureInfo.CurrentCulture = _culture;
-            CultureInfo.CurrentUICulture = _uiCulture;
-        }
-    }
 
     private NotificationService Notifications => Services.GetRequiredService<NotificationService>();
 
     private IRenderedComponent<EmailPage> Render()
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var user = new User { Email = "alice@example.com" };
         var um = AuthenticatedUserContext.BuildUserManager();
         var (auth, principal) = AuthenticatedUserContext.BuildAuthState(user);

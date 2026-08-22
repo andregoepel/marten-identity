@@ -1,4 +1,3 @@
-using System.Globalization;
 using AndreGoepel.Marten.Identity.Blazor.Components.Account.Pages;
 using AndreGoepel.Marten.Identity.Http;
 using AndreGoepel.Marten.Identity.Users;
@@ -91,24 +90,6 @@ public class RegisterLocalizationTests : BunitContext
 
     #region Helpers
 
-    private sealed class CultureScope : IDisposable
-    {
-        private readonly CultureInfo _culture = CultureInfo.CurrentCulture;
-        private readonly CultureInfo _uiCulture = CultureInfo.CurrentUICulture;
-
-        public CultureScope(string culture)
-        {
-            var info = CultureInfo.GetCultureInfo(culture);
-            CultureInfo.CurrentCulture = info;
-            CultureInfo.CurrentUICulture = info;
-        }
-
-        public void Dispose()
-        {
-            CultureInfo.CurrentCulture = _culture;
-            CultureInfo.CurrentUICulture = _uiCulture;
-        }
-    }
 
     private static async Task SubmitAsync(
         IRenderedComponent<Register> cut,
@@ -128,7 +109,7 @@ public class RegisterLocalizationTests : BunitContext
         Action<UserManager<User>>? configure = null
     )
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var store = Substitute.For<IUserStore<User>, IUserEmailStore<User>>();
         var identityOptions = Options.Create(
             new IdentityOptions { SignIn = { RequireConfirmedAccount = true } }

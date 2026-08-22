@@ -1,4 +1,3 @@
-using System.Globalization;
 using System.Text;
 using AndreGoepel.Marten.Identity.Blazor.Components.Account.Pages;
 using AndreGoepel.Marten.Identity.Http;
@@ -77,24 +76,6 @@ public class AcceptInvitationLocalizationTests : BunitContext
 
     #region Helpers
 
-    private sealed class CultureScope : IDisposable
-    {
-        private readonly CultureInfo _culture = CultureInfo.CurrentCulture;
-        private readonly CultureInfo _uiCulture = CultureInfo.CurrentUICulture;
-
-        public CultureScope(string culture)
-        {
-            var info = CultureInfo.GetCultureInfo(culture);
-            CultureInfo.CurrentCulture = info;
-            CultureInfo.CurrentUICulture = info;
-        }
-
-        public void Dispose()
-        {
-            CultureInfo.CurrentCulture = _culture;
-            CultureInfo.CurrentUICulture = _uiCulture;
-        }
-    }
 
     private static string Encode(string token) =>
         WebEncoders.Base64UrlEncode(Encoding.UTF8.GetBytes(token));
@@ -128,7 +109,7 @@ public class AcceptInvitationLocalizationTests : BunitContext
         Action<UserManager<User>>? configure = null
     )
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var store = Substitute.For<IUserStore<User>>();
         var um = Substitute.For<UserManager<User>>(
             store,

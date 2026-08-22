@@ -11,7 +11,7 @@ public class ShowRecoveryCodesTests : BunitContext
     public void ShowRecoveryCodes_MultipleCodes_RendersEachCode()
     {
         // Arrange
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
 
         // Arrange / Act
         var cut = Render<ShowRecoveryCodes>(p =>
@@ -28,7 +28,7 @@ public class ShowRecoveryCodesTests : BunitContext
     public void ShowRecoveryCodes_SingleCode_RendersWarningAlert()
     {
         // Arrange
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
 
         // Arrange / Act
         var cut = Render<ShowRecoveryCodes>(p => p.Add(c => c.RecoveryCodes, ["CODE-ONE"]));
@@ -41,7 +41,7 @@ public class ShowRecoveryCodesTests : BunitContext
     public void ShowRecoveryCodes_EmptyCodes_StillRendersWarningAlert()
     {
         // Arrange
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
 
         // Arrange / Act
         var cut = Render<ShowRecoveryCodes>(p => p.Add(c => c.RecoveryCodes, []));

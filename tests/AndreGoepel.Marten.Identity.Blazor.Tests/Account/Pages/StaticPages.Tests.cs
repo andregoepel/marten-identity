@@ -15,7 +15,7 @@ public class StaticPagesTests : BunitContext
     public void AccessDenied_OnRender_RedirectsToRoot()
     {
         // Arrange
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
 
         // Act
         Render<AccessDenied>();
@@ -32,7 +32,7 @@ public class StaticPagesTests : BunitContext
     public void Lockout_OnRender_RendersLockoutMessage()
     {
         // Arrange
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
 
         // Arrange / Act
         var cut = Render<Lockout>();
@@ -45,7 +45,7 @@ public class StaticPagesTests : BunitContext
     public void Lockout_BackToLoginButton_NavigatesToLogin()
     {
         // Arrange
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var cut = Render<Lockout>();
 
         // Act
@@ -63,7 +63,7 @@ public class StaticPagesTests : BunitContext
     public void InvalidUser_OnRender_RendersErrorMessage()
     {
         // Arrange
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
 
         // Arrange / Act
         var cut = Render<InvalidUser>();
@@ -76,7 +76,7 @@ public class StaticPagesTests : BunitContext
     public void InvalidUser_GoToHomeButton_NavigatesToRoot()
     {
         // Arrange
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var cut = Render<InvalidUser>();
 
         // Act
@@ -94,7 +94,7 @@ public class StaticPagesTests : BunitContext
     public void ForgotPasswordConfirmation_OnRender_RendersCheckEmailMessage()
     {
         // Arrange
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
 
         // Arrange / Act
         var cut = Render<ForgotPasswordConfirmation>();
@@ -107,7 +107,7 @@ public class StaticPagesTests : BunitContext
     public void ForgotPasswordConfirmation_BackToLoginButton_NavigatesToLogin()
     {
         // Arrange
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var cut = Render<ForgotPasswordConfirmation>();
 
         // Act
@@ -125,7 +125,7 @@ public class StaticPagesTests : BunitContext
     public void ResetPasswordConfirmation_OnRender_RendersSuccessMessage()
     {
         // Arrange
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
 
         // Arrange / Act
         var cut = Render<ResetPasswordConfirmation>();
@@ -138,7 +138,7 @@ public class StaticPagesTests : BunitContext
     public void ResetPasswordConfirmation_LoginButton_NavigatesToLogin()
     {
         // Arrange
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var cut = Render<ResetPasswordConfirmation>();
 
         // Act

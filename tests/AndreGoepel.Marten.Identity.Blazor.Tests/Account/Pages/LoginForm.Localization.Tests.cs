@@ -1,4 +1,3 @@
-using System.Globalization;
 using AndreGoepel.Marten.Identity.Blazor.Components.Account.Pages;
 using AndreGoepel.Marten.Identity.Http;
 using AndreGoepel.Marten.Identity.Users;
@@ -99,24 +98,6 @@ public class LoginFormLocalizationTests : BunitContext
 
     #region Helpers
 
-    private sealed class CultureScope : IDisposable
-    {
-        private readonly CultureInfo _culture = CultureInfo.CurrentCulture;
-        private readonly CultureInfo _uiCulture = CultureInfo.CurrentUICulture;
-
-        public CultureScope(string culture)
-        {
-            var info = CultureInfo.GetCultureInfo(culture);
-            CultureInfo.CurrentCulture = info;
-            CultureInfo.CurrentUICulture = info;
-        }
-
-        public void Dispose()
-        {
-            CultureInfo.CurrentCulture = _culture;
-            CultureInfo.CurrentUICulture = _uiCulture;
-        }
-    }
 
     private async Task<NotificationMessage> CaptureNotification(
         Action<UserManager<User>, SignInManager<User>> configure
@@ -137,7 +118,7 @@ public class LoginFormLocalizationTests : BunitContext
         Action<UserManager<User>, SignInManager<User>>? configure = null
     )
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var um = Substitute.For<UserManager<User>>(
             Substitute.For<IUserStore<User>>(),
             null!,
