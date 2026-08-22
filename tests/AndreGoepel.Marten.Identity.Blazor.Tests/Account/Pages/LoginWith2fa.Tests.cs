@@ -14,7 +14,7 @@ public class LoginWith2FaTests : BunitContext
 
     private IRenderedComponent<LoginWith2fa> Render(string? error = null, string? returnUrl = null)
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var notificationService = new NotificationService();
         Services.AddSingleton(notificationService);
         Services.AddSingleton(new LoginTokenProtector(DataProtectionProvider.Create("Tests")));

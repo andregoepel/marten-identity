@@ -34,7 +34,7 @@ public class RegisterConfirmationTests : BunitContext
         string? email = null
     )
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         Services.AddSingleton(userManager);
 
         var nav = Services.GetRequiredService<NavigationManager>();
@@ -105,7 +105,7 @@ public class RegisterConfirmationTests : BunitContext
         var userManager = BuildUserManager();
         userManager.FindByEmailAsync(Arg.Any<string>()).Returns(Task.FromResult<User?>(null));
 
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         Services.AddSingleton(userManager);
         var nav = Services.GetRequiredService<NavigationManager>();
         nav.NavigateTo("/Account/RegisterConfirmation?Email=unknown%40example.com");

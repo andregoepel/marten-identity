@@ -47,7 +47,7 @@ public class LoginFormTests : BunitContext
         Action<UserManager<User>, SignInManager<User>>? configure = null
     )
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var um = BuildUserManager();
         var sm = BuildSignInManager(um);
         configure?.Invoke(um, sm);

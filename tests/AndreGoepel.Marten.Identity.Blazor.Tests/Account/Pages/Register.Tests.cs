@@ -24,7 +24,7 @@ public class RegisterTests : BunitContext
         bool requireConfirmedAccount = true
     )
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var store = Substitute.For<IUserStore<User>, IUserEmailStore<User>>();
         var identityOptions = Options.Create(
             new IdentityOptions { SignIn = { RequireConfirmedAccount = requireConfirmedAccount } }

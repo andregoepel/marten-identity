@@ -20,7 +20,7 @@ public class ChangePasswordTests : BunitContext
         Action<UserManager<User>, User>? configure = null
     )
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var user = new User { Email = "alice@example.com" };
         var um = AuthenticatedUserContext.BuildUserManager();
         var (auth, principal) = AuthenticatedUserContext.BuildAuthState(user);

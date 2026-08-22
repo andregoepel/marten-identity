@@ -17,7 +17,7 @@ public class LoginWithRecoveryCodeTests : BunitContext
         string? returnUrl = null
     )
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var notificationService = new NotificationService();
         Services.AddSingleton(notificationService);
         Services.AddSingleton(new LoginTokenProtector(DataProtectionProvider.Create("Tests")));

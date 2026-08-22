@@ -18,7 +18,7 @@ public class ProfileTests : BunitContext
         Action<UserManager<User>, User>? configure = null
     )
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var user = new User
         {
             Email = "alice@example.com",

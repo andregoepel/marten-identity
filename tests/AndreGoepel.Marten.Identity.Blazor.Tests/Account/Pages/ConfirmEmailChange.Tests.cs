@@ -58,7 +58,7 @@ public class ConfirmEmailChangeTests : BunitContext
         string? code = null
     )
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         Services.AddSingleton(userManager);
         Services.AddSingleton(signInManager);
 

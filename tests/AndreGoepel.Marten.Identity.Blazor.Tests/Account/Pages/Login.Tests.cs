@@ -55,7 +55,7 @@ public class LoginTests : BunitContext
 
     private IRenderedComponent<Login> Render(IdentityFeatureFlags flags)
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
 
         var um = Substitute.For<UserManager<User>>(
             Substitute.For<IUserStore<User>>(),

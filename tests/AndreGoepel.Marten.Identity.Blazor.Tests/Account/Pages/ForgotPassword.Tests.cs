@@ -18,7 +18,7 @@ public class ForgotPasswordTests : BunitContext
         Action<UserManager<User>>? configure = null
     )
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var store = Substitute.For<IUserStore<User>>();
         var um = Substitute.For<UserManager<User>>(
             store,

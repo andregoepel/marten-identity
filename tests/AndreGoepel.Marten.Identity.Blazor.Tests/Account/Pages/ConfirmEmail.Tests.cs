@@ -41,7 +41,7 @@ public class ConfirmEmailTests : BunitContext
         string? code = null
     )
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         Services.AddSingleton(userManager);
 
         var nav = Services.GetRequiredService<NavigationManager>();

@@ -109,7 +109,7 @@ public class ChangePasswordValidationTests : BunitContext
 
     private IRenderedComponent<ChangePassword> Render(UserManager<User>? userManager = null)
     {
-        JSInterop.Mode = JSRuntimeMode.Loose;
+        this.UseLooseJSInterop();
         var user = new User { Email = "alice@example.com" };
         var um = userManager ?? AuthenticatedUserContext.BuildUserManager();
         var (auth, principal) = AuthenticatedUserContext.BuildAuthState(user);
