@@ -644,7 +644,7 @@
         "dependencies": {
           "AndreGoepel.Core": "[1.0.2, )",
           "AndreGoepel.Marten.Configuration": "[1.2.1, )",
-          "AndreGoepel.Marten.Identity.Abstractions": "[1.8.0, )",
+          "AndreGoepel.Marten.Identity.Abstractions": "[2.0.1, )",
           "Marten": "[9.29.0, )",
           "Marten.AspNetCore": "[9.29.0, )",
           "Quartz.Extensions.Hosting": "[3.19.1, )"

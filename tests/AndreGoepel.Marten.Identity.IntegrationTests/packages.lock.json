@@ -4,9 +4,9 @@
     "net10.0": {
       "AndreGoepel.Marten.Testing": {
         "type": "Direct",
-        "requested": "[1.1.0, )",
-        "resolved": "1.1.0",
-        "contentHash": "pT6i++l8JEuwnx4gY2ZO+EwOGuuLZkR9uEzPSybfPTrdVHblttZN/nl0Bb//jCW1Nk6YXPmk5oX5/ZGpzuGuew==",
+        "requested": "[1.2.0, )",
+        "resolved": "1.2.0",
+        "contentHash": "rE7ASlAE0L9xoOASfDhBKEWysPz7FpfofK/jNPjWc8l30aFvwNIE2ntImrelULs0GQvX5QGij3NjKs9GiQHxyQ==",
         "dependencies": {
           "Marten": "9.29.0",
           "Testcontainers.PostgreSql": "4.14.0",
@@ -435,7 +435,7 @@
         "dependencies": {
           "AndreGoepel.Core": "[1.0.2, )",
           "AndreGoepel.Marten.Configuration": "[1.2.1, )",
-          "AndreGoepel.Marten.Identity.Abstractions": "[1.8.0, )",
+          "AndreGoepel.Marten.Identity.Abstractions": "[2.0.1, )",
           "Marten": "[9.29.0, )",
           "Marten.AspNetCore": "[9.29.0, )",
           "Quartz.Extensions.Hosting": "[3.19.1, )"
@@ -449,7 +449,7 @@
         "dependencies": {
           "AndreGoepel.Design.Blazor": "[1.6.4, )",
           "AndreGoepel.Marten.Configuration": "[1.2.1, )",
-          "AndreGoepel.Marten.Identity": "[1.8.0, )",
+          "AndreGoepel.Marten.Identity": "[2.0.1, )",
           "Marten": "[9.29.0, )",
           "Radzen.Blazor": "[11.2.6, )"
         }
