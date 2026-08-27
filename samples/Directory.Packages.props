@@ -4,23 +4,23 @@
   </PropertyGroup>
 
   <ItemGroup Label="Aspire (latest)">
-    <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.5.1" />
-    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.5.1" />
+    <PackageVersion Include="Aspire.Hosting.AppHost" Version="13.5.3" />
+    <PackageVersion Include="Aspire.Hosting.PostgreSQL" Version="13.5.3" />
   </ItemGroup>
 
   <ItemGroup Label="Aspire service defaults (latest)">
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.9.0" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.9.0" />
-    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.17.0" />
-    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.17.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.17.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.17.0" />
-    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.17.0" />
+    <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.18.0" />
+    <PackageVersion Include="OpenTelemetry.Extensions.Hosting" Version="1.18.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.18.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Http" Version="1.18.0" />
+    <PackageVersion Include="OpenTelemetry.Instrumentation.Runtime" Version="1.18.0" />
   </ItemGroup>
 
   <ItemGroup Label="Web (kept in step with the libraries under /src)">
     <PackageVersion Include="AndreGoepel.Design.Blazor" Version="1.6.4" />
-    <PackageVersion Include="Marten" Version="9.29.0" />
-    <PackageVersion Include="Radzen.Blazor" Version="11.2.6" />
+    <PackageVersion Include="Marten" Version="9.30.0" />
+    <PackageVersion Include="Radzen.Blazor" Version="11.2.7" />
   </ItemGroup>
 </Project>
