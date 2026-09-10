@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup Label="Scheduling">
-    <PackageVersion Include="Quartz.Extensions.Hosting" Version="3.20.0" />
+    <PackageVersion Include="Quartz.Extensions.Hosting" Version="4.0.1" />
   </ItemGroup>
 
   <ItemGroup Label="UI">
