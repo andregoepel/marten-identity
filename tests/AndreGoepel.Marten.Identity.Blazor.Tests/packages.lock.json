@@ -14,12 +14,12 @@
       },
       "bunit": {
         "type": "Direct",
-        "requested": "[2.9.0, )",
-        "resolved": "2.9.0",
-        "contentHash": "Jz9ywwpjjYHppFDw4bIMkk5cNOy0vN74p3PzJFVIlCZicK8vpAovM5LsuNDLKE4bpwISNKrjwSrsw4SIVzT+0g==",
+        "requested": "[2.10.3, )",
+        "resolved": "2.10.3",
+        "contentHash": "5PF4ATzf/o9T/8nNe1dkGRg24zFRweWLPegZeNOjsKgLzOTX88tzK7xc6ZopUgVTB0JVUxlog7E/g8VVzzZCKw==",
         "dependencies": {
-          "AngleSharp": "1.7.0",
-          "AngleSharp.Css": "1.0.1",
+          "AngleSharp": "1.8.0",
+          "AngleSharp.Css": "1.1.0",
           "AngleSharp.Diffing": "1.1.1",
           "Microsoft.AspNetCore.Components.WebAssembly": "10.0.10",
           "Microsoft.AspNetCore.Components.WebAssembly.Authentication": "10.0.10"
@@ -33,12 +33,12 @@
       },
       "Microsoft.NET.Test.Sdk": {
         "type": "Direct",
-        "requested": "[18.9.0, )",
-        "resolved": "18.9.0",
-        "contentHash": "xIzVXa/VpKXqDWzyC/5Hw8JbFY5u9k3Jc53CpcjBiOXvkQGio484LD9FNwOiGUSMDcYL3Rcw9sNgGi5WrswlPQ==",
+        "requested": "[18.10.0, )",
+        "resolved": "18.10.0",
+        "contentHash": "0CZZ688UBvpQFB9HKo7wrNJNVe+AOM4UtipgwpER3TTM+d2DDM6QyKkIJZTR3mpbn9/zFbZEtAgVIz4SPTjQZQ==",
         "dependencies": {
-          "Microsoft.CodeCoverage": "18.9.0",
-          "Microsoft.TestPlatform.TestHost": "18.9.0"
+          "Microsoft.CodeCoverage": "18.10.0",
+          "Microsoft.TestPlatform.TestHost": "18.10.0"
         }
       },
       "NSubstitute": {
@@ -67,13 +67,13 @@
       },
       "AngleSharp": {
         "type": "Transitive",
-        "resolved": "1.7.2",
-        "contentHash": "r1rb5Qo/0KPzmP0nbSiXPDVfh4Ctu0B+y1RyyUq73g4sgAmEW7q10RDyTq2ZsILwtO9O2LAvMrUles7eD4zz1g=="
+        "resolved": "1.8.0",
+        "contentHash": "vRW/0M11Jlfd7WkT5Kr0tXXmnWNVdxyII2S2b6AsgZCJEBGaXCUnti6nKIJTvAjmnmKcQbvn+SJ3lpt8dqoLIA=="
       },
       "AngleSharp.Css": {
         "type": "Transitive",
-        "resolved": "1.0.1",
-        "contentHash": "6S13xNHH+SUGPZd6EO1MhkuDbpEnFroUM6A8DZpLJHQnLRTvtBJb3Ydu65s618E4gWF9FSWmM5jhKk4RIfwT2A==",
+        "resolved": "1.1.0",
+        "contentHash": "ZnqL8SGy3rXjnJsoKY4kJ6hq4XPLFh0qtq76YAlEBx3qG/bwBnAwf6i+TzexIrLNjBsHLBVbogsl7OQie7FanQ==",
         "dependencies": {
           "AngleSharp": "[1.5.0, 2.0.0)"
         }
@@ -166,8 +166,8 @@
       },
       "Microsoft.CodeCoverage": {
         "type": "Transitive",
-        "resolved": "18.9.0",
-        "contentHash": "MtegCIKGuG0r/LCdIjoR1HgzCGIUBhR3aNdbtQpts5vMXQuqBDZ2Jsd2uFKoHFM2XrQV6ZrDf3F5oLi3SLTp8w=="
+        "resolved": "18.10.0",
+        "contentHash": "zo1hqV+Nz6FlIwdc+aPfrvGzqfKAPPaZ6OPj1W8C0QQE2xH951AZwTUytL3K7XX8brVBUFd7MhrLDl3CtK3U/A=="
       },
       "Microsoft.IO.RecyclableMemoryStream": {
         "type": "Transitive",
@@ -211,15 +211,15 @@
       },
       "Microsoft.TestPlatform.ObjectModel": {
         "type": "Transitive",
-        "resolved": "18.9.0",
-        "contentHash": "Fz/qXC52VXXopzHj7v2reCKcCqSxkTDCkEDfkNAH0vni/7qK/KLMiEYtRmnUanxO2F2g2zZZ60qCpxF0AF7URA=="
+        "resolved": "18.10.0",
+        "contentHash": "aXA7DDbnt6MYu3eLBEDksNdl09QxJ/PpMzrFcSxqEOk3RvRGJzhKI5mezVCEOcvveRhjfw/mvn6xVXC/rTaOog=="
       },
       "Microsoft.TestPlatform.TestHost": {
         "type": "Transitive",
-        "resolved": "18.9.0",
-        "contentHash": "Oq+Pma/J86aZL72t71bcESvDszDsTjUfl6PIsuDdPoKTHZfNMhKamCfLD5fKx51W/u0KozXtJo2/3fnt0sgPxg==",
+        "resolved": "18.10.0",
+        "contentHash": "Spu6C7bgz1PmWN+Y7wS0PfGCw9Kwv5RvJbCwyQaEWjcwpMire+qYMrcZ7qk8agjy6nd0sdHLc3ugCSrGuSbZdw==",
         "dependencies": {
-          "Microsoft.TestPlatform.ObjectModel": "18.9.0"
+          "Microsoft.TestPlatform.ObjectModel": "18.10.0"
         }
       },
       "Microsoft.Win32.Registry": {
@@ -262,15 +262,15 @@
       },
       "Quartz": {
         "type": "Transitive",
-        "resolved": "3.20.0",
-        "contentHash": "mDyb74DiYb4FYs0/hdCdBEq/lQ2Y3ekgVb2APEnJXc6imFqMKIlKV8pKKurfRDMh2fGZ+iXZfNm7nKfmd6wOOg=="
+        "resolved": "3.21.0",
+        "contentHash": "CmJsq4pQRuaEmiNksCsrV0T2D2fzlA9QcpjEPLKoLoCC6Xx3ghx1mbSUi5rywZ0koTxoCTwGDqREKILocKR1jw=="
       },
       "Quartz.Extensions.DependencyInjection": {
         "type": "Transitive",
-        "resolved": "3.20.0",
-        "contentHash": "s7Na0G4rSHRLIEWNGZxou69tpuzyimib8lAR7q7Cidmz8tK4ELLfgPpfI7cwZE//9qhOMZkK6b9Hju40ZMNhOQ==",
+        "resolved": "3.21.0",
+        "contentHash": "Kk2XM8GVg2otHneU/H23eP8BD52bzsqZUYjqqYlyw8nfN4ULYbpWHjMXlAibJ3ay9VwQg9dQzapDnHmLYuIibQ==",
         "dependencies": {
-          "Quartz": "3.20.0"
+          "Quartz": "3.21.0"
         }
       },
       "Spectre.Console": {
@@ -391,12 +391,12 @@
       "andregoepel.marten.identity": {
         "type": "Project",
         "dependencies": {
-          "AndreGoepel.Core": "[1.0.2, )",
-          "AndreGoepel.Marten.Configuration": "[1.2.2, )",
+          "AndreGoepel.Core": "[1.0.3, )",
+          "AndreGoepel.Marten.Configuration": "[1.2.3, )",
           "AndreGoepel.Marten.Identity.Abstractions": "[2.0.1, )",
           "Marten": "[9.33.0, )",
           "Marten.AspNetCore": "[9.33.0, )",
-          "Quartz.Extensions.Hosting": "[3.20.0, )"
+          "Quartz.Extensions.Hosting": "[3.21.0, )"
         }
       },
       "andregoepel.marten.identity.abstractions": {
@@ -405,8 +405,8 @@
       "andregoepel.marten.identity.blazor": {
         "type": "Project",
         "dependencies": {
-          "AndreGoepel.Design.Blazor": "[1.6.5, )",
-          "AndreGoepel.Marten.Configuration": "[1.2.2, )",
+          "AndreGoepel.Design.Blazor": "[1.6.7, )",
+          "AndreGoepel.Marten.Configuration": "[1.2.3, )",
           "AndreGoepel.Marten.Identity": "[2.0.1, )",
           "Marten": "[9.33.0, )",
           "Radzen.Blazor": "[11.3.2, )"
@@ -414,26 +414,26 @@
       },
       "AndreGoepel.Core": {
         "type": "CentralTransitive",
-        "requested": "[1.0.2, )",
-        "resolved": "1.0.2",
-        "contentHash": "ID0p+VW7eTAztE+gSDZPD03tm+2tNHJ2yHwKH0m6ECLNH+udSqwhHqvsxdVl1Wj3ODrpCbU2lMb8L+S8GChZoQ=="
+        "requested": "[1.0.3, )",
+        "resolved": "1.0.3",
+        "contentHash": "uD6um0xQzwZeGW74YhNjoB7FfvbP7bvDfA87k7QU71NbPtZ4iNTEmWOLcmF6V+02jb+Op9oMF3BfxNAog3kOsw=="
       },
       "AndreGoepel.Design.Blazor": {
         "type": "CentralTransitive",
-        "requested": "[1.6.5, )",
-        "resolved": "1.6.5",
-        "contentHash": "b2qp/WtyxF1PF5JsbAdBdYCnbjnv/zS6GQQxQHQG2XksSP1WVrQl5yUmOtve1NoUkyIR4g2XXDQIc7+AfflpGQ==",
+        "requested": "[1.6.7, )",
+        "resolved": "1.6.7",
+        "contentHash": "lbeQ771dbQnBv68xUWJOnLy8Y23svZPCvuvCkHzlyxqkue5Ky5q4ZoawOi/4ulYcejwhWmcfuSiMLbujU7dzNg==",
         "dependencies": {
-          "Radzen.Blazor": "11.2.8"
+          "Radzen.Blazor": "11.3.2"
         }
       },
       "AndreGoepel.Marten.Configuration": {
         "type": "CentralTransitive",
-        "requested": "[1.2.2, )",
-        "resolved": "1.2.2",
-        "contentHash": "ob9QZQTHGhPO3rXcujQSOqhTVfqrvpVCdMHJaDkIhIAQRByN/DwaYaNHtq0tAq4ebsXVRUS+SS1cD79MPW4BCA==",
+        "requested": "[1.2.3, )",
+        "resolved": "1.2.3",
+        "contentHash": "6m+8rPQh/W8bRUYYV0/hSAhehjWY77VDCIq6K3+Juo57hUrXYfw2JdbRMBdROf+12F13YVasdcvThB+zBq42Qw==",
         "dependencies": {
-          "Marten": "9.30.0"
+          "Marten": "9.31.2"
         }
       },
       "Marten": {
@@ -460,11 +460,11 @@
       },
       "Quartz.Extensions.Hosting": {
         "type": "CentralTransitive",
-        "requested": "[3.20.0, )",
-        "resolved": "3.20.0",
-        "contentHash": "pFcsLUhDYMt00jW6atTp0+/GJGVp3JKNdAXCxV0l/pTJKOmHmZ5bw4+aTVHdyRx0oodW3B17gK/gg9Hw0KGMLQ==",
+        "requested": "[3.21.0, )",
+        "resolved": "3.21.0",
+        "contentHash": "Zgyj3yTIvlWFzk1rinXs2yr/W+H/QVSwsFM2AD84KMFjkM6MHHc3huHHj1+8aW68QcQXZIMbRD1GE7DFxdbUgg==",
         "dependencies": {
-          "Quartz.Extensions.DependencyInjection": "3.20.0"
+          "Quartz.Extensions.DependencyInjection": "3.21.0"
         }
       },
       "Radzen.Blazor": {
