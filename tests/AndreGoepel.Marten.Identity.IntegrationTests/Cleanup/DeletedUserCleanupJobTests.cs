@@ -27,7 +27,7 @@ public class DeletedUserCleanupJobTests(MartenFixture fixture) : IAsyncLifetime
         var job = BuildJob(retentionDays: 30);
 
         // Act
-        await job.Execute(Context());
+        await job.Execute(Context(), TestContext.Current.CancellationToken);
 
         // Assert
         await using var session = fixture.Store.QuerySession();
@@ -45,7 +45,7 @@ public class DeletedUserCleanupJobTests(MartenFixture fixture) : IAsyncLifetime
         var job = BuildJob(retentionDays: 30);
 
         // Act
-        await job.Execute(Context());
+        await job.Execute(Context(), TestContext.Current.CancellationToken);
 
         // Assert
         await using var session = fixture.Store.QuerySession();
@@ -66,7 +66,7 @@ public class DeletedUserCleanupJobTests(MartenFixture fixture) : IAsyncLifetime
         var job = BuildJob(retentionDays: 30);
 
         // Act
-        await job.Execute(Context());
+        await job.Execute(Context(), TestContext.Current.CancellationToken);
 
         // Assert — projection gone, and the events no longer carry personal data.
         await using var session = fixture.Store.QuerySession();
@@ -92,7 +92,7 @@ public class DeletedUserCleanupJobTests(MartenFixture fixture) : IAsyncLifetime
         var job = BuildJob(retentionDays: -999999);
 
         // Act
-        await job.Execute(Context());
+        await job.Execute(Context(), TestContext.Current.CancellationToken);
 
         // Assert — the recently deleted user survives (clamp prevented the future cutoff).
         await using var session = fixture.Store.QuerySession();

@@ -46,7 +46,7 @@ public sealed class CleanupSettingsService(
 
         if (
             string.IsNullOrWhiteSpace(settings.CronSchedule)
-            || !CronExpression.IsValidExpression(settings.CronSchedule)
+            || !CronExpression.TryParse(settings.CronSchedule, out _)
         )
             throw new ArgumentException(
                 $"'{settings.CronSchedule}' is not a valid Quartz cron expression.",
@@ -68,7 +68,7 @@ public sealed class CleanupSettingsService(
     {
         var scheduler = await schedulerFactory.GetScheduler(ct);
         var trigger = await scheduler.GetTrigger(TriggerKey, ct);
-        return trigger?.GetNextFireTimeUtc();
+        return trigger?.NextFireTimeUtc;
     }
 
     public async Task SaveAsync(CleanupSettings settings, CancellationToken ct = default)

@@ -12,11 +12,14 @@ internal sealed class DeletedUserCleanupJob(
     ILogger<DeletedUserCleanupJob> logger
 ) : IJob
 {
-    public async Task Execute(IJobExecutionContext context)
+    public async ValueTask Execute(
+        IJobExecutionContext context,
+        CancellationToken cancellationToken
+    )
     {
         try
         {
-            var settings = await settingsService.GetAsync(context.CancellationToken);
+            var settings = await settingsService.GetAsync(cancellationToken);
 
             // Defence in depth against a bad retention value reaching the job (e.g.
             // persisted before validation existed, or written directly to the DB): a
@@ -33,7 +36,7 @@ internal sealed class DeletedUserCleanupJob(
             var usersToClean = await querySession
                 .Query<User>()
                 .Where(u => u.Deleted && u.DeletedAt < cutoff)
-                .ToListAsync(context.CancellationToken);
+                .ToListAsync(cancellationToken);
 
             if (usersToClean.Count == 0)
                 return;
@@ -55,7 +58,7 @@ internal sealed class DeletedUserCleanupJob(
                     foreach (var user in usersToClean)
                         masking.IncludeStream(user.StreamId);
                 },
-                context.CancellationToken
+                cancellationToken
             );
 
             using var session = documentStore.LightweightSession();
@@ -67,7 +70,7 @@ internal sealed class DeletedUserCleanupJob(
                 session.DeleteWhere<UserRoleAssignment>(a => a.UserGuid == streamId);
             }
 
-            await session.SaveChangesAsync(context.CancellationToken);
+            await session.SaveChangesAsync(cancellationToken);
         }
         catch (Exception ex)
         {
