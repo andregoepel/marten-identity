@@ -514,14 +514,14 @@
       },
       "Quartz": {
         "type": "Transitive",
-        "resolved": "4.0.1",
-        "contentHash": "Z+UmHAn99DiRVk59KLKPLuXqkIYIVWb2JI5WuwtO45XqIY1Lz6FGD1/spM7sqB9d8VRDtHkkhyjeynS1uAi05w==",
+        "resolved": "4.1.0",
+        "contentHash": "PvDVogimvV3ZqpyXOFiQWPIAC9FmGRq/P8WLEuI2iVHvjo++riFdXFcu2P3T9EJ2p8KLAohy79TA9DXbFYMKOg==",
         "dependencies": {
           "Microsoft.Extensions.Configuration.Binder": "10.0.0",
           "Microsoft.Extensions.DependencyInjection": "10.0.0",
           "Microsoft.Extensions.Diagnostics.HealthChecks": "10.0.0",
           "Microsoft.Extensions.Hosting.Abstractions": "10.0.0",
-          "Microsoft.Extensions.Logging": "10.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.0",
           "Microsoft.Extensions.Options.ConfigurationExtensions": "10.0.0"
         }
       },
@@ -653,7 +653,7 @@
           "AndreGoepel.Marten.Identity.Abstractions": "[2.0.1, )",
           "Marten": "[9.37.0, )",
           "Marten.AspNetCore": "[9.37.0, )",
-          "Quartz.Extensions.Hosting": "[4.0.1, )"
+          "Quartz.Extensions.Hosting": "[4.1.0, )"
         }
       },
       "andregoepel.marten.identity.abstractions": {
@@ -701,11 +701,11 @@
       },
       "Quartz.Extensions.Hosting": {
         "type": "CentralTransitive",
-        "requested": "[4.0.1, )",
-        "resolved": "4.0.1",
-        "contentHash": "mi9gHtpeQCqUlgMCmZm34NdYWsOr7PB2THRu6t7mLoYvNYYXSDkUWZYWMyoTrr/pD9HjtWbp6HykpNyEEm6SkA==",
+        "requested": "[4.1.0, )",
+        "resolved": "4.1.0",
+        "contentHash": "6VvH64knZzS9geEi80FR/dXYBNgvs1WDSP5d473WbULqnx2vJfQDYeihAH2STXpn/quYtkH+6tcpXN/W9Mrb+Q==",
         "dependencies": {
-          "Quartz": "4.0.1"
+          "Quartz": "4.1.0"
         }
       }
     }

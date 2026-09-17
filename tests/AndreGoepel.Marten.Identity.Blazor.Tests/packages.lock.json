@@ -262,8 +262,8 @@
       },
       "Quartz": {
         "type": "Transitive",
-        "resolved": "4.0.1",
-        "contentHash": "Z+UmHAn99DiRVk59KLKPLuXqkIYIVWb2JI5WuwtO45XqIY1Lz6FGD1/spM7sqB9d8VRDtHkkhyjeynS1uAi05w=="
+        "resolved": "4.1.0",
+        "contentHash": "PvDVogimvV3ZqpyXOFiQWPIAC9FmGRq/P8WLEuI2iVHvjo++riFdXFcu2P3T9EJ2p8KLAohy79TA9DXbFYMKOg=="
       },
       "Spectre.Console": {
         "type": "Transitive",
@@ -388,7 +388,7 @@
           "AndreGoepel.Marten.Identity.Abstractions": "[2.0.1, )",
           "Marten": "[9.37.0, )",
           "Marten.AspNetCore": "[9.37.0, )",
-          "Quartz.Extensions.Hosting": "[4.0.1, )"
+          "Quartz.Extensions.Hosting": "[4.1.0, )"
         }
       },
       "andregoepel.marten.identity.abstractions": {
@@ -401,7 +401,7 @@
           "AndreGoepel.Marten.Configuration": "[1.2.4, )",
           "AndreGoepel.Marten.Identity": "[2.0.1, )",
           "Marten": "[9.37.0, )",
-          "Radzen.Blazor": "[11.3.2, )"
+          "Radzen.Blazor": "[11.4.0, )"
         }
       },
       "AndreGoepel.Core": {
@@ -452,18 +452,18 @@
       },
       "Quartz.Extensions.Hosting": {
         "type": "CentralTransitive",
-        "requested": "[4.0.1, )",
-        "resolved": "4.0.1",
-        "contentHash": "mi9gHtpeQCqUlgMCmZm34NdYWsOr7PB2THRu6t7mLoYvNYYXSDkUWZYWMyoTrr/pD9HjtWbp6HykpNyEEm6SkA==",
+        "requested": "[4.1.0, )",
+        "resolved": "4.1.0",
+        "contentHash": "6VvH64knZzS9geEi80FR/dXYBNgvs1WDSP5d473WbULqnx2vJfQDYeihAH2STXpn/quYtkH+6tcpXN/W9Mrb+Q==",
         "dependencies": {
-          "Quartz": "4.0.1"
+          "Quartz": "4.1.0"
         }
       },
       "Radzen.Blazor": {
         "type": "CentralTransitive",
-        "requested": "[11.3.2, )",
-        "resolved": "11.3.2",
-        "contentHash": "QtTy0/MZ5QFt50yDprnP2sBzCZWbqXpcYrdTHyX/DzSuOpdPUVw5m/zWzp6ZAdbfaWIAXHJhv7M4pEFCzLideg=="
+        "requested": "[11.4.0, )",
+        "resolved": "11.4.0",
+        "contentHash": "Gv36bvGh6UQlC/YfRtuWVGcCmZlXLM7tnEaJgHhNCF9bpQUSA0WtDVJTS5ulF5nT6j2n5pXBG98qRsUX39G6xg=="
       }
     }
   }
