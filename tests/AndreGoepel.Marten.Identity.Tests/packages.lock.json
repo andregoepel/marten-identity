@@ -649,7 +649,7 @@
         "type": "Project",
         "dependencies": {
           "AndreGoepel.Core": "[1.0.4, )",
-          "AndreGoepel.Marten.Configuration": "[1.2.5, )",
+          "AndreGoepel.Marten.Configuration": "[1.2.6, )",
           "AndreGoepel.Marten.Identity.Abstractions": "[2.0.1, )",
           "Marten": "[9.45.0, )",
           "Marten.AspNetCore": "[9.45.0, )",
@@ -667,11 +667,11 @@
       },
       "AndreGoepel.Marten.Configuration": {
         "type": "CentralTransitive",
-        "requested": "[1.2.5, )",
-        "resolved": "1.2.5",
-        "contentHash": "66cGukKc7uS1JF6nBNlyvKVmWHj8GhOkKtDea9UUQGobiL20A2V/XUBDUeHXAm4a2W3JDfpP/17n3957kyLAUQ==",
+        "requested": "[1.2.6, )",
+        "resolved": "1.2.6",
+        "contentHash": "LPytGVnOQqV3+8W4hLzk1fNJXsEkCB2jJ6zhS0AawNj7JiE4AfssQLc+YzUlBrt3jJu06lxAazX7Uy1Jm1R5DQ==",
         "dependencies": {
-          "Marten": "9.39.0",
+          "Marten": "9.45.0",
           "Microsoft.AspNetCore.DataProtection.Abstractions": "10.0.12",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.12"
         }
