@@ -8,10 +8,18 @@ var isE2E = string.Equals(builder.Configuration["E2E"], "true", StringComparison
 // A PostgreSQL container that backs Marten's event store. WithDataVolume keeps the
 // data across runs (so the first administrator you create in the Setup page survives
 // restarts) and WithPgAdmin adds a browser-based admin UI as a companion container.
-var postgres = builder.AddPostgres("postgres");
+var postgres = builder
+    .AddPostgres("postgres")
+    .WithImageTag("18.4@sha256:a02db8cac496f15b094798a38254f14d6e00741f709360e5e00bb6668ea31636");
 if (!isE2E)
 {
-    postgres = postgres.WithDataVolume("marten-identity-data").WithPgAdmin();
+    postgres = postgres
+        .WithDataVolume("marten-identity-data")
+        .WithPgAdmin(pgAdmin =>
+            pgAdmin.WithImageTag(
+                "9.18.0@sha256:c332c5f6dfba995d9ebc4af261d93506d6876085d712eaaa3defc8dd1a3f26de"
+            )
+        );
 }
 
 // The logical database. Aspire hands its connection string to the web app below as the
