@@ -14,15 +14,15 @@
       },
       "bunit": {
         "type": "Direct",
-        "requested": "[2.11.3, )",
-        "resolved": "2.11.3",
-        "contentHash": "tyHufngemDi1XAfS4kx0hNZBw3HT73M/Qsj+szQTMrDpLJB2BPPBFpWh70j/b1RF289ix1zDqd7vMcgf6rAysw==",
+        "requested": "[2.12.5, )",
+        "resolved": "2.12.5",
+        "contentHash": "1olbwxyrcxaZVXXz1pRCkvlecG0oPjidxv1e0nalOrOy94snZ83G8jEPx5WaY3483aKo+GmQpp2oOxwM0nt6Lw==",
         "dependencies": {
-          "AngleSharp": "1.8.1",
-          "AngleSharp.Css": "1.1.2",
+          "AngleSharp": "1.8.5",
+          "AngleSharp.Css": "1.1.3",
           "AngleSharp.Diffing": "1.1.1",
-          "Microsoft.AspNetCore.Components.WebAssembly": "10.0.10",
-          "Microsoft.AspNetCore.Components.WebAssembly.Authentication": "10.0.10"
+          "Microsoft.AspNetCore.Components.WebAssembly": "10.0.13",
+          "Microsoft.AspNetCore.Components.WebAssembly.Authentication": "10.0.13"
         }
       },
       "coverlet.collector": {
@@ -72,8 +72,8 @@
       },
       "AngleSharp.Css": {
         "type": "Transitive",
-        "resolved": "1.1.2",
-        "contentHash": "7o5yCTuURjxmjy+O5/2EDQihTwnVlbeg9cIO+Zq8zDLt/7AZWebOfIxij+cejBGUBMad95wl5VlY3XFo3VQuCg==",
+        "resolved": "1.1.3",
+        "contentHash": "oWkfG/aJhRbDp3Lj1PiQqP0WHWQI+/kPs7Xkbt3mCMUCUiDl01jfLnT7ofe2XUCTvSi5pXWDMQticPM7pCkoBA==",
         "dependencies": {
           "AngleSharp": "[1.5.0, 2.0.0)"
         }
@@ -130,16 +130,16 @@
       },
       "Microsoft.AspNetCore.Components.WebAssembly": {
         "type": "Transitive",
-        "resolved": "10.0.10",
-        "contentHash": "0Zib7U6HmGw4Noj/+yJz1YuEJwo3XOV0iLezXDLFsrHTaC8L+KUOR/1+1tX7AAeipDG6jP3gPZOwpirk6G3LYQ==",
+        "resolved": "10.0.13",
+        "contentHash": "w3V2ij4WptDXOLLu78o3/SIqHIVoW6uzCjKZzSr4hTJFKvv8/79YhwRyyGonktM+qP8hrFvBVNCQa51ZpoJ6Cw==",
         "dependencies": {
-          "Microsoft.JSInterop.WebAssembly": "10.0.10"
+          "Microsoft.JSInterop.WebAssembly": "10.0.13"
         }
       },
       "Microsoft.AspNetCore.Components.WebAssembly.Authentication": {
         "type": "Transitive",
-        "resolved": "10.0.10",
-        "contentHash": "D2GIsqVJ2+tVDViJmbEF4tc+gxhdAl5xkBAMZHWCJV7Pt+oBkU2omBSRbgVTq3N2OgreVNSp7w+FrZNgu97d5A=="
+        "resolved": "10.0.13",
+        "contentHash": "zS+Mr95eeC5NjVBawlOIWYUelUbcTV/EdudX0eVzYGwdamf1+pU8QIVzwXH7mtEs1I2rCAkmta1QhOcw1EUEsQ=="
       },
       "Microsoft.Bcl.AsyncInterfaces": {
         "type": "Transitive",
@@ -177,8 +177,8 @@
       },
       "Microsoft.JSInterop.WebAssembly": {
         "type": "Transitive",
-        "resolved": "10.0.10",
-        "contentHash": "FjPAGQWbCP85FWY2Wl9opHSsY+u9nZb8Ui6eTVHEMY/RJateOhW78jEtC4QOQ/6slkS1MKyIAF6ZHIrUR1fX/w=="
+        "resolved": "10.0.13",
+        "contentHash": "kh68RQ3KmgKSsIpkQetbuHxxLEsIkjaJ+GfJhGn7NQCgrT067JXGmbCzXM42uiPcdXW5dJ8S5AKwJcyRDJFWzQ=="
       },
       "Microsoft.Testing.Extensions.Telemetry": {
         "type": "Transitive",
