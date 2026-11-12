@@ -20,7 +20,7 @@
 
   <ItemGroup Label="UI">
     <PackageVersion Include="AndreGoepel.Design.Blazor" Version="1.7.2" />
-    <PackageVersion Include="Radzen.Blazor" Version="12.1.4" />
+    <PackageVersion Include="Radzen.Blazor" Version="13.0.0" />
   </ItemGroup>
 
   <ItemGroup Label="E2E (browser-driven tests)">
